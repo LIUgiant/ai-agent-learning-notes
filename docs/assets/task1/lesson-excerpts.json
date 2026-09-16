@@ -1,0 +1,103 @@
+{
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "excerpts": [
+    {
+      "file": "run_learning.py",
+      "start": 48,
+      "end": 51,
+      "sha256": "25577141145b7bb52afa22568f0c2f2d6e57d148faea47de6c9cf802bb685b3f",
+      "kind": "学习运行脚本原文"
+    },
+    {
+      "file": "chapter2/context-compression/compression_strategies.py",
+      "start": 117,
+      "end": 124,
+      "sha256": "719b30d4137502ed0627986cfc596f16c21ad5f183972870071ef9e8aa76fa76",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter2/context-compression/compression_strategies.py",
+      "start": 530,
+      "end": 546,
+      "sha256": "1582ab935e6fc22506bd0532a0019edbe2c7baef071c1bcea793e234a4fce67c",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "run_learning.py",
+      "start": 31,
+      "end": 36,
+      "sha256": "fb433622605ee4d281fd535c0baf139dad7062feae42bf890ec7ced657ad9030",
+      "kind": "学习运行脚本原文"
+    },
+    {
+      "file": "chapter3/user-memory/memory_manager.py",
+      "start": 162,
+      "end": 172,
+      "sha256": "b37c9a7b45afb81c79df063f0339b44f8958a56b65afbf41496e44b8bfefd956",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter3/user-memory/memory_manager.py",
+      "start": 148,
+      "end": 157,
+      "sha256": "ca738c7a8e51e77bf31fc7f4749ff776a9a9dce0ff084ffce8ffaf89c415f427",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter3/user-memory/memory_manager.py",
+      "start": 127,
+      "end": 140,
+      "sha256": "67b8d30a798b467ee8d3247ce6e1ff34cafdd6fccccb83f549d4bb164a5ca975",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "run_learning.py",
+      "start": 77,
+      "end": 79,
+      "sha256": "22f0f778b2e9cb7bfcd9a10a436237c74c0a076f9b34ee64b6241f5cae030973",
+      "kind": "学习运行脚本原文"
+    },
+    {
+      "file": "chapter3/sparse-embedding/bm25_engine.py",
+      "start": 170,
+      "end": 184,
+      "sha256": "6d4cb5188b4faecc13483acb84d473b97bbe5af43019ca1d211814c2def66a71",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter3/sparse-embedding/bm25_engine.py",
+      "start": 362,
+      "end": 378,
+      "sha256": "74a116ef27d1dc121c37acb2a4943864ae26ab6f5c51d1509394e524708e1735",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter3/sparse-embedding/bm25_engine.py",
+      "start": 303,
+      "end": 324,
+      "sha256": "334398ec51ef7d8e2e5df75cb664b92c47e2f423fd72f22db0d6f6c841c297d8",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "chapter3/sparse-embedding/bm25_engine.py",
+      "start": 396,
+      "end": 400,
+      "sha256": "dbf5c0037c978cda6595dc0f680f4db2b79b9ee8a7770c941a132d3c774460a5",
+      "kind": "课程源码原文"
+    },
+    {
+      "file": "run_learning.py",
+      "start": 97,
+      "end": 102,
+      "sha256": "39376d76d47ff0fc13429d380246543eb1cafc71c13825ff0d1099e14c73e8e4",
+      "kind": "学习运行脚本原文"
+    },
+    {
+      "file": "run_learning.py",
+      "start": 103,
+      "end": 106,
+      "sha256": "2639a04591a9ccfb4269f54723931eb6121052d31d6d634de5305f9fc3b76f10",
+      "kind": "学习运行脚本原文"
+    }
+  ]
+}

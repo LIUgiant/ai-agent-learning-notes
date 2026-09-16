@@ -64,9 +64,15 @@ nav:
   - Task 1 · 上下文与 Memory / RAG:
       - 学习任务与范围: task1/index.md
       - 概念与项目联系: task1/concepts.md
-      - 上下文组织与压缩: task1/context.md
-      - 跨会话长期记忆: task1/memory.md
-      - 检索与 RAG: task1/rag.md
+      - 上下文组织与压缩:
+          - 实验说明: task1/context.md
+          - 一步步读源码: task1/context-code.md
+      - 跨会话长期记忆:
+          - 实验说明: task1/memory.md
+          - 一步步读源码: task1/memory-code.md
+      - 检索与 RAG:
+          - 实验说明: task1/rag.md
+          - 一步步读源码: task1/rag-code.md
       - 实验结果与源码复现: task1/evidence.md
   - 持续学习:
       - Task 索引: tasks.md

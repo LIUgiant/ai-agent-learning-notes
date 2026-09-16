@@ -1,5 +1,9 @@
 # 上下文实验 · 内容少了，答案还能完整吗？
 
+!!! tip "先跑实验，再跟着代码走一遍"
+    [进入本实验的逐步源码教程](context-code.md)：设计问题、真实代码、SVG 数据变化、练习与 Python Tutor 模拟。
+
+
 [本次结果](evidence.md#context) · [源码与复现](evidence.md#source)
 
 ## 第一步：先把资料完整传给模型

@@ -1,5 +1,9 @@
 # Memory 实验 · 换一个会话，模型还记得吗？
 
+!!! tip "先跑实验，再跟着代码走一遍"
+    [进入本实验的逐步源码教程](memory-code.md)：设计问题、真实代码、SVG 数据变化、练习与 Python Tutor 模拟。
+
+
 [本次结果](evidence.md#memory) · [源码与复现](evidence.md#source)
 
 ## 第一步：明确短期与长期的边界
