@@ -1,0 +1,56 @@
+site_url: https://LIUgiant.github.io/ai-study-notes/
+repo_url: https://github.com/LIUgiant/ai-study-notes
+repo_name: LIUgiant/ai-study-notes
+site_name: AI 学习手记
+site_description: 从实验现象出发，理解 Agent 的代码与设计。
+use_directory_urls: false
+theme:
+  name: material
+  language: zh
+  font: false
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+plugins:
+  - search:
+      lang: [zh, en]
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+extra_css:
+  - stylesheets/notes.css
+extra_javascript:
+  - javascripts/notes.js
+nav:
+  - 首页: index.md
+  - Task 0 · Agent 基础:
+      - 学习导读: task0/index.md
+      - 基础概念: task0/concepts.md
+      - 环境与离线验证: task0/environment.md
+      - 1-1 上下文消融: task0/ablation.md
+      - 1-1 源码逐组解读: task0/source.md
+      - 1-2 多轮搜索: task0/search.md
+      - 1-3 搜索与计算: task0/research.md
+      - 1-4 生图工作流: task0/images.md
+      - 复盘与证据边界: task0/review.md
+  - 持续学习:
+      - Task 索引: tasks.md
+      - 新 Task 写作模板: template.md
+      - 网站维护与发布: maintaining.md
