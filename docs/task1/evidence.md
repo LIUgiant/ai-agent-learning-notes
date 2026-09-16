@@ -3,7 +3,8 @@
 ## 本次运行信息
 
 - 运行目录：`learning/task1/runs/20260916T154639Z`（UTC 时间戳）。
-- 模型：`deepseek-v4-flash`；实际请求关闭 thinking；15 次真实调用，总 usage 为 **4109 tokens**。
+- 请求模型：`deepseek-v4-flash`；15 次响应的服务端模型标识均为 `deepseek-flash`。记录两种名称，不据别名推断额外版本信息。
+- 实际请求关闭 thinking；15 次真实调用，总 usage 为 **4109 tokens**。
 - 数据：人工客服 / 实时对话案例 + 课程自带英文检索语料，没有使用私人业务资料。
 - 每个模型条件仅一次；结论只适用于本次观察，不报告普遍成功率。
 - [完整请求与响应证据](../assets/task1/evidence.json) · [SHA-256](../assets/task1/evidence.sha256) · [独立审计](../assets/task1/audit.json)
