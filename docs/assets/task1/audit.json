@@ -1,0 +1,483 @@
+{
+  "evidence_sha256": "003028672307d4012d167065a2b69876fa6354fc5bf1e3d02ffc58b098d0a151",
+  "single_variable_retrieval": [
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 1,
+      "mean_recall": 0.7,
+      "mean_precision_at_k": 0.8,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3"
+          ],
+          "recall": 0.5,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 3,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.3333333333333333,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.6666666666666666
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 5,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.2,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.4
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 0.7,
+      "b": 0.75,
+      "top_k": 1,
+      "mean_recall": 0.7,
+      "mean_precision_at_k": 0.8,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3"
+          ],
+          "recall": 0.5,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 0.7,
+      "b": 0.75,
+      "top_k": 3,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.3333333333333333,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.6666666666666666
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 0.7,
+      "b": 0.75,
+      "top_k": 5,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.2,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.4
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 1.5,
+      "b": 0,
+      "top_k": 1,
+      "mean_recall": 0.7,
+      "mean_precision_at_k": 0.8,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3"
+          ],
+          "recall": 0.5,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 1.5,
+      "b": 0,
+      "top_k": 3,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.3333333333333333,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.6666666666666666
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    },
+    {
+      "k1": 1.5,
+      "b": 0,
+      "top_k": 5,
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.2,
+      "cases": [
+        {
+          "query": "model distillation",
+          "ids": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.4
+        },
+        {
+          "query": "HTTP 404 error",
+          "ids": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "ids": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "BM25 ranking function",
+          "ids": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2
+        },
+        {
+          "query": "cat",
+          "ids": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0
+        }
+      ]
+    }
+  ],
+  "rag_audit": [
+    {
+      "top_k": 0,
+      "prompt": "strict",
+      "json_schema_pass": true,
+      "strict_citation_ids_pass": true,
+      "normalized_citation_ids_pass": true,
+      "normalization": "strip surrounding square brackets only",
+      "manual_review": "No evidence; all four fields null. Correct abstention, not successful fact retrieval."
+    },
+    {
+      "top_k": 1,
+      "prompt": "strict",
+      "json_schema_pass": true,
+      "strict_citation_ids_pass": false,
+      "normalized_citation_ids_pass": false,
+      "normalization": "strip surrounding square brackets only",
+      "manual_review": "top-1 cites T42, a ticket ID rather than a document ID."
+    },
+    {
+      "top_k": 3,
+      "prompt": "strict",
+      "json_schema_pass": true,
+      "strict_citation_ids_pass": false,
+      "normalized_citation_ids_pass": true,
+      "normalization": "strip surrounding square brackets only",
+      "manual_review": "See per-field checks; top-3 sources are bracketed document IDs."
+    },
+    {
+      "top_k": 3,
+      "prompt": "loose",
+      "json_schema_pass": false,
+      "strict_citation_ids_pass": true,
+      "normalized_citation_ids_pass": true,
+      "normalization": "strip surrounding square brackets only",
+      "manual_review": "No JSON; prose states all 3 facts correctly and abstains on phone. Failure is format, not factual hallucination."
+    }
+  ],
+  "notes": [
+    "Fixed synthetic fixture; one model run per condition.",
+    "Original combined k1/b change retained as exploratory only.",
+    "No JSON prose manually reviewed against the fixed facts; no general semantic judge claimed."
+  ]
+}

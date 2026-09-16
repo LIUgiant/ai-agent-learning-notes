@@ -56,3 +56,7 @@
 本站是个人学习与实验记录，参考 [《深入理解 AI Agent》](https://bojieli.github.io/ai-agent-book/) 学习，采用同样的 Material for MkDocs 文档形式。课程原文、个人理解和实测结论分别标注。
 
 每个 Task 使用独立目录；笔记以 Markdown 保存，代码块、图片和流程图进入 Git 版本管理。更新推送后由 GitHub Actions 构建并发布。
+
+## Task 1 · 上下文工程与 Memory / RAG
+
+已记录上下文压缩、长期记忆、BM25 与 RAG 的真实运行及参数对照。[进入 Task 1](task1/index.md)。

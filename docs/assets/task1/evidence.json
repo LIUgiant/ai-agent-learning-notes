@@ -1,0 +1,1452 @@
+{
+  "scope": "Task1 learning variants; not full chapter reproduction",
+  "fixture": "synthetic support and realtime scenarios; not actual company policies",
+  "model": "deepseek-v4-flash",
+  "calls": [
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a helpful assistant that creates comprehensive summaries."
+          },
+          {
+            "role": "user",
+            "content": "Summarize the following combined webpage content comprehensively:\n\n\n===== Page: Synthetic support note =====\nURL: https://example.invalid/support\nContent: Ticket T42: refunds arrive in 13 business days.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: escalation code is ORBIT-62.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n\n\nRequirements:\n1. Create a comprehensive summary covering all pages\n2. Include key information from each source\n3. Maintain factual accuracy\n4. Maximum length: 180 tokens\n\nProvide a comprehensive summary:"
+          }
+        ],
+        "temperature": 0.3,
+        "max_tokens": 180,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "666ec12e-e8cb-4564-b712-45dae4ba7763",
+        "created": 1789573638,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 94,
+          "prompt_tokens": 720,
+          "total_tokens": 814,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 720
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "The page at example.invalid/support contains support ticket T42 details interspersed with repeated filler text about a design meeting. Key facts from Ticket T42: refunds arrive in 13 business days; the escalation code is ORBIT-62; and the realtime reconnect retry limit is 4. The repeated design meeting content mentions button colors, illustration spacing, onboarding videos, and documentation typography, but adds no substantive information. No other pages are present."
+      },
+      "finish_reason": "stop",
+      "seconds": 1.362
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a helpful assistant that creates focused, context-aware summaries."
+          },
+          {
+            "role": "user",
+            "content": "Given the search query: \"For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts.\"\n\n\nAnalyze the following search results and provide a focused summary that directly addresses the query.\nFocus on extracting information most relevant to answering: For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts.\n\nSearch Results:\n\nTitle: Synthetic support note\nURL: https://example.invalid/support\nContent: Ticket T42: refunds arrive in 13 business days.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: escalation code is ORBIT-62.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n\n\nRequirements:\n1. Focus only on information relevant to the query\n2. Prioritize current/recent information\n3. Include specific names, dates, and affiliations\n4. Maximum length: 180 tokens\n\nProvide a query-focused summary:"
+          }
+        ],
+        "temperature": 0.3,
+        "max_tokens": 180,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "4335b394-54ff-4287-9d3d-cee97085ad43",
+        "created": 1789573639,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 139,
+          "prompt_tokens": 803,
+          "total_tokens": 942,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 803
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "For ticket T42, the search results provide:\n\n- **refund_days**: 13 (refunds arrive in 13 business days)\n- **escalation_code**: \"ORBIT-62\"\n- **retry_limit**: 4 (realtime reconnect retry limit)\n\nAll three requested keys are present; no nulls needed.\n\n```json\n{\n  \"refund_days\": 13,\n  \"escalation_code\": \"ORBIT-62\",\n  \"retry_limit\": 4\n}\n```\n\nSource: Synthetic support note (https://example.invalid/support). The remaining content concerns unrelated design meeting topics and is not relevant to ticket T42."
+      },
+      "finish_reason": "stop",
+      "seconds": 1.229
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from supplied context. Return JSON only; never guess missing values."
+          },
+          {
+            "role": "user",
+            "content": "\n===== Search Result =====\nTitle: Synthetic support note\nURL: https://example.invalid/support\nSnippet: Synthetic fixture; not authoritative policy.\n\nFull Content:\nTicket T42: refunds arrive in 13 business days.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: escalation code is ORBIT-62.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n========================\n\nQUESTION: For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "2340fc60-a761-4600-9c61-8d587e80ee0b",
+        "created": 1789573640,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 29,
+          "prompt_tokens": 719,
+          "total_tokens": 748,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 719
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"refund_days\": 13, \"escalation_code\": \"ORBIT-62\", \"retry_limit\": 4}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.741
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from supplied context. Return JSON only; never guess missing values."
+          },
+          {
+            "role": "user",
+            "content": "discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n========================\n\nQUESTION: For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "43bd91d3-9363-464d-83d8-1e13e7d7d37a",
+        "created": 1789573641,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 24,
+          "prompt_tokens": 127,
+          "total_tokens": 151,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 127
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"refund_days\": null, \"escalation_code\": null, \"retry_limit\": 4}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.884
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from supplied context. Return JSON only; never guess missing values."
+          },
+          {
+            "role": "user",
+            "content": "The page at example.invalid/support contains support ticket T42 details interspersed with repeated filler text about a design meeting. Key facts from Ticket T42: refunds arrive in 13 business days; the escalation code is ORBIT-62; and the realtime reconnect retry limit is 4. The repeated design meeting content mentions button colors, illustration spacing, onboarding videos, and documentation typography, but adds no substantive information. No other pages are present.\nQUESTION: For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "dc30f8f4-5463-42a2-a8a7-e9e37ca8578f",
+        "created": 1789573642,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 29,
+          "prompt_tokens": 141,
+          "total_tokens": 170,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 141
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"refund_days\": 13, \"escalation_code\": \"ORBIT-62\", \"retry_limit\": 4}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.743
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from supplied context. Return JSON only; never guess missing values."
+          },
+          {
+            "role": "user",
+            "content": "For ticket T42, the search results provide:\n\n- **refund_days**: 13 (refunds arrive in 13 business days)\n- **escalation_code**: \"ORBIT-62\"\n- **retry_limit**: 4 (realtime reconnect retry limit)\n\nAll three requested keys are present; no nulls needed.\n\n```json\n{\n  \"refund_days\": 13,\n  \"escalation_code\": \"ORBIT-62\",\n  \"retry_limit\": 4\n}\n```\n\nSource: Synthetic support note (https://example.invalid/support). The remaining content concerns unrelated design meeting topics and is not relevant to ticket T42.\nQUESTION: For ticket T42, return JSON keys refund_days, escalation_code, retry_limit. Use null for missing facts."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "ded79cc6-b6f2-43b6-a499-f08a7f899fb1",
+        "created": 1789573643,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 34,
+          "prompt_tokens": 186,
+          "total_tokens": 220,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 186
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"refund_days\": 13,\n  \"escalation_code\": \"ORBIT-62\",\n  \"retry_limit\": 4\n}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.55
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Extract user facts as JSON keys language, style, temporary_location. Return JSON only."
+          },
+          {
+            "role": "user",
+            "content": "Synthetic user: My long-term preferred language is Chinese. My preferred explanation style is code-first. Today only I am at desk B7; do not save my temporary location."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "474ac46f-1d15-4662-9ae5-d5ac70d7bc99",
+        "created": 1789573643,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 20,
+          "prompt_tokens": 59,
+          "total_tokens": 79,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 59
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"language\": \"Chinese\", \"style\": \"code-first\", \"temporary_location\": null}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.805
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Extract only explicitly stated durable preferences. JSON keys language, style, temporary_location. Normalize language as Chinese, style as code-first. temporary_location must be null when temporary or user requests not to store. Return JSON only."
+          },
+          {
+            "role": "user",
+            "content": "Synthetic user: My long-term preferred language is Chinese. My preferred explanation style is code-first. Today only I am at desk B7; do not save my temporary location."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "ed7cafc4-cd0a-43d6-b5d8-b967ae550b2a",
+        "created": 1789573644,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 87,
+          "total_tokens": 103,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 87
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"language\":\"Chinese\",\"style\":\"code-first\",\"temporary_location\":null}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.475
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Use only provided memory. Return JSON only."
+          },
+          {
+            "role": "user",
+            "content": "\nReturn JSON keys language and style for this user. Use null if no evidence."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "053b9b63-a17a-4d07-819c-6e8b9efb4f63",
+        "created": 1789573645,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 10,
+          "prompt_tokens": 31,
+          "total_tokens": 41,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 31
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"language\": null, \"style\": null}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.776
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Use only provided memory. Return JSON only."
+          },
+          {
+            "role": "user",
+            "content": "User Memory Notes:\n\nNote 1 (ID: 3c281394-68e2-45a2-87d6-4156a6cf5555, Session: session-A):\n  Content: Preferred language: Chinese. Explanation style: code-first.\n  Tags: explicit-preference\n  Updated: 2026-09-16T23:47:24.877648\n\n\nReturn JSON keys language and style for this user. Use null if no evidence."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "226c16d7-6ac9-49a4-9691-e8a9a41d7769",
+        "created": 1789573645,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 13,
+          "prompt_tokens": 112,
+          "total_tokens": 125,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 112
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"language\": \"Chinese\", \"style\": \"code-first\"}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.673
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Use only provided memory. Return JSON only."
+          },
+          {
+            "role": "user",
+            "content": "User Memory Notes:\n\nNote 1 (ID: 3c281394-68e2-45a2-87d6-4156a6cf5555, Session: session-B):\n  Content: Preferred language: Chinese. Explanation style: diagram-first.\n  Tags: explicit-correction\n  Updated: 2026-09-16T23:47:26.334561\n\n\nReturn JSON keys language and style for this user. Use null if no evidence."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "5968eb01-7c1f-4c60-8c51-e7904d079e8b",
+        "created": 1789573646,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 14,
+          "prompt_tokens": 112,
+          "total_tokens": 126,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 112
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"language\": \"Chinese\", \"style\": \"diagram-first\"}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.573
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Return JSON keys refund_days, retry_limit, escalation_code, emergency_phone, sources (document IDs). Answer only using supplied documents; missing facts must be null. Cite only supplied IDs."
+          },
+          {
+            "role": "user",
+            "content": "\nQuestion: For T42 what are refund days, retry limit, escalation code and emergency phone?"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "6b97f96b-f780-4c3d-918e-b34984ca0ab8",
+        "created": 1789573647,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 37,
+          "prompt_tokens": 66,
+          "total_tokens": 103,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 66
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\"refund_days\": null, \"retry_limit\": null, \"escalation_code\": null, \"emergency_phone\": null, \"sources\": []}"
+      },
+      "finish_reason": "stop",
+      "seconds": 1.383
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Return JSON keys refund_days, retry_limit, escalation_code, emergency_phone, sources (document IDs). Answer only using supplied documents; missing facts must be null. Cite only supplied IDs."
+          },
+          {
+            "role": "user",
+            "content": "[retry] T42 realtime reconnect retry limit is 4.\nQuestion: For T42 what are refund days, retry limit, escalation code and emergency phone?"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "4987efb9-8700-481b-93bc-7fae877d6887",
+        "created": 1789573648,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 47,
+          "prompt_tokens": 81,
+          "total_tokens": 128,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 81
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"refund_days\": null,\n  \"retry_limit\": 4,\n  \"escalation_code\": null,\n  \"emergency_phone\": null,\n  \"sources\": [\"T42\"]\n}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.847
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Return JSON keys refund_days, retry_limit, escalation_code, emergency_phone, sources (document IDs). Answer only using supplied documents; missing facts must be null. Cite only supplied IDs."
+          },
+          {
+            "role": "user",
+            "content": "[retry] T42 realtime reconnect retry limit is 4.\n[escalation] T42 support escalation code is ORBIT-62.\n[refund] T42 refund refund policy refund payment: 13 business days.\nQuestion: For T42 what are refund days, retry limit, escalation code and emergency phone?"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "595431f0-0f63-4967-8f38-28a647760608",
+        "created": 1789573649,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 63,
+          "prompt_tokens": 114,
+          "total_tokens": 177,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 114
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"refund_days\": 13,\n  \"retry_limit\": 4,\n  \"escalation_code\": \"ORBIT-62\",\n  \"emergency_phone\": null,\n  \"sources\": [\"[retry]\", \"[escalation]\", \"[refund]\"]\n}"
+      },
+      "finish_reason": "stop",
+      "seconds": 0.848
+    },
+    {
+      "request": {
+        "model": "deepseek-v4-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Return JSON keys refund_days, retry_limit, escalation_code, emergency_phone, sources (document IDs). Helpfully answer the user question and provide sources."
+          },
+          {
+            "role": "user",
+            "content": "[retry] T42 realtime reconnect retry limit is 4.\n[escalation] T42 support escalation code is ORBIT-62.\n[refund] T42 refund refund policy refund payment: 13 business days.\nQuestion: For T42 what are refund days, retry limit, escalation code and emergency phone?"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 800,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "783773bf-0180-4b35-bfa5-ac79c78fc1a6",
+        "created": 1789573650,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "moderation": null,
+        "service_tier": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 107,
+          "total_tokens": 182,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 107
+        }
+      },
+      "message": {
+        "role": "assistant",
+        "content": "Based on the provided information for T42:\n\n- **Refund days:** 13 business days\n- **Retry limit:** 4\n- **Escalation code:** ORBIT-62\n- **Emergency phone:** Not provided in the available information\n\nSources: T42 refund policy, T42 realtime reconnect retry limit, T42 support escalation code."
+      },
+      "finish_reason": "stop",
+      "seconds": 0.973
+    }
+  ],
+  "context": [
+    {
+      "text": "{\"refund_days\": 13, \"escalation_code\": \"ORBIT-62\", \"retry_limit\": 4}",
+      "parsed": {
+        "refund_days": 13,
+        "escalation_code": "ORBIT-62",
+        "retry_limit": 4
+      },
+      "call_index": 2,
+      "complete": true,
+      "variant": "full",
+      "context": "\n===== Search Result =====\nTitle: Synthetic support note\nURL: https://example.invalid/support\nSnippet: Synthetic fixture; not authoritative policy.\n\nFull Content:\nTicket T42: refunds arrive in 13 business days.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: escalation code is ORBIT-62.\nDesign meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n========================\n",
+      "estimated_tokens_cl100k": 664,
+      "checks": {
+        "refund_days": true,
+        "escalation_code": true,
+        "retry_limit": true
+      }
+    },
+    {
+      "text": "{\"refund_days\": null, \"escalation_code\": null, \"retry_limit\": 4}",
+      "parsed": {
+        "refund_days": null,
+        "escalation_code": null,
+        "retry_limit": 4
+      },
+      "call_index": 3,
+      "complete": true,
+      "variant": "tail_500_chars",
+      "context": "discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. Design meeting discussed button colors, illustration spacing, onboarding videos and documentation typography. \nTicket T42: realtime reconnect retry limit is 4.\n========================\n",
+      "estimated_tokens_cl100k": 78,
+      "checks": {
+        "refund_days": false,
+        "escalation_code": false,
+        "retry_limit": true
+      }
+    },
+    {
+      "text": "{\"refund_days\": 13, \"escalation_code\": \"ORBIT-62\", \"retry_limit\": 4}",
+      "parsed": {
+        "refund_days": 13,
+        "escalation_code": "ORBIT-62",
+        "retry_limit": 4
+      },
+      "call_index": 4,
+      "complete": true,
+      "variant": "generic_summary",
+      "context": "The page at example.invalid/support contains support ticket T42 details interspersed with repeated filler text about a design meeting. Key facts from Ticket T42: refunds arrive in 13 business days; the escalation code is ORBIT-62; and the realtime reconnect retry limit is 4. The repeated design meeting content mentions button colors, illustration spacing, onboarding videos, and documentation typography, but adds no substantive information. No other pages are present.",
+      "estimated_tokens_cl100k": 90,
+      "checks": {
+        "refund_days": true,
+        "escalation_code": true,
+        "retry_limit": true
+      }
+    },
+    {
+      "text": "{\n  \"refund_days\": 13,\n  \"escalation_code\": \"ORBIT-62\",\n  \"retry_limit\": 4\n}",
+      "parsed": {
+        "refund_days": 13,
+        "escalation_code": "ORBIT-62",
+        "retry_limit": 4
+      },
+      "call_index": 5,
+      "complete": true,
+      "variant": "query_summary",
+      "context": "For ticket T42, the search results provide:\n\n- **refund_days**: 13 (refunds arrive in 13 business days)\n- **escalation_code**: \"ORBIT-62\"\n- **retry_limit**: 4 (realtime reconnect retry limit)\n\nAll three requested keys are present; no nulls needed.\n\n```json\n{\n  \"refund_days\": 13,\n  \"escalation_code\": \"ORBIT-62\",\n  \"retry_limit\": 4\n}\n```\n\nSource: Synthetic support note (https://example.invalid/support). The remaining content concerns unrelated design meeting topics and is not relevant to ticket T42.",
+      "estimated_tokens_cl100k": 129,
+      "checks": {
+        "refund_days": true,
+        "escalation_code": true,
+        "retry_limit": true
+      }
+    }
+  ],
+  "memory": [
+    {
+      "text": "{\"language\": \"Chinese\", \"style\": \"code-first\", \"temporary_location\": null}",
+      "parsed": {
+        "language": "Chinese",
+        "style": "code-first",
+        "temporary_location": null
+      },
+      "call_index": 6,
+      "complete": true,
+      "variant": "extract_broad",
+      "checks": {
+        "language": true,
+        "style": true,
+        "no_temporary": true
+      }
+    },
+    {
+      "text": "{\"language\":\"Chinese\",\"style\":\"code-first\",\"temporary_location\":null}",
+      "parsed": {
+        "language": "Chinese",
+        "style": "code-first",
+        "temporary_location": null
+      },
+      "call_index": 7,
+      "complete": true,
+      "variant": "extract_durable_only",
+      "checks": {
+        "language": true,
+        "style": true,
+        "no_temporary": true
+      }
+    },
+    {
+      "text": "{\"language\": null, \"style\": null}",
+      "parsed": {
+        "language": null,
+        "style": null
+      },
+      "call_index": 8,
+      "complete": true,
+      "variant": "new_session_empty",
+      "context": ""
+    },
+    {
+      "text": "{\"language\": \"Chinese\", \"style\": \"code-first\"}",
+      "parsed": {
+        "language": "Chinese",
+        "style": "code-first"
+      },
+      "call_index": 9,
+      "complete": true,
+      "variant": "new_session_reloaded",
+      "context": "User Memory Notes:\n\nNote 1 (ID: 3c281394-68e2-45a2-87d6-4156a6cf5555, Session: session-A):\n  Content: Preferred language: Chinese. Explanation style: code-first.\n  Tags: explicit-preference\n  Updated: 2026-09-16T23:47:24.877648\n\n"
+    },
+    {
+      "text": "{\"language\": \"Chinese\", \"style\": \"diagram-first\"}",
+      "parsed": {
+        "language": "Chinese",
+        "style": "diagram-first"
+      },
+      "call_index": 10,
+      "complete": true,
+      "variant": "after_correction",
+      "context": "User Memory Notes:\n\nNote 1 (ID: 3c281394-68e2-45a2-87d6-4156a6cf5555, Session: session-B):\n  Content: Preferred language: Chinese. Explanation style: diagram-first.\n  Tags: explicit-correction\n  Updated: 2026-09-16T23:47:26.334561\n\n"
+    }
+  ],
+  "retrieval": [
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 1,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3"
+          ],
+          "recall": 0.5,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.7,
+      "mean_precision_at_k": 0.8
+    },
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 3,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.3333333333333333
+    },
+    {
+      "k1": 1.5,
+      "b": 0.75,
+      "top_k": 5,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.4,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.2
+    },
+    {
+      "k1": 0.7,
+      "b": 0.0,
+      "top_k": 1,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3"
+          ],
+          "recall": 0.5,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.7,
+      "mean_precision_at_k": 0.8
+    },
+    {
+      "k1": 0.7,
+      "b": 0.0,
+      "top_k": 3,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.3333333333333333,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.3333333333333333
+    },
+    {
+      "k1": 0.7,
+      "b": 0.0,
+      "top_k": 5,
+      "queries": [
+        {
+          "query": "model distillation",
+          "gold": [
+            "doc_3",
+            "doc_4"
+          ],
+          "retrieved": [
+            "doc_3",
+            "doc_4"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.4,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "HTTP 404 error",
+          "gold": [
+            "doc_6"
+          ],
+          "retrieved": [
+            "doc_6",
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "XK9-2B4-7Q1",
+          "gold": [
+            "doc_9"
+          ],
+          "retrieved": [
+            "doc_9"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "BM25 ranking function",
+          "gold": [
+            "doc_5"
+          ],
+          "retrieved": [
+            "doc_5"
+          ],
+          "recall": 1.0,
+          "precision_at_k": 0.2,
+          "reciprocal_rank": 1.0
+        },
+        {
+          "query": "cat",
+          "gold": [
+            "doc_7",
+            "doc_8"
+          ],
+          "retrieved": [],
+          "recall": 0.0,
+          "precision_at_k": 0.0,
+          "reciprocal_rank": 0
+        }
+      ],
+      "mean_recall": 0.8,
+      "mean_precision_at_k": 0.2
+    }
+  ],
+  "rag": [
+    {
+      "text": "{\"refund_days\": null, \"retry_limit\": null, \"escalation_code\": null, \"emergency_phone\": null, \"sources\": []}",
+      "parsed": {
+        "refund_days": null,
+        "retry_limit": null,
+        "escalation_code": null,
+        "emergency_phone": null,
+        "sources": []
+      },
+      "call_index": 11,
+      "complete": true,
+      "top_k": 0,
+      "prompt_mode": "strict",
+      "retrieved_ids": [],
+      "context": "",
+      "checks": {
+        "refund_days": false,
+        "retry_limit": false,
+        "escalation_code": false,
+        "emergency_phone": true
+      },
+      "citation_ids_valid": true
+    },
+    {
+      "text": "{\n  \"refund_days\": null,\n  \"retry_limit\": 4,\n  \"escalation_code\": null,\n  \"emergency_phone\": null,\n  \"sources\": [\"T42\"]\n}",
+      "parsed": {
+        "refund_days": null,
+        "retry_limit": 4,
+        "escalation_code": null,
+        "emergency_phone": null,
+        "sources": [
+          "T42"
+        ]
+      },
+      "call_index": 12,
+      "complete": true,
+      "top_k": 1,
+      "prompt_mode": "strict",
+      "retrieved_ids": [
+        "retry"
+      ],
+      "context": "[retry] T42 realtime reconnect retry limit is 4.",
+      "checks": {
+        "refund_days": false,
+        "retry_limit": true,
+        "escalation_code": false,
+        "emergency_phone": true
+      },
+      "citation_ids_valid": false
+    },
+    {
+      "text": "{\n  \"refund_days\": 13,\n  \"retry_limit\": 4,\n  \"escalation_code\": \"ORBIT-62\",\n  \"emergency_phone\": null,\n  \"sources\": [\"[retry]\", \"[escalation]\", \"[refund]\"]\n}",
+      "parsed": {
+        "refund_days": 13,
+        "retry_limit": 4,
+        "escalation_code": "ORBIT-62",
+        "emergency_phone": null,
+        "sources": [
+          "[retry]",
+          "[escalation]",
+          "[refund]"
+        ]
+      },
+      "call_index": 13,
+      "complete": true,
+      "top_k": 3,
+      "prompt_mode": "strict",
+      "retrieved_ids": [
+        "retry",
+        "escalation",
+        "refund"
+      ],
+      "context": "[retry] T42 realtime reconnect retry limit is 4.\n[escalation] T42 support escalation code is ORBIT-62.\n[refund] T42 refund refund policy refund payment: 13 business days.",
+      "checks": {
+        "refund_days": true,
+        "retry_limit": true,
+        "escalation_code": true,
+        "emergency_phone": true
+      },
+      "citation_ids_valid": false
+    },
+    {
+      "text": "Based on the provided information for T42:\n\n- **Refund days:** 13 business days\n- **Retry limit:** 4\n- **Escalation code:** ORBIT-62\n- **Emergency phone:** Not provided in the available information\n\nSources: T42 refund policy, T42 realtime reconnect retry limit, T42 support escalation code.",
+      "parsed": {},
+      "call_index": 14,
+      "complete": true,
+      "top_k": 3,
+      "prompt_mode": "loose",
+      "retrieved_ids": [
+        "retry",
+        "escalation",
+        "refund"
+      ],
+      "context": "[retry] T42 realtime reconnect retry limit is 4.\n[escalation] T42 support escalation code is ORBIT-62.\n[refund] T42 refund refund policy refund payment: 13 business days.",
+      "checks": {
+        "refund_days": false,
+        "retry_limit": false,
+        "escalation_code": false,
+        "emergency_phone": false
+      },
+      "citation_ids_valid": true
+    }
+  ],
+  "source_hashes": {
+    "chapter2/context-compression/config.py": "19f79d7b454d7c59f34b286af9df2273188d9139f09f5ec927efa29a1ee1a5a3",
+    "chapter2/context-compression/compression_strategies.py": "e0d89b9d440f4bea51983f90461fbe08811c48ce2de115c37028f39681f33b2f",
+    "chapter3/user-memory/config.py": "13d60328db96b8bd38c1f6d69e8ac61e77f7fb259851bc28eddf060a6fd1960b",
+    "chapter3/user-memory/memory_manager.py": "e3deee1f8278ad1cbd32e05d27041b7ad99e1626a8d027640467e6ba4404f1d0",
+    "chapter3/sparse-embedding/bm25_engine.py": "ad6ddfa11ab626de719e89f462d4e9648ee457b64433e7c7c8ae145899d101f2",
+    "chapter3/sparse-embedding/cli.py": "6b76c01fd3889a029b5c37a4f589e3a438bc093c406e144e5e4209441c556ec2"
+  },
+  "memory_storage_checks": {
+    "reload_preserved_id": true,
+    "update_no_duplicate": true,
+    "current_content": "Preferred language: Chinese. Explanation style: diagram-first.",
+    "temporary_not_stored": true
+  },
+  "query_expansion": {
+    "original": "cat",
+    "expanded": "cat kitten feline",
+    "manual_not_llm": true,
+    "original_hits": [],
+    "expanded_hits": [
+      "doc_7",
+      "doc_8"
+    ]
+  },
+  "completed": true,
+  "total_tokens": 4109
+}
