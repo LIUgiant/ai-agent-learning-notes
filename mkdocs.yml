@@ -44,19 +44,22 @@ nav:
       - 基础概念: task0/concepts.md
       - 环境与离线验证: task0/environment.md
       - 代码来源与阅读约定: task0/code-guide.md
-      - 1-1 上下文消融: task0/ablation.md
-      - 1-1 源码逐组解读: task0/source.md
-      - 1-2 多轮搜索: task0/search.md
-      - 1-2 搜索代码精读: task0/search-code.md
-      - 1-3 搜索与计算: task0/research.md
-      - 1-3 计算代码精读: task0/research-code.md
-      - 1-4 生图工作流: task0/images.md
-      - 1-4 生图代码精读: task0/images-code.md
-      - 源码摘录备查:
-          - 1-1 上下文实现: task0/source-reference.md
-          - 1-2 搜索实现: task0/search-code-reference.md
-          - 1-3 计算实现: task0/research-code-reference.md
-          - 1-4 生图实现: task0/images-code-reference.md
+      - 1-1 上下文消融:
+          - 实验与结果: task0/ablation.md
+          - 设计思路与代码精读: task0/source.md
+          - 源码摘录备查: task0/source-reference.md
+      - 1-2 多轮搜索:
+          - 实验与结果: task0/search.md
+          - 设计思路与代码精读: task0/search-code.md
+          - 源码摘录备查: task0/search-code-reference.md
+      - 1-3 搜索与计算:
+          - 实验与结果: task0/research.md
+          - 设计思路与代码精读: task0/research-code.md
+          - 源码摘录备查: task0/research-code-reference.md
+      - 1-4 生图工作流:
+          - 实验与结果: task0/images.md
+          - 设计思路与代码精读: task0/images-code.md
+          - 源码摘录备查: task0/images-code-reference.md
       - 复盘与证据边界: task0/review.md
   - 持续学习:
       - Task 索引: tasks.md
