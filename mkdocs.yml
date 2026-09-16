@@ -1,6 +1,6 @@
-site_url: https://LIUgiant.github.io/ai-study-notes/
-repo_url: https://github.com/LIUgiant/ai-study-notes
-repo_name: LIUgiant/ai-study-notes
+site_url: https://LIUgiant.github.io/ai-agent-learning-notes/
+repo_url: https://github.com/LIUgiant/ai-agent-learning-notes
+repo_name: LIUgiant/ai-agent-learning-notes
 site_name: AI 学习手记
 site_description: 从实验现象出发，理解 Agent 的代码与设计。
 use_directory_urls: false
