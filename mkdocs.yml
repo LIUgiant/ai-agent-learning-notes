@@ -52,6 +52,11 @@ nav:
       - 1-3 计算代码精读: task0/research-code.md
       - 1-4 生图工作流: task0/images.md
       - 1-4 生图代码精读: task0/images-code.md
+      - 源码摘录备查:
+          - 1-1 上下文实现: task0/source-reference.md
+          - 1-2 搜索实现: task0/search-code-reference.md
+          - 1-3 计算实现: task0/research-code-reference.md
+          - 1-4 生图实现: task0/images-code-reference.md
       - 复盘与证据边界: task0/review.md
   - 持续学习:
       - Task 索引: tasks.md

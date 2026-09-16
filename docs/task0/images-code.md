@@ -1,197 +1,44 @@
-# 1-4 · 生图工作流代码精读
+# 1-4 · 怎样设计一个可比较的生图工作流？
 
-[先看 10 张实测图片](images.md) · [代码来源与阅读约定](code-guide.md)
+[实验结果与图片](images.md) · [代码来源约定](code-guide.md)
 
-!!! note "阅读约定"
-    **课程源码原文**：从课程当前学习版本逐行摘录，附路径和行号。**学习配套脚本原文**：本次为替代实验编写并实际使用的代码。**教学示意 / 建议实现**：为了说明设计写的示例，不是原文件，也不代表已经加入运行器。
+<div class="design-lead"><span>设计问题 / IMAGES</span><p>要比较提示词改写有没有帮助，需要知道两条路径在哪处分开、在哪处重新共用实现，以及哪些差异还没有控制。</p></div>
 
-## 1. 固定工作流：程序决定先后顺序
+!!! note "怎样读这一页"
+    先理解为什么需要这些模块，再跟随例子进入函数。标为“教学推演”的数据仅帮助理解，不是实验日志；代码块注明来源。完整摘录放在页末的备查链接中。
 
-本次入口是 `learning/task0/run_image_learning.py`，复用课程 `pipeline.py` 的解析与万相生图函数。五条需求分别走 direct 与 rewrite，两条路线使用同一个生图模型。
+## 1. 从两段脚本推到一条公共流水线
 
-模型只负责改写文本；是否改写由 `if route == "rewrite"` 决定。这里不是模型自主选下一步的 Agent loop。
+最直观的写法是“原提示词生图”一份脚本、“改写后生图”另一份脚本。但若两份脚本选了不同图像模型、尺寸或保存方式，就很难把差异归因于提示词。
 
+本次学习运行器把同一需求送入 `direct` 和 `rewrite` 两条路线，之后都调用 `generate_image_wanx`。改写模型用 DeepSeek，图像模型都用 `wan2.2-t2i-flash`。它是学习替代实验，不是原课程 Gemini / OpenAI 对照的完成证明。
 
-[![同一需求两条路线：先改写，还是直接生成](../assets/code-flow/images-branches.svg)](../assets/code-flow/images-branches.svg)
+![design-images 的状态与责任](../assets/code-flow/design-images.svg)
 
-*读图：A、B 各一张；未配对随机种子，不能把这次观察推广为稳定质量排名。*
+## 2. 跟一个需求穿过分支
 
-## 2. 双层循环怎样生成十个样本
+用本次真实需求中的海报文字约束：“深夜独处也清净”。以下是数据流的简化展示，完整请求见实验记录。
 
-**本次学习配套脚本原文** · `learning/task0/run_image_learning.py` · L74–L88。仅去除公共缩进，未增补注释。
-
-```python linenums="74"
-save()
-for requirement in REQUIREMENTS:
-    for route in ["direct", "rewrite"]:
-        record = {
-            "requirement": requirement["id"],
-            "route": route,
-            "input": requirement["text"],
-            "image": None,
-            "error": None,
-            "calls": [],
-        }
-        data["runs"].append(record)
-        try:
-            prompt = requirement["text"]
-            negative = ""
-```
-
-外层遍历需求，内层遍历路线。`record` 在执行前就加入 `data["runs"]`，所以后面即使报错，仍能为该样本填写 `error`。`image=None` 表示尚未取得图片，不应提前写成功。
-
-每个样本都重新从原始 `requirement["text"]` 设置 `prompt`；B 组不会错误地沿用上一条需求的改写。
-
-## 3. 改写节点：从自然语言到结构化参数
-
-**本次学习配套脚本原文** · `learning/task0/run_image_learning.py` · L89–L111。仅去除公共缩进，未增补注释。
-
-```python linenums="89"
-if route == "rewrite":
-    messages = [
-        {"role": "system", "content": REWRITE_SYSTEM_PROMPT},
-        {"role": "user", "content": prompt},
-    ]
-    response = client.chat.completions.create(
-        model=data["rewrite_model"], messages=messages
-    )
-    raw = response.choices[0].message.content or ""
-    rewritten = parse_rewrite_output(raw)
-    record["rewrite"] = rewritten
-    record["calls"].append(
-        {
-            "provider": "deepseek",
-            "model": data["rewrite_model"],
-            "response_id": response.id,
-            "request": {"messages": messages},
-            "raw_output": raw,
-            "usage": response.usage.model_dump() if response.usage else {},
-        }
-    )
-    prompt = rewritten["prompt"]
-    negative = rewritten["negative_prompt"]
-```
-
-1. `messages` 包含课程的改写系统提示与当前原始需求。
-2. `response.choices[0].message.content` 是模型返回文本；空内容暂转为 `""`，随后由解析器明确拒绝。
-3. `parse_rewrite_output` 将文本转换成三字段字典。
-4. 保存原始输出和请求摘要，才能反查是改写阶段丢了要求，还是生成阶段没做到。
-5. 真正传给图片模型的是 `prompt` 与 `negative_prompt`；`style_notes` 只作解释，不是生图参数。
-
-## 4. 解析 JSON，不等于检查语义
-
-**课程源码原文** · `chapter1/image-gen-workflow/pipeline.py` · L46–L80。仅去除公共缩进，未增补注释。
-
-[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/image-gen-workflow/pipeline.py#L46)
-
-```python linenums="46"
-if not isinstance(text, str) or not text.strip():
-    raise ValueError("改写输出为空")
-
-cleaned = text.strip()
-if cleaned.startswith("```"):
-    # 去掉首行围栏与结尾围栏
-    lines = cleaned.splitlines()
-    lines = [l for l in lines if not l.strip().startswith("```")]
-    cleaned = "\n".join(lines).strip()
-
-decoder = json.JSONDecoder()
-start = cleaned.find("{")
-if start == -1:
-    raise ValueError(f"改写输出中没有 JSON 对象: {cleaned[:100]!r}")
-try:
-    obj, _ = decoder.raw_decode(cleaned[start:])
-except json.JSONDecodeError as e:
-    raise ValueError(f"改写输出不是合法 JSON: {e}") from e
-
-if not isinstance(obj, dict):
-    raise ValueError("改写输出的 JSON 不是对象")
-prompt = obj.get("prompt")
-if not isinstance(prompt, str) or not prompt.strip():
-    raise ValueError("改写输出缺少非空的 prompt 字段")
-negative = obj.get("negative_prompt", "")
-if not isinstance(negative, str):
-    raise ValueError("negative_prompt 字段必须是字符串")
-notes = obj.get("style_notes", "")
-if not isinstance(notes, str):
-    raise ValueError("style_notes 字段必须是字符串")
-return {
-    "prompt": prompt.strip(),
-    "negative_prompt": negative.strip(),
-    "style_notes": notes.strip(),
-}
-```
-
-| 检查 | 拦住什么 | 拦不住什么 |
+| 阶段 | direct | rewrite |
 | --- | --- | --- |
-| 输入非空字符串 | 空响应 | 内容是否忠于需求 |
-| 去围栏并找 `{` | 常见代码围栏包装 | 前后附加文本仍可能被容忍 |
-| `raw_decode` | JSON 语法错误 | `prompt` 的描述是否正确 |
-| `prompt` 非空字符串 | 缺少主要参数 | 必须呈现的文字被删掉 |
-| negative、notes 类型正确 | 错误字段类型 | 负面提示词与原需求冲突 |
+| 原始输入 | 包含指定文案的需求 | 相同需求 |
+| 中间处理 | 直接使用原文 | 改写模型输出 `prompt`、`negative_prompt`、`notes` |
+| 生图输入 | 原需求进入图像模型 | 改写后的英文描述进入图像模型 |
+| 需要验收 | 图像是否包含准确文案 | 先检查改写是否保留文案，再检查图片 |
 
-`raw_decode` 返回对象与结束位置，但这里忽略结束位置，因此不要求整个响应严格只有一个 JSON 对象。它适合容错解析，不能声称做了严格的完整响应验证。
+这解释了为什么“改写 JSON 能解析”远远不够。解析器能验证字段形状，却不知道哪一句中文是用户不可丢失的要求。本次 rewrite 遗漏了指定文案，还出现排除文字的负面提示；两条路线最终都没有满足准确文案要求。
 
-## 5. 异步生图：提交成功还没拿到图片
+## 3. 为什么把改写结果定义为结构化字段？
 
+`parse_rewrite_output` 去掉围栏、寻找首个 JSON 对象，用 `raw_decode` 解析，检查对象与非空 prompt，再规范化其他字段。它解决的是模型输出可能夹带说明的问题，让下游函数只接收明确的 prompt 和 negative prompt。
 
-[![generate_image_wanx：提交 → 轮询 → 下载](../assets/code-flow/images-async.svg)](../assets/code-flow/images-async.svg)
+这个宽容设计也有代价：首个对象后的文字可被忽略，能解析不等于严格遵守“只输出 JSON”。`notes` 解释改写，但生图主输入取的是 `prompt` 与 `negative_prompt`，不能靠 notes 补回丢失的硬约束。
 
-*读图：03 在未完成时重复查询；轮询循环是在等服务完成，不是模型自主决定下一步。*
+**如果自己增强设计**：把原始需求里的硬约束单独保存，在改写前后校验，再决定是否允许生图。这是建议增强，本次运行器没有实现通用约束校验器。
 
-**课程源码原文** · `chapter1/image-gen-workflow/pipeline.py` · L191–L226。仅去除公共缩进，未增补注释。
+### 共用的生成入口如何保证两条路线汇合
 
-[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/image-gen-workflow/pipeline.py#L191)
-
-```python linenums="191"
-deadline = t0 + Config.TASK_POLL_TIMEOUT
-try:
-    while True:
-        time.sleep(Config.TASK_POLL_INTERVAL)
-        r = requests.get(poll_url, headers=headers, timeout=30)
-        body = r.json()
-        status = body.get("output", {}).get("task_status")
-        if status == "SUCCEEDED":
-            break
-        if status in ("FAILED", "CANCELED"):
-            raise RuntimeError(f"任务失败: {body}")
-        if time.monotonic() > deadline:
-            raise TimeoutError(f"轮询超时（{Config.TASK_POLL_TIMEOUT}s），最后状态 {status}")
-    poll["response_id"] = body.get("request_id")
-    poll["usage"] = body.get("usage", {})
-    poll["task_metrics"] = {
-        k: body["output"].get(k)
-        for k in ("submit_time", "scheduled_time", "end_time")
-    }
-    result = body["output"]["results"][0]
-    image_url = result["url"]
-    poll["actual_prompt"] = result.get("actual_prompt")
-    _finish(poll, t0)
-except Exception as e:
-    poll["status"] = "error"
-    poll["error"] = f"{type(e).__name__}: {e}"
-    _finish(poll, t0)
-    raise
-
-dl = _new_call_record("dashscope", Config.WANX_MODEL, image_url.split("?")[0])
-t0 = time.monotonic()
-r = requests.get(image_url, timeout=60)
-r.raise_for_status()
-mime = r.headers.get("Content-Type", "image/png").split(";")[0]
-dl["response_bytes"] = len(r.content)
-_finish(dl, t0)
-```
-
-- `task_id` 是服务端异步任务标识，和改写响应的 `response.id` 不是同一个 ID。
-- 每次循环先等待，再查询状态。成功退出；失败或取消直接抛错。
-- `deadline` 使用 `time.monotonic()`，用于计算经过时间，避免系统时钟调整影响超时判断。
-- 这个超时不是硬截止：HTTP 查询本身还有最长 30 秒等待，轮询间隔也占时间。
-- `actual_prompt` 若提供则记录下来，可帮助观察服务端是否又改写过提示词。
-- 轮询代码没有逐次保存所有 HTTP 回执；返回的 calls 是 submit、poll、download 三段汇总。不要把三条记录当成恰好三次 HTTP 请求。
-
-## 6. 下载、文件名和证据之间的对应
-
-**本次学习配套脚本原文** · `learning/task0/run_image_learning.py` · L112–L129。仅去除公共缩进，未增补注释。
+**学习配套脚本原文** · `learning/task0/run_image_learning.py` L112–120。这里只去除公共缩进。
 
 ```python linenums="112"
 record["image_request"] = {
@@ -203,66 +50,43 @@ record["image_request"] = {
 image, mime, calls = generate_image_wanx(prompt, negative)
 record["calls"].extend(calls)
 ext = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}[mime]
-filename = requirement["id"] + "-" + route + ext
-(output / filename).write_bytes(image)
-record["image"] = {
-    "path": filename,
-    "mime": mime,
-    "bytes": len(image),
-    "sha256": hashlib.sha256(image).hexdigest(),
-}
-print(requirement["id"], route, "image saved", flush=True)
 ```
 
-`generate_image_wanx` 返回三元组：图片字节、MIME 类型、调用记录。文件名由需求 ID 和路线组成，例如 `headphone-poster-rewrite.png`。SHA-256 用于验证字节是否变化，不判断图片内容质量。
+运行到这里时，`prompt` 和 `negative` 已经由前面的 route 分支确定。`record["image_request"]` 记录即将发送的输入，紧接着调用公共生成函数；返回值同时包含图片、类型和调用记录。把“记录输入”和“执行生成”放在相邻位置，有助于核对每张图究竟使用了什么条件。
 
-保存证据的 `save()` 会对环境中的 API_KEY 值做替换，再保存 JSON 与哈希。脱敏和文件完整性分别解决不同问题。
+## 4. 为什么提交成功后还要轮询？
 
-## 7. 出错时如何继续、哪些记录仍可能缺失
+图像生成耗时较长，服务先返回 `task_id`。提交成功只能说明任务被接收；直接把这次 HTTP 成功当成图片完成，会提前交付不存在的结果。
 
-**本次学习配套脚本原文** · `learning/task0/run_image_learning.py` · L130–L146。仅去除公共缩进，未增补注释。
+| 状态 | 手里有什么 | 下一步 |
+| --- | --- | --- |
+| 提交成功 | `task_id` | 用 ID 查询状态 |
+| 尚未完成 | 状态信息 | 等待后再次查询 |
+| `SUCCEEDED` | 结果中的图片 URL | 下载图片字节 |
+| `FAILED` / `CANCELED` | 错误信息 | 抛出错误，由运行器记录 |
+| 超过等待期限 | 未得到可用结果 | 结束等待，记录失败 |
 
-```python linenums="130"
-        except Exception as exc:  # noqa: BLE001 -- persist failed external calls as experiment evidence
-            message = f"{type(exc).__name__}: {exc}"
-            for secret in secrets:
-                message = message.replace(secret, "[REDACTED]")
-            record["error"] = message
-            print(requirement["id"], route, message, flush=True)
-            if not any(r["image"] for r in data["runs"]):
-                data["stop_reason"] = (
-                    "First image failed; stopped instead of repeating unavailable service across ten cells."
-                )
-                save()
-                return 1
-        save()
-data["completed_images"] = sum(bool(r["image"]) for r in data["runs"])
-data["passed_execution"] = data["completed_images"] == 10
-save()
-return 0 if data["passed_execution"] else 1
-```
+函数的超时包含请求超时和轮询期限，不是一个到点瞬间打断全部工作的硬截止。读轮询代码时要看期限检查位于哪里，而不只看变量叫 `deadline`。
 
-- 样本失败后记录异常；如果此前没有任何成功图片，就停止整个批次，避免对不可用服务连发十组。
-- 如果已有成功样本，后续单个失败会被记录，循环继续。
-- 最后的 `passed_execution` 只检查是否取得十张图片。它没有检查海报文字、构图等要求。
-- 上游 `generate_image_wanx` 内部失败时会抛出异常，调用方可能拿不到它未返回的调用记录；因此本次成功路径证据较完整，但不能声称所有失败请求均完整落盘。
+## 5. 为什么保存图片还要存哈希和请求？
 
-## 8. 海报文案在哪里丢掉了
+只留下十张图片，过几天就难以确定哪张对应哪个 prompt。运行器按需求与路线记录改写输出、图像请求、调用信息，再保存 MIME、字节数与 SHA-256。文件扩展名也由 MIME 决定，避免内容和后缀错配。
 
-课程改写系统提示把 `text` 列为负面词示例，这只是通用建议，却可能与当前需求“必须有中文文案”冲突。本次改写结果把指定中文删掉，且负面词包括 text/letters/words。
+哈希证明“现在的文件与当时记录的字节一致”，不证明图片符合需求。调用记录也有边界：生图函数把提交、轮询、下载聚合成记录，记录条数不等于底层 HTTP 请求数；函数中途抛错时，尚未返回的内部记录不会完整传回调用者。
 
-问题发生在**生成之前的改写节点**；JSON 格式正确、图片下载成功都无法修复它。应把不可丢失要求单独保存，在改写后检查。
+### 在真实代码里找分支与汇合点
 
-```python title="建议实现 · 教学示意，未加入本次实验"
-required_text = "深夜独处也清净"
-rewritten = parse_rewrite_output(raw)
-if required_text not in rewritten["prompt"]:
-    return invalid_rewrite("改写丢失指定文案")
-# 这只检查输入保留，最终图片仍需核对文字是否正确。
-```
+打开 `learning/task0/run_image_learning.py`：L75 起遍历需求，L76 遍历两条 route；L89 的条件只控制是否改写，L118 汇合到同一 `generate_image_wanx`。L130 起处理失败，并在运行中持续保存已有结果。
 
-这里只示范精确文案约束。对于“简约”“未来感”等语义要求，不能仅靠字符串包含判断；还需人工或专门的内容评价。
+接着读 `chapter1/image-gen-workflow/pipeline.py`：先看 `parse_rewrite_output` 的输入契约，再看 `generate_image_wanx` 的提交、状态循环与下载。此时每段代码都在回答一个你已知道的问题。
 
-## 9. 亲手练习
+## 6. 这个比较能支持什么结论？
 
-把 `rewrite_requirement`、`validate_rewrite`、`generate_image`、`save_sample` 分成四个函数。先用固定 JSON 与假图片验证接口，再接真实 API。保留每次失败原因，最后分别统计“执行成功”和“需求满足”。
+本次五个需求、两条路线，共十张图片成功落盘，说明工作流可运行。没有匹配随机种子，每个条件仅一张，不能把某一张更好看完全归因于改写。应先逐项看构图、主体、指定文案等需求是否满足，再讨论风格偏好。
+
+**自检题**：为了更公平比较，能否给两条路线换成不同的图像模型？为了验证海报文案，检查 `prompt` 非空够不够？
+
+??? tip "思路对照"
+    换图像模型会同时改变另一个因素；若目的是研究改写，应尽可能保持生成配置一致并增加重复样本。非空 prompt 只验证结构；准确文案需要单独的约束检查和输出图像核对。若服务支持控制种子，可纳入配对设计，但不能假设当前接口已支持。
+
+[逐段源码与异步 SVG 备查](images-code-reference.md) · [回到实验复盘](review.md)

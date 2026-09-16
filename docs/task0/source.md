@@ -1,418 +1,121 @@
-# 1-1 · 从流程到源码
+# 1-1 · 为什么把“留存历史”和“发给模型”分开？
 
-[代码来源与阅读约定](code-guide.md) · [返回五组实验结果](ablation.md)
+[实验结果](ablation.md) · [代码来源约定](code-guide.md)
 
-!!! note "先区分原文与示意"
-    每节默认展示的短代码是**笔记教学示意**；“对照真实源码”折叠块才是课程文件摘录。`# 教学简化...` 是笔记新增的注释，不能当作课程原注释。
+<div class="design-lead"><span>设计问题 / CONTEXT</span><p>要测出一类上下文的作用，就必须控制模型看见什么，同时留下足够的证据解释它做了什么。</p></div>
 
-## 先看对象关系：response 不是 message
+!!! note "怎样读这一页"
+    先理解为什么需要这些模块，再跟随例子进入函数。标为“教学推演”的数据仅帮助理解，不是实验日志；代码块注明来源。完整摘录放在页末的备查链接中。
 
-调用模型得到的外层 `response` 包含候选结果、用量等内容；`response.choices[0].message` 才是此轮 assistant 消息。原代码随后把 message 传入 `_prepare_assistant_message()`。
+## 1. 从最简单的实现推到现在的设计
 
-**课程源码原文** · `chapter1/context/agent.py` · L811–L813。仅去除公共缩进，未增补注释。
+假设只写一个循环：把问题发给模型，执行工具，把结果拼回下一次请求。这能跑，但还不能做可信的消融实验。若直接把历史清空，实验结束后也难以复盘；若为五组复制五份循环，修复一组时容易漏掉另一组，差别就不再只是上下文。
 
-[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/agent.py#L811)
+源码因此保留**同一个执行循环**，把差异放在三个边界：发送请求之前、保存 assistant 消息时、写回工具结果时。实验运行器为每一组创建新的 Agent，避免上一组历史混进下一组。
 
-```python linenums="811"
+先记住一个限制：这里的留存也不是完整原始消息的永不修改副本。`no_reasoning` 会在保存 assistant 字典时删字段，`no_tool_results` 会在对话中存空结果；完整工具执行记录另有轨迹。不同记录承担不同责任。
 
-message = response.choices[0].message
-has_tool_calls = bool(getattr(message, "tool_calls", None))
-```
+## 2. 谁拥有哪份数据？
 
-
-[![1-1：模型响应如何变成下一轮历史](../assets/code-flow/context-sdk.svg)](../assets/code-flow/context-sdk.svg)
-
-*读图：数据从对象转为字典，再进入消息历史；删除发生在哪一步，决定消融的含义。*
-
-
-
-## 五组流程对照
-
-<div class="flow-explorer" id="context-flow"><div class="flow-heading"><h3>五组共用一个循环，改动发生在不同位置</h3><p class="quiet">点击下面的模式，对照同一张图。每次只选一种消融；箭头表示信息流和主执行路径。</p></div><div aria-label="选择流程图模式" class="flow-switch" role="group"><button aria-pressed="true" data-flow="full" type="button">完整循环</button><button aria-pressed="false" data-flow="no_history" type="button">移除历史</button><button aria-pressed="false" data-flow="no_reasoning" type="button">移除历史 reasoning</button><button aria-pressed="false" data-flow="no_tool_calls" type="button">移除工具定义</button><button aria-pressed="false" data-flow="no_tool_results" type="button">隐藏工具结果</button></div><div class="flow-panel" data-flow-panel="full"><p class="flow-explanation">先读完整流程：输入组装成请求 → 模型响应 → 保存 assistant 消息 → 执行结构化工具调用 → 写回结果 → 下一轮。</p><div class="svg-scroll"><svg aria-labelledby="title-full desc-full" role="img" viewbox="0 0 1120 990" xmlns="http://www.w3.org/2000/svg">
-<title id="title-full">完整循环：Agent 上下文与工具循环</title><desc id="desc-full">先读完整流程：输入组装成请求 → 模型响应 → 保存 assistant 消息 → 执行结构化工具调用 → 写回结果 → 下一轮。 无工具调用时转入终止文本，再独立评分；所有模式都受轮数上限约束。</desc>
-<defs><marker id="arrow-full" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#617799"></path></marker><marker id="cut-full" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#b63b45"></path></marker></defs>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.title{font-size:21px;font-weight:650;fill:#18243d}.body{font-size:17px;fill:#4b5d76}.code{font-family:ui-monospace,monospace;font-size:13px;fill:#506282}.tag{font-size:13px;font-weight:650}.edge{fill:none;stroke:#617799;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.label{font-size:15px;fill:#536986}</style>
-<rect fill="#f6f8fc" height="990" rx="20" width="1120"></rect>
-<text class="tag" fill="#2a51df" x="30" y="34">输入：决定模型这一轮能看到什么</text><path class="edge" d="M190 235 V285 H910" style="stroke:#617799"></path><path class="edge" d="M550 235 V285" style="stroke:#617799"></path><path class="edge" d="M910 235 V285" style="stroke:#617799"></path><path class="edge" d="M190 285 V350" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M350 425 H390" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M710 425 H750" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M910 510 V675" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M910 565 H710" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M750 755 H710" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M390 755 H350" marker-end="url(#arrow-full)" style="stroke:#617799"></path><path class="edge" d="M30 755 H12 V425 H30" marker-end="url(#arrow-full)" style="stroke:#617799"></path><text class="label" x="33" y="310">组成本轮 API 请求</text><text class="label" x="925" y="641">有 tool_calls</text><text class="label" x="721" y="548">无 tool_calls</text><text class="label" x="35" y="631">下一轮 ↑</text><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="65"></rect><text class="tag" fill="#2a51df" x="50" y="94">固定输入 · 每组保留</text><text class="title" x="50" y="124">系统指令 + 当前任务</text><text class="body" x="50" y="153">system：目标与规则</text><text class="body" x="50" y="178">user：四季度换汇任务</text><text class="code" x="50" y="219">conversation_history</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="65"></rect><text class="tag" fill="#2a51df" x="410" y="94">历史输入 · 首轮尚无历史</text><text class="title" x="410" y="124">历史消息</text><text class="body" x="410" y="153">此前 assistant / tool 消息</text><text class="body" x="410" y="178">含调用、结果、历史 reasoning</text><text class="code" x="410" y="219">_prepare_messages_for_api()</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="65"></rect><text class="tag" fill="#2a51df" x="770" y="94">能力接口 · tools</text><text class="title" x="770" y="124">工具定义</text><text class="body" x="770" y="153">工具名、用途与参数 schema</text><text class="body" x="770" y="178">告诉模型有哪些工具可选</text><text class="code" x="770" y="219">_get_tools_description()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="350"></rect><text class="tag" fill="#2a51df" x="50" y="379">保留</text><text class="title" x="50" y="409">01 · 组装请求</text><text class="body" x="50" y="438">选择 messages 与 tools</text><text class="body" x="50" y="463">不改工具的本地实现</text><text class="code" x="50" y="494">execute_task() · agent.py:757</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="350"></rect><text class="tag" fill="#2a51df" x="410" y="379">保留</text><text class="title" x="410" y="409">02 · 调用模型</text><text class="body" x="410" y="438">输出文本，或结构化工具调用</text><text class="body" x="410" y="463">本轮 thinking 仍然开启</text><text class="code" x="410" y="494">client.chat.completions.create</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="350"></rect><text class="tag" fill="#2a51df" x="770" y="379">写入历史 · assistant</text><text class="title" x="770" y="409">03 · 保存模型响应</text><text class="body" x="770" y="438">保留 assistant 与 tool_calls</text><text class="body" x="770" y="463">保留 reasoning_content</text><text class="code" x="770" y="494">_prepare_assistant_message()</text></g><rect fill="#eaf0ff" height="74" rx="12" stroke="#c6d5fa" width="320" x="390" y="533"></rect><text class="body" x="410" y="561">终止文本 → 单独评分</text><text class="label" x="410" y="588">有文本，不等于答案正确</text><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="675"></rect><text class="tag" fill="#2a51df" x="770" y="704">程序执行 · 模型只提出调用</text><text class="title" x="770" y="734">04 · 执行工具</text><text class="body" x="770" y="763">按名称和参数调用本地函数</text><text class="body" x="770" y="788">一轮可能执行多个工具</text><text class="code" x="770" y="819">_execute_tool()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="675"></rect><text class="tag" fill="#2a51df" x="410" y="704">反馈消息 · 对应此前调用</text><text class="title" x="410" y="734">05 · 写回工具结果</text><text class="body" x="410" y="763">保留 role=tool 与调用 ID</text><text class="body" x="410" y="788">content = 实际返回的 JSON</text><text class="code" x="410" y="819">tool_call_id + content</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="675"></rect><text class="tag" fill="#2a51df" x="50" y="704">仍保留 · 记录不等于发送</text><text class="title" x="50" y="734">06 · 留存与下一轮</text><text class="body" x="50" y="763">本地保存调用、实际结果</text><text class="body" x="50" y="788">下一轮重新选择要发送的历史</text><text class="code" x="50" y="819">trajectory + history</text></g><rect fill="#eaf0ff" height="80" rx="12" width="1040" x="30" y="875"></rect><text class="body" x="52" y="906">运行边界：最多 5 轮；达到上限也要保存证据，并单独判断任务是否完成。</text><text class="label" x="52" y="933">这是主路径示意：省略异常分支与“工具调用同轮附带最终答案”的特殊路径。</text></svg></div></div><div class="flow-panel" data-flow-panel="no_history" hidden=""><p class="flow-explanation">切断“历史消息 → 本轮请求”的连线。本地仍保存执行记录；每轮只发送 system 与当前 user，所以模型看不到之前做过什么。</p><div class="svg-scroll"><svg aria-labelledby="title-no_history desc-no_history" role="img" viewbox="0 0 1120 990" xmlns="http://www.w3.org/2000/svg">
-<title id="title-no_history">移除历史：Agent 上下文与工具循环</title><desc id="desc-no_history">切断“历史消息 → 本轮请求”的连线。本地仍保存执行记录；每轮只发送 system 与当前 user，所以模型看不到之前做过什么。 无工具调用时转入终止文本，再独立评分；所有模式都受轮数上限约束。</desc>
-<defs><marker id="arrow-no_history" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#617799"></path></marker><marker id="cut-no_history" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#b63b45"></path></marker></defs>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.title{font-size:21px;font-weight:650;fill:#18243d}.body{font-size:17px;fill:#4b5d76}.code{font-family:ui-monospace,monospace;font-size:13px;fill:#506282}.tag{font-size:13px;font-weight:650}.edge{fill:none;stroke:#617799;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.label{font-size:15px;fill:#536986}</style>
-<rect fill="#f6f8fc" height="990" rx="20" width="1120"></rect>
-<text class="tag" fill="#2a51df" x="30" y="34">输入：决定模型这一轮能看到什么</text><path class="edge" d="M190 235 V285 H910" style="stroke:#617799"></path><path class="edge" d="M550 235 V285" stroke-dasharray="7 6" style="stroke:#b63b45"></path><path class="edge" d="M910 235 V285" style="stroke:#617799"></path><path class="edge" d="M190 285 V350" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M350 425 H390" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M710 425 H750" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M910 510 V675" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M910 565 H710" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M750 755 H710" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M390 755 H350" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><path class="edge" d="M30 755 H12 V425 H30" marker-end="url(#arrow-no_history)" style="stroke:#617799"></path><text class="label" x="33" y="310">组成本轮 API 请求</text><text class="label" x="925" y="641">有 tool_calls</text><text class="label" x="721" y="548">无 tool_calls</text><text class="label" x="35" y="631">下一轮 ↑</text><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="65"></rect><text class="tag" fill="#2a51df" x="50" y="94">固定输入 · 每组保留</text><text class="title" x="50" y="124">系统指令 + 当前任务</text><text class="body" x="50" y="153">system：目标与规则</text><text class="body" x="50" y="178">user：四季度换汇任务</text><text class="code" x="50" y="219">conversation_history</text></g><g><rect fill="#fff3f3" height="170" rx="14" stroke="#e8a3aa" stroke-dasharray="7 5" stroke-width="1.5" width="320" x="390" y="65"></rect><text class="tag" fill="#b63b45" x="410" y="94">移除：不进入本轮请求</text><text class="title" x="410" y="124">历史消息</text><text class="body" x="410" y="153">此前 assistant / tool 消息</text><text class="body" x="410" y="178">含调用、结果、历史 reasoning</text><text class="code" x="410" y="219">_prepare_messages_for_api()</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="65"></rect><text class="tag" fill="#2a51df" x="770" y="94">能力接口 · tools</text><text class="title" x="770" y="124">工具定义</text><text class="body" x="770" y="153">工具名、用途与参数 schema</text><text class="body" x="770" y="178">告诉模型有哪些工具可选</text><text class="code" x="770" y="219">_get_tools_description()</text></g><circle cx="550" cy="262" fill="#fff3f3" r="12" stroke="#b63b45"></circle><path d="M545 257L555 267M555 257L545 267" stroke="#b63b45" stroke-width="2"></path><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="350"></rect><text class="tag" fill="#2a51df" x="50" y="379">保留</text><text class="title" x="50" y="409">01 · 组装请求</text><text class="body" x="50" y="438">选择 messages 与 tools</text><text class="body" x="50" y="463">不改工具的本地实现</text><text class="code" x="50" y="494">execute_task() · agent.py:757</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="350"></rect><text class="tag" fill="#2a51df" x="410" y="379">保留</text><text class="title" x="410" y="409">02 · 调用模型</text><text class="body" x="410" y="438">输出文本，或结构化工具调用</text><text class="body" x="410" y="463">本轮 thinking 仍然开启</text><text class="code" x="410" y="494">client.chat.completions.create</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="350"></rect><text class="tag" fill="#2a51df" x="770" y="379">写入历史 · assistant</text><text class="title" x="770" y="409">03 · 保存模型响应</text><text class="body" x="770" y="438">保留 assistant 与 tool_calls</text><text class="body" x="770" y="463">保留 reasoning_content</text><text class="code" x="770" y="494">_prepare_assistant_message()</text></g><rect fill="#eaf0ff" height="74" rx="12" stroke="#c6d5fa" width="320" x="390" y="533"></rect><text class="body" x="410" y="561">终止文本 → 单独评分</text><text class="label" x="410" y="588">有文本，不等于答案正确</text><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="675"></rect><text class="tag" fill="#2a51df" x="770" y="704">程序执行 · 模型只提出调用</text><text class="title" x="770" y="734">04 · 执行工具</text><text class="body" x="770" y="763">按名称和参数调用本地函数</text><text class="body" x="770" y="788">一轮可能执行多个工具</text><text class="code" x="770" y="819">_execute_tool()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="675"></rect><text class="tag" fill="#2a51df" x="410" y="704">反馈消息 · 对应此前调用</text><text class="title" x="410" y="734">05 · 写回工具结果</text><text class="body" x="410" y="763">保留 role=tool 与调用 ID</text><text class="body" x="410" y="788">content = 实际返回的 JSON</text><text class="code" x="410" y="819">tool_call_id + content</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="675"></rect><text class="tag" fill="#2a51df" x="50" y="704">仍保留 · 记录不等于发送</text><text class="title" x="50" y="734">06 · 留存与下一轮</text><text class="body" x="50" y="763">本地保存调用、实际结果</text><text class="body" x="50" y="788">下一轮重新选择要发送的历史</text><text class="code" x="50" y="819">trajectory + history</text></g><rect fill="#eaf0ff" height="80" rx="12" width="1040" x="30" y="875"></rect><text class="body" x="52" y="906">运行边界：最多 5 轮；达到上限也要保存证据，并单独判断任务是否完成。</text><text class="label" x="52" y="933">这是主路径示意：省略异常分支与“工具调用同轮附带最终答案”的特殊路径。</text></svg></div></div><div class="flow-panel" data-flow-panel="no_reasoning" hidden=""><p class="flow-explanation">在保存 assistant 消息时删除 reasoning_content。模型本轮仍可推理，工具调用字段和结果消息都保留。</p><div class="svg-scroll"><svg aria-labelledby="title-no_reasoning desc-no_reasoning" role="img" viewbox="0 0 1120 990" xmlns="http://www.w3.org/2000/svg">
-<title id="title-no_reasoning">移除历史 reasoning：Agent 上下文与工具循环</title><desc id="desc-no_reasoning">在保存 assistant 消息时删除 reasoning_content。模型本轮仍可推理，工具调用字段和结果消息都保留。 无工具调用时转入终止文本，再独立评分；所有模式都受轮数上限约束。</desc>
-<defs><marker id="arrow-no_reasoning" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#617799"></path></marker><marker id="cut-no_reasoning" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#b63b45"></path></marker></defs>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.title{font-size:21px;font-weight:650;fill:#18243d}.body{font-size:17px;fill:#4b5d76}.code{font-family:ui-monospace,monospace;font-size:13px;fill:#506282}.tag{font-size:13px;font-weight:650}.edge{fill:none;stroke:#617799;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.label{font-size:15px;fill:#536986}</style>
-<rect fill="#f6f8fc" height="990" rx="20" width="1120"></rect>
-<text class="tag" fill="#2a51df" x="30" y="34">输入：决定模型这一轮能看到什么</text><path class="edge" d="M190 235 V285 H910" style="stroke:#617799"></path><path class="edge" d="M550 235 V285" style="stroke:#617799"></path><path class="edge" d="M910 235 V285" style="stroke:#617799"></path><path class="edge" d="M190 285 V350" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M350 425 H390" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M710 425 H750" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M910 510 V675" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M910 565 H710" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M750 755 H710" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M390 755 H350" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><path class="edge" d="M30 755 H12 V425 H30" marker-end="url(#arrow-no_reasoning)" style="stroke:#617799"></path><text class="label" x="33" y="310">组成本轮 API 请求</text><text class="label" x="925" y="641">有 tool_calls</text><text class="label" x="721" y="548">无 tool_calls</text><text class="label" x="35" y="631">下一轮 ↑</text><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="65"></rect><text class="tag" fill="#2a51df" x="50" y="94">固定输入 · 每组保留</text><text class="title" x="50" y="124">系统指令 + 当前任务</text><text class="body" x="50" y="153">system：目标与规则</text><text class="body" x="50" y="178">user：四季度换汇任务</text><text class="code" x="50" y="219">conversation_history</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="65"></rect><text class="tag" fill="#2a51df" x="410" y="94">历史输入 · 首轮尚无历史</text><text class="title" x="410" y="124">历史消息</text><text class="body" x="410" y="153">此前 assistant / tool 消息</text><text class="body" x="410" y="178">含调用、结果、历史 reasoning</text><text class="code" x="410" y="219">_prepare_messages_for_api()</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="65"></rect><text class="tag" fill="#2a51df" x="770" y="94">能力接口 · tools</text><text class="title" x="770" y="124">工具定义</text><text class="body" x="770" y="153">工具名、用途与参数 schema</text><text class="body" x="770" y="178">告诉模型有哪些工具可选</text><text class="code" x="770" y="219">_get_tools_description()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="350"></rect><text class="tag" fill="#2a51df" x="50" y="379">保留</text><text class="title" x="50" y="409">01 · 组装请求</text><text class="body" x="50" y="438">选择 messages 与 tools</text><text class="body" x="50" y="463">不改工具的本地实现</text><text class="code" x="50" y="494">execute_task() · agent.py:757</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="350"></rect><text class="tag" fill="#2a51df" x="410" y="379">保留</text><text class="title" x="410" y="409">02 · 调用模型</text><text class="body" x="410" y="438">输出文本，或结构化工具调用</text><text class="body" x="410" y="463">本轮 thinking 仍然开启</text><text class="code" x="410" y="494">client.chat.completions.create</text></g><g><rect fill="#fff8eb" height="160" rx="14" stroke="#dfbd7b" stroke-width="1.5" width="320" x="750" y="350"></rect><text class="tag" fill="#975b08" x="770" y="379">改这里：删除历史推理字段</text><text class="title" x="770" y="409">03 · 保存模型响应</text><text class="body" x="770" y="438">保留 assistant 与 tool_calls</text><text class="body" x="770" y="463">删除 reasoning_content</text><text class="code" x="770" y="494">_prepare_assistant_message()</text></g><rect fill="#eaf0ff" height="74" rx="12" stroke="#c6d5fa" width="320" x="390" y="533"></rect><text class="body" x="410" y="561">终止文本 → 单独评分</text><text class="label" x="410" y="588">有文本，不等于答案正确</text><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="675"></rect><text class="tag" fill="#2a51df" x="770" y="704">程序执行 · 模型只提出调用</text><text class="title" x="770" y="734">04 · 执行工具</text><text class="body" x="770" y="763">按名称和参数调用本地函数</text><text class="body" x="770" y="788">一轮可能执行多个工具</text><text class="code" x="770" y="819">_execute_tool()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="675"></rect><text class="tag" fill="#2a51df" x="410" y="704">反馈消息 · 对应此前调用</text><text class="title" x="410" y="734">05 · 写回工具结果</text><text class="body" x="410" y="763">保留 role=tool 与调用 ID</text><text class="body" x="410" y="788">content = 实际返回的 JSON</text><text class="code" x="410" y="819">tool_call_id + content</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="675"></rect><text class="tag" fill="#2a51df" x="50" y="704">仍保留 · 记录不等于发送</text><text class="title" x="50" y="734">06 · 留存与下一轮</text><text class="body" x="50" y="763">本地保存调用、实际结果</text><text class="body" x="50" y="788">下一轮重新选择要发送的历史</text><text class="code" x="50" y="819">trajectory + history</text></g><rect fill="#eaf0ff" height="80" rx="12" width="1040" x="30" y="875"></rect><text class="body" x="52" y="906">运行边界：最多 5 轮；达到上限也要保存证据，并单独判断任务是否完成。</text><text class="label" x="52" y="933">这是主路径示意：省略异常分支与“工具调用同轮附带最终答案”的特殊路径。</text></svg></div></div><div class="flow-panel" data-flow-panel="no_tool_calls" hidden=""><p class="flow-explanation">请求不提供 tools。工具函数仍在本地，但没有作为接口交给模型。本次只返回调用样式文本，未产生结构化 tool_calls。</p><div class="svg-scroll"><svg aria-labelledby="title-no_tool_calls desc-no_tool_calls" role="img" viewbox="0 0 1120 990" xmlns="http://www.w3.org/2000/svg">
-<title id="title-no_tool_calls">移除工具定义：Agent 上下文与工具循环</title><desc id="desc-no_tool_calls">请求不提供 tools。工具函数仍在本地，但没有作为接口交给模型。本次只返回调用样式文本，未产生结构化 tool_calls。 无工具调用时转入终止文本，再独立评分；所有模式都受轮数上限约束。</desc>
-<defs><marker id="arrow-no_tool_calls" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#617799"></path></marker><marker id="cut-no_tool_calls" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#b63b45"></path></marker></defs>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.title{font-size:21px;font-weight:650;fill:#18243d}.body{font-size:17px;fill:#4b5d76}.code{font-family:ui-monospace,monospace;font-size:13px;fill:#506282}.tag{font-size:13px;font-weight:650}.edge{fill:none;stroke:#617799;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.label{font-size:15px;fill:#536986}</style>
-<rect fill="#f6f8fc" height="990" rx="20" width="1120"></rect>
-<text class="tag" fill="#2a51df" x="30" y="34">输入：决定模型这一轮能看到什么</text><path class="edge" d="M190 235 V285 H910" style="stroke:#617799"></path><path class="edge" d="M550 235 V285" style="stroke:#617799"></path><path class="edge" d="M910 235 V285" stroke-dasharray="7 6" style="stroke:#b63b45"></path><path class="edge" d="M190 285 V350" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M350 425 H390" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M710 425 H750" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M910 510 V675" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M910 565 H710" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M750 755 H710" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M390 755 H350" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><path class="edge" d="M30 755 H12 V425 H30" marker-end="url(#arrow-no_tool_calls)" style="stroke:#617799"></path><text class="label" x="33" y="310">组成本轮 API 请求</text><text class="label" x="925" y="641">有 tool_calls</text><text class="label" x="721" y="548">无 tool_calls</text><text class="label" x="35" y="631">下一轮 ↑</text><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="65"></rect><text class="tag" fill="#2a51df" x="50" y="94">固定输入 · 每组保留</text><text class="title" x="50" y="124">系统指令 + 当前任务</text><text class="body" x="50" y="153">system：目标与规则</text><text class="body" x="50" y="178">user：四季度换汇任务</text><text class="code" x="50" y="219">conversation_history</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="65"></rect><text class="tag" fill="#2a51df" x="410" y="94">历史输入 · 首轮尚无历史</text><text class="title" x="410" y="124">历史消息</text><text class="body" x="410" y="153">此前 assistant / tool 消息</text><text class="body" x="410" y="178">含调用、结果、历史 reasoning</text><text class="code" x="410" y="219">_prepare_messages_for_api()</text></g><g><rect fill="#fff3f3" height="170" rx="14" stroke="#e8a3aa" stroke-dasharray="7 5" stroke-width="1.5" width="320" x="750" y="65"></rect><text class="tag" fill="#b63b45" x="770" y="94">移除：请求不提供 tools</text><text class="title" x="770" y="124">工具定义</text><text class="body" x="770" y="153">工具名、用途与参数 schema</text><text class="body" x="770" y="178">告诉模型有哪些工具可选</text><text class="code" x="770" y="219">_get_tools_description()</text></g><circle cx="910" cy="262" fill="#fff3f3" r="12" stroke="#b63b45"></circle><path d="M905 257L915 267M915 257L905 267" stroke="#b63b45" stroke-width="2"></path><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="350"></rect><text class="tag" fill="#2a51df" x="50" y="379">保留</text><text class="title" x="50" y="409">01 · 组装请求</text><text class="body" x="50" y="438">选择 messages 与 tools</text><text class="body" x="50" y="463">不改工具的本地实现</text><text class="code" x="50" y="494">execute_task() · agent.py:757</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="350"></rect><text class="tag" fill="#2a51df" x="410" y="379">保留</text><text class="title" x="410" y="409">02 · 调用模型</text><text class="body" x="410" y="438">输出文本，或结构化工具调用</text><text class="body" x="410" y="463">本轮 thinking 仍然开启</text><text class="code" x="410" y="494">client.chat.completions.create</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="350"></rect><text class="tag" fill="#2a51df" x="770" y="379">写入历史 · assistant</text><text class="title" x="770" y="409">03 · 保存模型响应</text><text class="body" x="770" y="438">保留 assistant 与 tool_calls</text><text class="body" x="770" y="463">保留 reasoning_content</text><text class="code" x="770" y="494">_prepare_assistant_message()</text></g><rect fill="#eaf0ff" height="74" rx="12" stroke="#c6d5fa" width="320" x="390" y="533"></rect><text class="body" x="410" y="561">终止文本 → 单独评分</text><text class="label" x="410" y="588">有文本，不等于答案正确</text><g><rect fill="#fff8eb" height="160" rx="14" stroke="#dfbd7b" stroke-width="1.5" width="320" x="750" y="675"></rect><text class="tag" fill="#975b08" x="770" y="704">本次观察：没有结构化调用</text><text class="title" x="770" y="734">04 · 执行工具</text><text class="body" x="770" y="763">按名称和参数调用本地函数</text><text class="body" x="770" y="788">此步骤未触发</text><text class="code" x="770" y="819">_execute_tool()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="675"></rect><text class="tag" fill="#2a51df" x="410" y="704">反馈消息 · 对应此前调用</text><text class="title" x="410" y="734">05 · 写回工具结果</text><text class="body" x="410" y="763">保留 role=tool 与调用 ID</text><text class="body" x="410" y="788">content = 实际返回的 JSON</text><text class="code" x="410" y="819">tool_call_id + content</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="675"></rect><text class="tag" fill="#2a51df" x="50" y="704">仍保留 · 记录不等于发送</text><text class="title" x="50" y="734">06 · 留存与下一轮</text><text class="body" x="50" y="763">本地保存调用、实际结果</text><text class="body" x="50" y="788">下一轮重新选择要发送的历史</text><text class="code" x="50" y="819">trajectory + history</text></g><rect fill="#eaf0ff" height="80" rx="12" width="1040" x="30" y="875"></rect><text class="body" x="52" y="906">运行边界：最多 5 轮；达到上限也要保存证据，并单独判断任务是否完成。</text><text class="label" x="52" y="933">这是主路径示意：省略异常分支与“工具调用同轮附带最终答案”的特殊路径。</text></svg></div></div><div class="flow-panel" data-flow-panel="no_tool_results" hidden=""><p class="flow-explanation">工具执行成功后，仅把回传的 content 置空。本地实际结果保留，tool 消息和 tool_call_id 也保留。</p><div class="svg-scroll"><svg aria-labelledby="title-no_tool_results desc-no_tool_results" role="img" viewbox="0 0 1120 990" xmlns="http://www.w3.org/2000/svg">
-<title id="title-no_tool_results">隐藏工具结果：Agent 上下文与工具循环</title><desc id="desc-no_tool_results">工具执行成功后，仅把回传的 content 置空。本地实际结果保留，tool 消息和 tool_call_id 也保留。 无工具调用时转入终止文本，再独立评分；所有模式都受轮数上限约束。</desc>
-<defs><marker id="arrow-no_tool_results" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#617799"></path></marker><marker id="cut-no_tool_results" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="#b63b45"></path></marker></defs>
-<style>text{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}.title{font-size:21px;font-weight:650;fill:#18243d}.body{font-size:17px;fill:#4b5d76}.code{font-family:ui-monospace,monospace;font-size:13px;fill:#506282}.tag{font-size:13px;font-weight:650}.edge{fill:none;stroke:#617799;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.label{font-size:15px;fill:#536986}</style>
-<rect fill="#f6f8fc" height="990" rx="20" width="1120"></rect>
-<text class="tag" fill="#2a51df" x="30" y="34">输入：决定模型这一轮能看到什么</text><path class="edge" d="M190 235 V285 H910" style="stroke:#617799"></path><path class="edge" d="M550 235 V285" style="stroke:#617799"></path><path class="edge" d="M910 235 V285" style="stroke:#617799"></path><path class="edge" d="M190 285 V350" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M350 425 H390" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M710 425 H750" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M910 510 V675" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M910 565 H710" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M750 755 H710" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M390 755 H350" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><path class="edge" d="M30 755 H12 V425 H30" marker-end="url(#arrow-no_tool_results)" style="stroke:#617799"></path><text class="label" x="33" y="310">组成本轮 API 请求</text><text class="label" x="925" y="641">有 tool_calls</text><text class="label" x="721" y="548">无 tool_calls</text><text class="label" x="35" y="631">下一轮 ↑</text><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="65"></rect><text class="tag" fill="#2a51df" x="50" y="94">固定输入 · 每组保留</text><text class="title" x="50" y="124">系统指令 + 当前任务</text><text class="body" x="50" y="153">system：目标与规则</text><text class="body" x="50" y="178">user：四季度换汇任务</text><text class="code" x="50" y="219">conversation_history</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="65"></rect><text class="tag" fill="#2a51df" x="410" y="94">历史输入 · 首轮尚无历史</text><text class="title" x="410" y="124">历史消息</text><text class="body" x="410" y="153">此前 assistant / tool 消息</text><text class="body" x="410" y="178">含调用、结果、历史 reasoning</text><text class="code" x="410" y="219">_prepare_messages_for_api()</text></g><g><rect fill="#fff" height="170" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="65"></rect><text class="tag" fill="#2a51df" x="770" y="94">能力接口 · tools</text><text class="title" x="770" y="124">工具定义</text><text class="body" x="770" y="153">工具名、用途与参数 schema</text><text class="body" x="770" y="178">告诉模型有哪些工具可选</text><text class="code" x="770" y="219">_get_tools_description()</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="350"></rect><text class="tag" fill="#2a51df" x="50" y="379">保留</text><text class="title" x="50" y="409">01 · 组装请求</text><text class="body" x="50" y="438">选择 messages 与 tools</text><text class="body" x="50" y="463">不改工具的本地实现</text><text class="code" x="50" y="494">execute_task() · agent.py:757</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="390" y="350"></rect><text class="tag" fill="#2a51df" x="410" y="379">保留</text><text class="title" x="410" y="409">02 · 调用模型</text><text class="body" x="410" y="438">输出文本，或结构化工具调用</text><text class="body" x="410" y="463">本轮 thinking 仍然开启</text><text class="code" x="410" y="494">client.chat.completions.create</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="350"></rect><text class="tag" fill="#2a51df" x="770" y="379">写入历史 · assistant</text><text class="title" x="770" y="409">03 · 保存模型响应</text><text class="body" x="770" y="438">保留 assistant 与 tool_calls</text><text class="body" x="770" y="463">保留 reasoning_content</text><text class="code" x="770" y="494">_prepare_assistant_message()</text></g><rect fill="#eaf0ff" height="74" rx="12" stroke="#c6d5fa" width="320" x="390" y="533"></rect><text class="body" x="410" y="561">终止文本 → 单独评分</text><text class="label" x="410" y="588">有文本，不等于答案正确</text><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="750" y="675"></rect><text class="tag" fill="#2a51df" x="770" y="704">程序执行 · 模型只提出调用</text><text class="title" x="770" y="734">04 · 执行工具</text><text class="body" x="770" y="763">按名称和参数调用本地函数</text><text class="body" x="770" y="788">一轮可能执行多个工具</text><text class="code" x="770" y="819">_execute_tool()</text></g><g><rect fill="#fff8eb" height="160" rx="14" stroke="#dfbd7b" stroke-width="1.5" width="320" x="390" y="675"></rect><text class="tag" fill="#975b08" x="410" y="704">改这里：仅将结果内容置空</text><text class="title" x="410" y="734">05 · 写回工具结果</text><text class="body" x="410" y="763">保留 role=tool 与调用 ID</text><text class="body" x="410" y="788">content = ""</text><text class="code" x="410" y="819">tool_call_id + content</text></g><g><rect fill="#fff" height="160" rx="14" stroke="#d3dded" stroke-width="1.5" width="320" x="30" y="675"></rect><text class="tag" fill="#2a51df" x="50" y="704">仍保留 · 记录不等于发送</text><text class="title" x="50" y="734">06 · 留存与下一轮</text><text class="body" x="50" y="763">本地保存调用、实际结果</text><text class="body" x="50" y="788">下一轮重新选择要发送的历史</text><text class="code" x="50" y="819">trajectory + history</text></g><rect fill="#eaf0ff" height="80" rx="12" width="1040" x="30" y="875"></rect><text class="body" x="52" y="906">运行边界：最多 5 轮；达到上限也要保存证据，并单独判断任务是否完成。</text><text class="label" x="52" y="933">这是主路径示意：省略异常分支与“工具调用同轮附带最终答案”的特殊路径。</text></svg></div></div></div>
-
-
-
-## 01 · 先理解一轮，然后再看循环
-
-**请求层** · `history → messages → response`
-
-每一轮重新组装请求。history 是本地记忆，messages 是这一轮实际发出的内容；两者不一定相同。
-
-```python title="笔记教学示意 · 非课程源码原文" linenums="1"
-# 教学简化：省略供应商参数与异常分支
-for turn in range(max_iterations):
-    messages = select_context(history, mode)
-    response = call_model(messages, tools)
-    if not response.tool_calls:
-        final_answer = response.content
-        break
-    # 有结构化调用时，进入工具执行与回传
-```
-
-**① 有限循环**  
-轮数上限防止反复调用；到达上限只能说明停止，不能说明任务完成。
-
-**② 先选上下文**  
-消融在请求发出之前生效，不需要为每组重写一个 Agent。
-
-**③ 看结构化字段**  
-正文写“我要调用工具”没有执行效力，程序检查的是 tool_calls。
-
-??? info "对照真实源码 · agent.py · L757–790"
-
-    ```python linenums="757"
-    api_messages = self._prepare_messages_for_api()
-
-    # Prepare request data for logging
-    request_data = {
-        "model": self.model,
-        "messages": api_messages,
-        "temperature": _reasoning_safe_temperature(self.model, 0.3),
-        "max_tokens": 8192
-    }
-
-    if self.context_mode != ContextMode.NO_TOOL_CALLS:
-        request_data["tools"] = self._get_tools_description()
-        request_data["tool_choice"] = "auto"
-
-    # DeepSeek V4: enable thinking so reasoning_content is present
-    # for the no_reasoning ablation (parity with thinking defaults of
-    # Doubao/Kimi). Skip when routed via OpenRouter, which may not
-    # accept the same extra body shape.
-    create_kwargs = {
-        "model": self.model,
-        "messages": api_messages,
-        "tools": self._get_tools_description() if self.context_mode != ContextMode.NO_TOOL_CALLS else None,
-        "tool_choice": "auto" if self.context_mode != ContextMode.NO_TOOL_CALLS else None,
-        "temperature": _reasoning_safe_temperature(self.model, 0.3),
-        "max_tokens": 8192,
-        "timeout": 180,  # 180 second timeout for main execution
-    }
-    if self.provider == "deepseek" and not getattr(self, "using_openrouter", False):
-        create_kwargs["extra_body"] = {"thinking": {"type": "enabled"}}
-        request_data["thinking"] = {"type": "enabled"}
-
-    logger.info(f"Sending request to {self.provider} API")
-
-    # Call the model with tools
-    ```
-
-
-
-## 02 · 删掉发送内容，保留实验记录
-
-**上下文层** · `完整历史 → 本轮视图`
-
-no_history 在发送前过滤消息。不要直接清空 history，否则你连事后复盘所需的轨迹也丢掉了。
-
-```python title="笔记教学示意 · 非课程源码原文" linenums="1"
-# 教学简化：调用前保证 history 中存在 user 任务
-def select_context(history, mode):
-    if mode != "no_history":
-        return history
-    system = [m for m in history if m["role"] == "system"]
-    latest_user = next(m for m in reversed(history)
-                       if m["role"] == "user")
-    return [*system, latest_user]
-```
-
-**① 默认保留**  
-完整组和其他三组仍使用已有消息历史。
-
-**② 定位当前任务**  
-只保留 system 和最后一条 user，之前的 assistant/tool 不发给模型。
-
-**③ 对照现象**  
-本次移除历史组重复了 12 次调用；它每轮看不到之前做过什么。
-
-??? info "对照真实源码 · agent.py · L680–694"
-
-    ```python linenums="680"
-    messages = self.conversation_history
-    if self.context_mode != ContextMode.NO_HISTORY:
-        return messages
-
-    # System prompt(s) are always kept as the static prefix.
-    windowed = [m for m in messages if m.get("role") == "system"]
-
-    # Anchor on the latest user task. Nothing after it is retained: those
-    # messages are precisely the previous-round history being ablated.
-    user_indices = [i for i, m in enumerate(messages) if m.get("role") == "user"]
-    if not user_indices:
-        return windowed
-    last_user_idx = user_indices[-1]
-    windowed.append(messages[last_user_idx])
-    return windowed
-    ```
-
-
-
-## 03 · 只移除一个字段
-
-**消息层** · `模型响应 → assistant 历史`
-
-no_reasoning 改的是历史响应的保存方式。当前轮仍能推理，不应将它理解为关闭模型的思考能力。
-
-```python title="笔记教学示意 · 非课程源码原文" linenums="1"
-# 笔记教学示意：message 是外层 response 中的一条消息
-message = response.choices[0].message
-assistant = message.model_dump()
-if mode == "no_reasoning":
-    assistant.pop("reasoning_content", None)
-history.append(assistant)
-# tool_calls 继续保留，随后还要匹配工具结果
-```
-
-**① 转为字典**  
-SDK 对象与消息字典是不同边界；原实现同时兼容 dict/model_dump。
-
-**② 精确删除**  
-pop 的默认值 None 允许字段原本不存在。
-
-**③ 对照现象**  
-本次仍然答对，只能说明这次任务未出现正确性退化。
-
-**和原实现的区别：** 上面的示意假定 message 提供 `model_dump()`；原代码先用 `hasattr(message, 'dict')` 选择方法。示意使用 `pop(..., None)`，原代码先判断字段存在再 `pop`。两者都在讲“只移除历史 reasoning”，但文字并非逐字原文。
-
-??? info "对照真实源码 · agent.py · L547–553"
-
-    ```python linenums="547"
-    msg_dict = message.dict() if hasattr(message, 'dict') else message.model_dump()
-
-    # Remove reasoning_content if in NO_REASONING mode
-    if self.context_mode == ContextMode.NO_REASONING and 'reasoning_content' in msg_dict:
-        msg_dict.pop('reasoning_content')
-
-    return msg_dict
-    ```
-
-
-
-## 04 · 把“可选择”与“实际执行”分开
-
-**能力接口** · `tools 定义 ≠ 本地函数`
-
-工具定义告诉模型名字、用途与参数；工具分发器负责在本地执行。移除定义不会把 Python 函数从磁盘删掉。
-
-```python title="笔记教学示意 · 非课程源码原文" linenums="1"
-# 教学简化：模型请求与本地执行分属两个位置
-kwargs = {"messages": messages, "model": model}
-if mode != "no_tool_calls":
-    kwargs["tools"] = tool_definitions
-response = client.chat.completions.create(**kwargs)
-
-# 只有收到结构化调用，执行分支才使用此映射
-tool_map = {"calculate": calculate}
-result = tool_map[tool_name](**arguments)
-```
-
-**① 不发送 tools**  
-这组改变的是模型的能力接口。
-
-**② 名称映射**  
-原实现先判断未知名称，再调用本地函数；示意代码省略了该错误分支。
-
-**③ 对照现象**  
-本次返回 DSML 样式文本，但实际工具执行次数为 0。
-
-??? info "对照真实源码 · agent.py · L639–660"
-
-    ```python linenums="639"
-    def _execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
-        """
-        Execute a tool and return the result
-
-        Args:
-            tool_name: Name of the tool to execute
-            arguments: Arguments for the tool
-
-        Returns:
-            Tool execution result
-        """
-        tool_map = {
-            "parse_pdf": self.tools.parse_pdf,
-            "convert_currency": self.tools.convert_currency,
-            "calculate": self.tools.calculate,
-            "code_interpreter": self.tools.code_interpreter
-        }
-
-        if tool_name not in tool_map:
-            return {"error": f"Unknown tool: {tool_name}"}
-
-        return tool_map[tool_name](**arguments)
-    ```
-
-
-
-## 05 · 一个结果，两个去向
-
-**反馈层** · `实际结果 → 本地证据 / 模型消息`
-
-先留存真实结果，再决定给模型看什么。这样才能证明工具执行过，也能确认隐藏组确实没收到内容。
-
-```python title="笔记教学示意 · 非课程源码原文" linenums="1"
-# 教学简化：正常工具执行路径
-result = execute_tool(name, arguments)
-trajectory.append({"name": name, "result": result})
-content = json.dumps(result, default=str)
-if mode == "no_tool_results":
-    content = ""
-history.append({
-    "role": "tool", "tool_call_id": call.id,
-    "content": content,
-})
-```
-
-**① 先存真实结果**  
-trajectory 用于审计，不会因为隐藏反馈而丢失执行证据。
-
-**② 保留调用 ID**  
-tool_call_id 把这条结果与之前的调用对应起来，不能随意删除。
-
-**③ 明确适用范围**  
-原实现使用 hidden_result_content，本次配置为空字符串。参数 JSON 解析失败另有分支，不能把此图理解成所有错误反馈都被清空。
-
-??? info "对照真实源码 · agent.py · L869–900"
-
-    ```python linenums="869"
-
-        result = self._execute_tool(function_name, function_args)
-
-        tool_call_record = ToolCall(
-            tool_name=function_name,
-            arguments=function_args,
-            result=result
-        )
-        self.trajectory.tool_calls.append(tool_call_record)
-
-        if self.context_mode != ContextMode.NO_TOOL_RESULTS:
-            tool_msg = {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                # default=str: code_interpreter returns the raw
-                # namespace in `variables`, which can hold sets,
-                # dict views etc. that json can't encode — that
-                # must not abort the whole task.
-                "content": json.dumps(result, default=str)
-            }
-        else:
-            tool_msg = {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": self.hidden_result_content
-            }
-        messages.append(tool_msg)
-
-    # If the same turn also tagged FINAL ANSWER: (unusual with tools),
-    # still prefer extracting it after tools are recorded.
-    if message.content and "FINAL ANSWER:" in message.content:
-        final_answer = self._extract_final_answer(message.content)
-    ```
-
-## 自己实现的顺序
-
-1. 先用一个计算器工具跑通完整循环。
-2. 拆开上下文选择、工具分发和结果评分。
-3. 逐个加入消融，核对实际请求。
-4. 最后补参数解析、异常、轮数限制与日志。
-
-!!! note "示例边界"
-    教学片段只解释职责，不是独立可运行脚本。原始源码摘录来自本次学习所用的仓库版本。
-
-## 06 · 实验入口为什么每组新建 Agent
-
-**课程源码原文** · `chapter1/context/run_experiment_1_1.py` · L645–L663。仅去除公共缩进，未增补注释。
-
-[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/run_experiment_1_1.py#L645)
-
-```python linenums="645"
-arms = []
-for mode in modes:
-    started = utc_now()
-    agent = ContextAwareAgent(
-        key,
-        context_mode=mode,
-        provider=args.provider,
-        model=model,
-        verbose=False,
-        hidden_result_content=hidden_result_content,
-    )
-    begin = time.monotonic()
-    result = agent.execute_task(task, max_iterations=args.max_iterations)
-    arm = summarize_arm(
-        mode,
-        result,
-        time.monotonic() - begin,
-        task_text=task,
-        hidden_result_content=hidden_result_content,
-```
-
-`modes` 是这次要运行的模式列表。循环内创建新实例，把模式传入 `context_mode`；随后用同一 `task` 和相同轮数上限执行。新实例避免上一组的历史污染下一组。
-
-不要在同一个实例上只改 mode 就立刻继续下一组，除非你确实清理了所有历史、轨迹与提供商状态。那会改变“各组独立”的实验条件。
-
-## 07 · 为什么还需要检查实际请求
-
-**课程源码原文** · `chapter1/context/run_experiment_1_1.py` · L207–L215。仅去除公共缩进，未增补注释。
-
-[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/run_experiment_1_1.py#L207)
-
-```python linenums="207"
-elif mode == ContextMode.NO_TOOL_CALLS.value:
-    details.update(
-        {
-            "tools_absent_every_turn": all(
-                "tools" not in r and "tool_choice" not in r for r in requests
-            ),
-        }
-    )
-    required = ("has_provider_response_ids", "tools_absent_every_turn")
-```
-
-这是工具定义消融的验收：检查每一轮请求里同时没有 `tools` 与 `tool_choice`，而不是只相信命令行写了 `no_tool_calls`。
-
-其他组也应在请求层检查：历史是否仍被发送、历史 reasoning 字段是否残留、工具结果内容是否真的置空。模式名是配置意图，实际请求才是行为证据。
-
-## 08 · 把三个“成功”分开
-
-| 层次 | 问题 | 本次例子 |
+| 实际变量 / 记录 | 谁使用它 | 设计理由 |
 | --- | --- | --- |
-| 执行有效 | 有真实响应，实际请求满足消融条件吗？ | 五组均可形成有效记录 |
-| 循环终止 | 没有工具调用，或达到轮数上限了吗？ | 移除工具定义后收到普通文本并停止 |
-| 任务正确 | 是否给出正确且有依据的答案？ | 上述普通文本没有完成换汇任务 |
+| `self.conversation_history` | Agent 保存对话；局部 `messages` 指向它 | 执行循环持续追加 assistant 和 tool 消息 |
+| `api_messages` | 当前模型请求 | 可以只选一部分历史，而不清空本地列表 |
+| `tools` 请求字段 | 模型 | 描述可调用的名字、参数，不是 Python 实现 |
+| `_execute_tool` 的工具映射 | 本地执行器 | 把模型提出的名字映射到真实函数 |
+| 工具调用轨迹、`api_turns` | 实验评估与复盘 | 分别追踪执行行为和每轮实际请求 |
 
-没有结构化调用时，源码会把非空正文作为终止文本。因此不要把终止标记理解成任务答案正确；评分应单独进行。
+![design-context 的状态与责任](../assets/code-flow/design-context.svg)
 
-## 09 · 写代码时逐层自查
+## 3. 跟一条消息走两轮
 
-1. **入口**：各组是否使用同一任务、同一模型和相同上限？
-2. **请求**：真正发给模型的 messages 与 tools 是否符合模式？
-3. **执行**：模型只是提议，本地是否按名称与参数执行了工具？
-4. **反馈**：assistant 调用与 tool 结果的 ID 是否一一对应？
-5. **记录**：隐藏给模型的内容，是否仍留在本地证据里？
-6. **结论**：有没有把 API 成功、循环结束和任务正确混成一个布尔值？
+**教学推演**：用户要求“计算 2 + 3”。用 S 表示 system，U 表示 user，A₁ 表示第一轮的工具调用，T₁ 表示返回结果 5。工具名与参数形状在此省略，避免把推演误认成原始请求。
+
+| 时刻 | 本地历史 | full 发给模型 | no_history 发给模型 |
+| --- | --- | --- | --- |
+| 第一轮开始 | `[S, U]` | `[S, U]` | `[S, U]` |
+| 执行工具后 | `[S, U, A₁, T₁]` | 尚未发送下一轮 | 尚未发送下一轮 |
+| 第二轮开始 | `[S, U, A₁, T₁]` | 知道已经算出 5 | 仍只有 `[S, U]`，看不到上轮动作与结果 |
+
+由此可以先预测：`no_history` 可能反复执行同样工具。它并不是工具没运行，而是下一轮缺少“已经运行”的信息。预测不是必然规律，实际次数要看日志。
+
+### 设计落点：在请求边界选择，不在循环中删除
+
+**课程源码原文** · `chapter1/context/agent.py` L680–694 · [定位源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/agent.py#L680)
+
+```python linenums="680"
+messages = self.conversation_history
+if self.context_mode != ContextMode.NO_HISTORY:
+    return messages
+
+# System prompt(s) are always kept as the static prefix.
+windowed = [m for m in messages if m.get("role") == "system"]
+
+# Anchor on the latest user task. Nothing after it is retained: those
+# messages are precisely the previous-round history being ablated.
+user_indices = [i for i, m in enumerate(messages) if m.get("role") == "user"]
+if not user_indices:
+    return windowed
+last_user_idx = user_indices[-1]
+windowed.append(messages[last_user_idx])
+return windowed
+```
+
+这里 `windowed` 是新列表；`append` 选入最后一个 user。它不是“最近 N 轮”，也不是“保留当前工具往返”：**最新 user 后的 assistant / tool 都不选入**。源码调用处的概括性注释不如这段选择逻辑精确。
+
+普通模式直接返回 `messages`，没有复制列表。阅读调用处时，要区分 `messages`（留存列表的别名）与 `api_messages`（实际传给 API 的选择结果）。如果把这里改成 `self.conversation_history.clear()`，就同时改变了留存状态，不能再用同样方式解释实验。
+
+## 4. 另外三种删除，为什么放在不同位置？ {#context-flow}
+
+| 模式 | 处理位置 | 改了什么 | 仍然保留什么 |
+| --- | --- | --- | --- |
+| `no_reasoning` | assistant 消息入历史前 | 移除 `reasoning_content` | 工具调用、正常消息；当前轮 thinking 配置仍开启 |
+| `no_tool_calls` | API 参数组装时 | 不发送 `tools`、`tool_choice` | 本地工具函数仍存在，但没有正常的结构化工具接口声明 |
+| `no_tool_results` | 工具执行后 | 正常结果分支的 tool `content` 替换为空串 | 工具已执行，调用 ID、角色与执行轨迹仍存在 |
+
+三个位置对应三种不同问题：模型是否能继承历史 reasoning？是否知道工具接口？是否能获得执行反馈？只说“删上下文”无法指导你该改哪段代码。
+
+### 为什么 SDK 消息先转成字典？
+
+SDK 的 `message` 是对象，后续逻辑却需要统一用键来删字段、存入历史。转换发生在 `_prepare_assistant_message` 内；这是程序的数据边界。
+
+**课程源码原文** · `chapter1/context/agent.py` L547–553 · [定位源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/agent.py#L547)
+
+```python linenums="547"
+msg_dict = message.dict() if hasattr(message, 'dict') else message.model_dump()
+
+# Remove reasoning_content if in NO_REASONING mode
+if self.context_mode == ContextMode.NO_REASONING and 'reasoning_content' in msg_dict:
+    msg_dict.pop('reasoning_content')
+
+return msg_dict
+```
+
+`# 教学简化：先把 SDK 响应转换为消息字典` 是旧笔记写的注释，**不是原注释**。上面是课程原文。输入是 `response.choices[0].message`，不是整个 `response`；外层还有用量等数据，不能混为一谈。
+
+### 为什么空结果还要留一条 tool 消息？
+
+模型先给出调用 ID，返回消息用 `tool_call_id` 对上它。隐藏结果时保留这层配对，就能尽量把“没有结果内容”与“调用协议被破坏”区分开。注意源码的参数 JSON 解析错误走单独分支，会写回错误；不能声称该模式所有 tool 内容都绝对为空。
+
+[切换五组完整 SVG 流程图](source-reference.md#context-flow)
+
+## 5. 从实现推出实验的验收方式
+
+首先检查**实际 API 请求**是否遵守该组规则，然后再检查行动和答案。只检查 `context_mode` 字符串，证明不了请求真的删掉了对应内容。
+
+本次 full 用 3 轮、4 次工具得到正确答案；no_history 达到 5 轮上限，15 次工具里有 12 次重复。这个结果与上面的信息缺失推演相符。但每组只跑一次，不能据此宣称普遍成功率。`completed` 只说明产生终止文本，不代表计算正确；评分必须独立。
+
+## 6. 现在打开源码，按什么顺序读？
+
+1. `run_experiment_1_1.py::main` 附近的模式循环（L645 起）：确认每组新的实例与相同任务。
+2. `agent.py::execute_task`（L703 起）：只先标出请求、保存、执行、回写、终止五个位置。
+3. `_prepare_messages_for_api`（L663 起）：解释第二轮模型究竟能看到什么。
+4. `_prepare_assistant_message` 与 `_execute_tool`：理解数据转换与动作执行的职责。
+5. 运行器 `evaluate_context_contract`：对照实验声明和实际请求。
+
+**自检题**：如果想测“只保留最近一次工具往返”，应该改工具执行器还是消息选择器？
+
+??? tip "思路对照"
+    改消息选择器，并保留 assistant 调用与其全部 tool 结果的配对。它是新的实验条件，不等同于当前 `no_history`。还应添加请求层的契约检查，确认你真正发出了计划中的窗口。
+
+[继续：逐段源码备查](source-reference.md) · [下一课：搜索循环由谁执行？](search-code.md)
