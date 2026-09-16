@@ -7,6 +7,68 @@
 !!! note "怎样读这一页"
     先理解为什么需要这些模块，再跟随例子进入函数。标为“教学推演”的数据仅帮助理解，不是实验日志；代码块注明来源。完整摘录放在页末的备查链接中。
 
+## 动手搭建：从生成一张图，到比较两条路线
+
+以下为**教学示意**；`rewrite`、`generate` 是简化接口。每一步说明真实代码的落点。
+
+### 版本 1：先有一条能运行的路径
+
+```python
+prompt = requirement
+image = generate(prompt)
+```
+
+这只回答“能否生成图片”。要研究提示词改写，必须加入另一路径，同时尽量固定生成条件。
+
+### 版本 2：增加改写分支，然后共用生成器
+
+```python
+for route in ["direct", "rewrite"]:
+    prompt = requirement
+    negative = ""
+    if route == "rewrite":
+        rewritten = rewrite(requirement)
+        prompt = rewritten["prompt"]
+        negative = rewritten["negative_prompt"]
+    image = generate(prompt, negative)
+```
+
+**为什么在循环内重新赋值？** 保证每条路线都从原始需求开始，避免上一条路线的改写结果成为下一条路线的输入。
+
+**真实落点**：`run_image_learning.py` 的 route 循环与 `generate_image_wanx()` 汇合点。`parse_rewrite_output()` 负责把改写文本解析为字段。
+
+### 版本 3：把“生成”展开，原来是异步任务
+
+```text
+提交 prompt → 获得 task_id → 查询状态
+                              ├─ 未完成：继续等待
+                              ├─ 失败：记录错误
+                              └─ 成功：取 URL → 下载 bytes
+```
+
+**问题**：提交请求成功不代表图片已经完成。真实 `generate_image_wanx()` 封装提交、轮询与下载，让上层可以继续围绕 route 组织实验。
+
+**看数据类型**：`task_id` 是任务标识；URL 是下载位置；`bytes` 才是实际图片内容，三者不能混用。
+
+### 版本 4：把可追溯记录与输出一起保存
+
+```python
+record = {"route": route, "prompt": prompt, "negative_prompt": negative}
+# 教学示意：实际还保存文件类型、哈希、调用信息等
+save(image, record)
+```
+
+**为什么不只保留图片？** 以后需要从结果追溯输入，才能判断比较是否公平。真实代码保存图像文件及请求、MIME、字节数、SHA-256。
+
+### 版本 5：增加需求验收，区分“生成了”与“满足了”
+
+用海报指定文字作例子：先看改写是否保留文案，再看图中是否准确呈现。本次两条路线都未满足准确文案要求，不能以十张图片成功落盘替代质量验收。
+
+**动手预测**：如果改写 JSON 中 prompt 非空，但文案丢失，解析器会报错吗？不会；结构校验与语义约束不同。自动硬约束校验是建议增强，当前实现尚未提供通用检查。
+
+---
+
+
 ## 1. 从两段脚本推到一条公共流水线
 
 最直观的写法是“原提示词生图”一份脚本、“改写后生图”另一份脚本。但若两份脚本选了不同图像模型、尺寸或保存方式，就很难把差异归因于提示词。

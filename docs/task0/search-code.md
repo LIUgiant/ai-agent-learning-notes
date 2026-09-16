@@ -7,6 +7,62 @@
 !!! note "怎样读这一页"
     先理解为什么需要这些模块，再跟随例子进入函数。标为“教学推演”的数据仅帮助理解，不是实验日志；代码块注明来源。完整摘录放在页末的备查链接中。
 
+## 动手搭建：从一次提问，到有证据的搜索
+
+以下是**教学示意**。`request()`、`collect_final()`、`extract()` 表示职责，不是项目中可以直接调用的同名函数。真实实现位置在每一步后说明。
+
+### 版本 1：只拿回答，无法证明搜索发生
+
+```python
+result = request(input=question)
+print(result["text"])
+```
+
+**问题**：文本写“我查过资料”，程序仍然不知道是否真的调用搜索。下一步需要给请求声明能力，并保留行动记录。
+
+### 版本 2：只改变能力声明，复用请求层
+
+```python
+result = request(input=question, tools=[{"type": "web_search"}])
+```
+
+**为什么没有本地工具循环？** 本实验用提供商托管搜索，远端负责多次查询与补证。本地请求一次，不等于远端只搜索一次。
+
+**真实落点**：`SearchOnlyAgent._tools()` 覆盖父类工具列表；父类 `_build_request()` 调用 `self._tools()`。继承的目的，是只改实验变量、复用传输和解析。
+
+### 版本 3：收到内容，还要确认完整结束
+
+```python
+final_response = collect_final(event_stream)
+if final_response is None:
+    return {"success": False, "error": "stream_incomplete"}
+```
+
+**问题**：网络流可能只有部分事件就结束。不能看到几个字就当完整响应。真实 `_post_responses()` 收集 SSE 事件里的终态 response；失败终态仍需判失败。
+
+**追踪数据**：问题字符串 → 请求字典 → 事件流 → 完整 response。直到这一步之后，才适合统一整理答案和证据。
+
+### 版本 4：拆开答案与行动，再验收
+
+```python
+text, items, citations = extract(final_response)
+completed_searches = [
+    item for item in items
+    if item.get("type") == "web_search_call"
+    and item.get("status") == "completed"
+]
+passed = len(completed_searches) >= 2 and bool(citations)
+```
+
+**这能证明什么？** 至少两个完成回执且有引用；不能证明两个查询不同，也不能证明每个结论可靠。真实运行器还检查响应成功。
+
+**真实落点**：`process_request()` 整理结果；学习脚本 `run_search_learning.py` 的 `checks` 验收。
+
+**动手验证**：构造三个字典记录，其中两个 completed、一个 failed，观察过滤后还剩几个；再把两个 completed 改为相同查询，观察当前计数仍通过。你就能理解“次数检查”的边界。
+
+---
+
+
 ## 1. 需求如何变成模块边界
 
 任务要求核查东盟信息并补充证据。最简单的“直接问模型”只能得到一段回答，无法证明它查过资料。加上搜索后，又会出现两个职责：**决定下一次查什么**，以及**核实它确实查了什么**。
