@@ -1,6 +1,30 @@
 # 1-1 · 从流程到源码
 
-先看完整循环，再定位每一种消融改动。
+[代码来源与阅读约定](code-guide.md) · [返回五组实验结果](ablation.md)
+
+!!! note "先区分原文与示意"
+    每节默认展示的短代码是**笔记教学示意**；“对照真实源码”折叠块才是课程文件摘录。`# 教学简化...` 是笔记新增的注释，不能当作课程原注释。
+
+## 先看对象关系：response 不是 message
+
+调用模型得到的外层 `response` 包含候选结果、用量等内容；`response.choices[0].message` 才是此轮 assistant 消息。原代码随后把 message 传入 `_prepare_assistant_message()`。
+
+**课程源码原文** · `chapter1/context/agent.py` · L811–L813。仅去除公共缩进，未增补注释。
+
+[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/agent.py#L811)
+
+```python linenums="811"
+
+message = response.choices[0].message
+has_tool_calls = bool(getattr(message, "tool_calls", None))
+```
+
+
+[![1-1：模型响应如何变成下一轮历史](../assets/code-flow/context-sdk.svg)](../assets/code-flow/context-sdk.svg)
+
+*读图：数据从对象转为字典，再进入消息历史；删除发生在哪一步，决定消融的含义。*
+
+
 
 ## 五组流程对照
 
@@ -39,7 +63,7 @@
 
 每一轮重新组装请求。history 是本地记忆，messages 是这一轮实际发出的内容；两者不一定相同。
 
-```python linenums="1"
+```python title="笔记教学示意 · 非课程源码原文" linenums="1"
 # 教学简化：省略供应商参数与异常分支
 for turn in range(max_iterations):
     messages = select_context(history, mode)
@@ -106,7 +130,7 @@ for turn in range(max_iterations):
 
 no_history 在发送前过滤消息。不要直接清空 history，否则你连事后复盘所需的轨迹也丢掉了。
 
-```python linenums="1"
+```python title="笔记教学示意 · 非课程源码原文" linenums="1"
 # 教学简化：调用前保证 history 中存在 user 任务
 def select_context(history, mode):
     if mode != "no_history":
@@ -154,9 +178,10 @@ def select_context(history, mode):
 
 no_reasoning 改的是历史响应的保存方式。当前轮仍能推理，不应将它理解为关闭模型的思考能力。
 
-```python linenums="1"
-# 教学简化：先把 SDK 响应转换为消息字典
-assistant = response.model_dump()
+```python title="笔记教学示意 · 非课程源码原文" linenums="1"
+# 笔记教学示意：message 是外层 response 中的一条消息
+message = response.choices[0].message
+assistant = message.model_dump()
 if mode == "no_reasoning":
     assistant.pop("reasoning_content", None)
 history.append(assistant)
@@ -171,6 +196,8 @@ pop 的默认值 None 允许字段原本不存在。
 
 **③ 对照现象**  
 本次仍然答对，只能说明这次任务未出现正确性退化。
+
+**和原实现的区别：** 上面的示意假定 message 提供 `model_dump()`；原代码先用 `hasattr(message, 'dict')` 选择方法。示意使用 `pop(..., None)`，原代码先判断字段存在再 `pop`。两者都在讲“只移除历史 reasoning”，但文字并非逐字原文。
 
 ??? info "对照真实源码 · agent.py · L547–553"
 
@@ -192,7 +219,7 @@ pop 的默认值 None 允许字段原本不存在。
 
 工具定义告诉模型名字、用途与参数；工具分发器负责在本地执行。移除定义不会把 Python 函数从磁盘删掉。
 
-```python linenums="1"
+```python title="笔记教学示意 · 非课程源码原文" linenums="1"
 # 教学简化：模型请求与本地执行分属两个位置
 kwargs = {"messages": messages, "model": model}
 if mode != "no_tool_calls":
@@ -248,7 +275,7 @@ result = tool_map[tool_name](**arguments)
 
 先留存真实结果，再决定给模型看什么。这样才能证明工具执行过，也能确认隐藏组确实没收到内容。
 
-```python linenums="1"
+```python title="笔记教学示意 · 非课程源码原文" linenums="1"
 # 教学简化：正常工具执行路径
 result = execute_tool(name, arguments)
 trajectory.append({"name": name, "result": result})
@@ -316,3 +343,76 @@ tool_call_id 把这条结果与之前的调用对应起来，不能随意删除�
 
 !!! note "示例边界"
     教学片段只解释职责，不是独立可运行脚本。原始源码摘录来自本次学习所用的仓库版本。
+
+## 06 · 实验入口为什么每组新建 Agent
+
+**课程源码原文** · `chapter1/context/run_experiment_1_1.py` · L645–L663。仅去除公共缩进，未增补注释。
+
+[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/run_experiment_1_1.py#L645)
+
+```python linenums="645"
+arms = []
+for mode in modes:
+    started = utc_now()
+    agent = ContextAwareAgent(
+        key,
+        context_mode=mode,
+        provider=args.provider,
+        model=model,
+        verbose=False,
+        hidden_result_content=hidden_result_content,
+    )
+    begin = time.monotonic()
+    result = agent.execute_task(task, max_iterations=args.max_iterations)
+    arm = summarize_arm(
+        mode,
+        result,
+        time.monotonic() - begin,
+        task_text=task,
+        hidden_result_content=hidden_result_content,
+```
+
+`modes` 是这次要运行的模式列表。循环内创建新实例，把模式传入 `context_mode`；随后用同一 `task` 和相同轮数上限执行。新实例避免上一组的历史污染下一组。
+
+不要在同一个实例上只改 mode 就立刻继续下一组，除非你确实清理了所有历史、轨迹与提供商状态。那会改变“各组独立”的实验条件。
+
+## 07 · 为什么还需要检查实际请求
+
+**课程源码原文** · `chapter1/context/run_experiment_1_1.py` · L207–L215。仅去除公共缩进，未增补注释。
+
+[打开该版本源码](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter1/context/run_experiment_1_1.py#L207)
+
+```python linenums="207"
+elif mode == ContextMode.NO_TOOL_CALLS.value:
+    details.update(
+        {
+            "tools_absent_every_turn": all(
+                "tools" not in r and "tool_choice" not in r for r in requests
+            ),
+        }
+    )
+    required = ("has_provider_response_ids", "tools_absent_every_turn")
+```
+
+这是工具定义消融的验收：检查每一轮请求里同时没有 `tools` 与 `tool_choice`，而不是只相信命令行写了 `no_tool_calls`。
+
+其他组也应在请求层检查：历史是否仍被发送、历史 reasoning 字段是否残留、工具结果内容是否真的置空。模式名是配置意图，实际请求才是行为证据。
+
+## 08 · 把三个“成功”分开
+
+| 层次 | 问题 | 本次例子 |
+| --- | --- | --- |
+| 执行有效 | 有真实响应，实际请求满足消融条件吗？ | 五组均可形成有效记录 |
+| 循环终止 | 没有工具调用，或达到轮数上限了吗？ | 移除工具定义后收到普通文本并停止 |
+| 任务正确 | 是否给出正确且有依据的答案？ | 上述普通文本没有完成换汇任务 |
+
+没有结构化调用时，源码会把非空正文作为终止文本。因此不要把终止标记理解成任务答案正确；评分应单独进行。
+
+## 09 · 写代码时逐层自查
+
+1. **入口**：各组是否使用同一任务、同一模型和相同上限？
+2. **请求**：真正发给模型的 messages 与 tools 是否符合模式？
+3. **执行**：模型只是提议，本地是否按名称与参数执行了工具？
+4. **反馈**：assistant 调用与 tool 结果的 ID 是否一一对应？
+5. **记录**：隐藏给模型的内容，是否仍留在本地证据里？
+6. **结论**：有没有把 API 成功、循环结束和任务正确混成一个布尔值？

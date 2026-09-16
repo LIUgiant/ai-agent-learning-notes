@@ -1,0 +1,144 @@
+{
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "note": "sha256 is over exact selected lines joined with LF before display dedent; personal scripts are local snapshots, not upstream committed files",
+  "excerpts": [
+    {
+      "file": "learning/task0/run_search_learning.py",
+      "start": 16,
+      "end": 18,
+      "sha256": "4a3e50e6b0de132e69eab553b7c489b2b872ae8c4636a8dc89787743079c7f37"
+    },
+    {
+      "file": "learning/task0/run_search_learning.py",
+      "start": 33,
+      "end": 48,
+      "sha256": "cac95cf0499d53341367e511317ee31dd4fb6d8670d01a1dfab5ca3de20ed4c4"
+    },
+    {
+      "file": "chapter1/search-codegen/agent.py",
+      "start": 94,
+      "end": 117,
+      "sha256": "b32ee5221e2aa8756944aaf059a27d749de143a34ad6db1c8467882e4bfdab48"
+    },
+    {
+      "file": "chapter1/search-codegen/agent.py",
+      "start": 213,
+      "end": 231,
+      "sha256": "bfae99e92b1590cadf66c6e330e575c4b1d6e40451c4bcd6f7712fc1b04905cd"
+    },
+    {
+      "file": "chapter1/search-codegen/agent.py",
+      "start": 133,
+      "end": 145,
+      "sha256": "ffdec6ace542dc6c3e9548258e3b55ba4f1af6249978a251fb9ad29fc77bdc8b"
+    },
+    {
+      "file": "learning/task0/run_search_learning.py",
+      "start": 49,
+      "end": 65,
+      "sha256": "9f22458d9b4c959cdc839c08b5c0b9615c96644e6a9162a1729e3091fb73e397"
+    },
+    {
+      "file": "chapter1/web-search-agent/agent.py",
+      "start": 449,
+      "end": 479,
+      "sha256": "f31fe4b2f26768610531434955191c60a9e4117f2e3c088f3c14c513781ff339"
+    },
+    {
+      "file": "chapter1/search-codegen/run_experiment_1_3.py",
+      "start": 218,
+      "end": 242,
+      "sha256": "445af3747958aed81f7c09bfb882f4036754fcab5aaf7d4ab97e1537a9023e85"
+    },
+    {
+      "file": "chapter1/search-codegen/run_experiment_1_3.py",
+      "start": 160,
+      "end": 165,
+      "sha256": "a3cccdb94afa53dd6d2b053736659aac8bbfbcdb91be1e5577015a00ba99ed1e"
+    },
+    {
+      "file": "chapter1/search-codegen/agent.py",
+      "start": 302,
+      "end": 322,
+      "sha256": "b365cdcdb793d70156229f27a27c5372bf71815cd29c5bab3ca17849acf65731"
+    },
+    {
+      "file": "chapter1/search-codegen/agent.py",
+      "start": 65,
+      "end": 68,
+      "sha256": "42d7b00cb65dba727ec9f14fea636d1ecac619a2436b4e9dab183fc46ca4afd1"
+    },
+    {
+      "file": "chapter1/search-codegen/run_experiment_1_3.py",
+      "start": 167,
+      "end": 189,
+      "sha256": "f0fb3f53bf427e25e8dcff43414cc1dbac262304dad17ec0607a59475f675558"
+    },
+    {
+      "file": "learning/task0/audit_remaining.py",
+      "start": 18,
+      "end": 37,
+      "sha256": "3184b8cefdc72c13f0359927d23c1bcc211faaf21b4159002429054592c8ccfa"
+    },
+    {
+      "file": "learning/task0/run_image_learning.py",
+      "start": 74,
+      "end": 88,
+      "sha256": "51f663eb067313c5e41ece978f06da1e5db327342744f53d518c30bd5b84abf7"
+    },
+    {
+      "file": "learning/task0/run_image_learning.py",
+      "start": 89,
+      "end": 111,
+      "sha256": "58f5191e36904339d518d03fd1dd811a8e5e9b23d2af3ee6e4a8de89bf81c89f"
+    },
+    {
+      "file": "chapter1/image-gen-workflow/pipeline.py",
+      "start": 46,
+      "end": 80,
+      "sha256": "a75164f9711b987804e97ec495ece56c1fabdbfbcf4c89bef5f72ef7110a59be"
+    },
+    {
+      "file": "chapter1/image-gen-workflow/pipeline.py",
+      "start": 191,
+      "end": 226,
+      "sha256": "f93b032a49d5e91472123493c5398249db0aaed559a021a52c6de3d3e535c159"
+    },
+    {
+      "file": "learning/task0/run_image_learning.py",
+      "start": 112,
+      "end": 129,
+      "sha256": "9bb1c44121d7009b443cf278257948777a42b5b4b24a69056f68e83b1632b93f"
+    },
+    {
+      "file": "learning/task0/run_image_learning.py",
+      "start": 130,
+      "end": 146,
+      "sha256": "7ea487bd89586ecfbbddef2bec001a53d8ce86597bc5ee5fee0c9eaaaa11afe2"
+    },
+    {
+      "file": "chapter1/context/agent.py",
+      "start": 547,
+      "end": 553,
+      "sha256": "55e445a598cd6a8aade738c46f9bea43e205d31a2c13af820ac67310caedc03f"
+    },
+    {
+      "file": "chapter1/context/agent.py",
+      "start": 811,
+      "end": 813,
+      "sha256": "db4e5346587e074ec74687d864c903be52a205b40a929320b64fadc90e513e18"
+    },
+    {
+      "file": "chapter1/context/run_experiment_1_1.py",
+      "start": 645,
+      "end": 663,
+      "sha256": "29d015bc4b371a3f3e26b45127879efde7e02b0edb8ca5da0d0da6a1375cee2d"
+    },
+    {
+      "file": "chapter1/context/run_experiment_1_1.py",
+      "start": 207,
+      "end": 215,
+      "sha256": "ef4553aedd94d9f4fe999154ffb84d88f8654e87c60a100b9b2898c8a5b16516"
+    }
+  ]
+}
