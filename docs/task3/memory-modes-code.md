@@ -1,147 +1,127 @@
-# 用户记忆源码精读 · 一个状态字段怎样跨会话存活
+# 用户记忆源码精读 · run_evaluation.py 逐函数通读
 
 [实验说明](memory-modes.md) · [实测结果](evidence.md#memory-modes) · [学习运行脚本](../assets/task3/run_memory_modes.py)
 
-<div class="design-lead"><span>逐步搭建 / READ THE CODE</span><p>先看一个"只有记忆没有历史"的会话循环怎样被拼出来，再逐个拆四种记忆模式的指令差异，最后看评审的一票否决与检查点的续跑语义。</p></div>
+<div class="design-lead"><span>逐函数通读 / READ EVERY FUNCTION</span><p>本页按源码顺序把 run_evaluation.py 的每个函数过一遍——先给函数清单证明一个不漏，再逐个拆，最后用一次真实执行把整条调用链串起来。读完本页，你应该能在不打开源码的情况下说出这个文件每一部分在干什么。</p></div>
 
 !!! note "先分清三种代码"
-    **课程源码原文**附文件与行号（chapter3/user-memory/run_evaluation.py 与 chapter3/experiment_utils.py）；**学习运行脚本原文**来自 `run_memory_modes.py`；**教学示意**仅用于理解数据形状。task1 的 [memory 笔记](../task1/memory-code.md) 走过 NotesMemoryManager 的单机持久化，本页是它的上一层：**多会话、四模式、外部评审**的完整战役。
+    **课程源码原文**附文件与行号，链接指向课程仓库固定提交；配套文件 `chapter3/experiment_utils.py`（全章共享的证据工具）在用到它的位置一并讲解。**学习运行脚本原文**来自 `run_memory_modes.py`；**教学示意**仅用于理解数据形状。
 
-## 本页阅读路线
-
-生命周期 → 四模式指令 → 记忆写手 prompt → 隔离证明 → 问答与评审 → 一票否决口径 → 检查点续跑 → 证据落盘 → 学习版结果解读。
+**主文件**：[chapter3/user-memory/run_evaluation.py](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py)（558 行，3-1 与 3-2 两个实验共用一个战役）。task1 的 [memory 笔记](../task1/memory-code.md) 走过 NotesMemoryManager 单机版；本文件是它的战役版：多会话、四模式、独立评审、可断点续跑。
 
 ---
 
-## 1. 生命周期：会话流进，状态流出，历史蒸发
+## 0. 函数清单（一个不漏）
 
-**遇到的问题**
+| # | 函数/常量 | 行号 | 一句话作用 | 谁调用它 |
+| --- | --- | --- | --- | --- |
+| — | `HERE` / `CHAPTER` | L31–32 | 本文件与 chapter3 目录路径 | 全文件 |
+| — | `ARK_ENDPOINT` / `MOONSHOT_ENDPOINT` | L37–38 | 写手/评审的默认端点 | `build_parser` |
+| — | `MODES` | L39 | 四种记忆模式元组 | `build_parser`、`mode_call_stats` |
+| — | `MODE_INSTRUCTIONS` | L41–59 | 四模式的写手指令（实验的自变量） | `memory_prompt` |
+| 1 | `parse_json` | L62–69 | 从模型回复里抠出 JSON（容忍 ``` 围栏） | `run_one` ×3 |
+| 2 | `load_cases` | L72–91 | 从 YAML 评测集加载案例（smoke/全量/指定 id） | `main` |
+| 3 | `format_history` | L94–103 | 会话 dict → 纯文本（写手输入的最后一层） | `memory_prompt`、`judge_prompt` |
+| 4 | `initial_memory` | L106–107 | 各模式的初始记忆值（数组或对象） | `run_one` |
+| 5 | `memory_prompt` | L110–124 | 写手请求：旧状态 + 新会话 → 替换后状态 | `run_one` |
+| 6 | `answer_prompt` | L127–145 | 答题请求：只有最终记忆 + 问题 | `run_one` |
+| 7 | `judge_prompt` | L148–176 | 评审请求：全部原文 + 答案 → 四维分 + 幻觉 | `run_one` |
+| 8 | `judge_summary` | L179–188 | 评审 JSON → passed/reward（幻觉一票否决） | `run_one` |
+| 9 | `Campaign.__init__` | L191–212 | 建两个客户端、检查点目录与签名 | `main` |
+| 10 | `Campaign._checkpoint_path` | L214–216 | 检查点文件名（test_id--mode.json） | `run_one` |
+| 11 | `Campaign._write_checkpoint` | L218–225 | 原子写检查点（tmp + replace） | `run_one` 内的闭包 |
+| 12 | `Campaign._successful_call` | L227–239 | 按 purpose 找"上次成功的调用"（续跑用） | `run_one` ×3 |
+| 13 | `Campaign._content_from_call` | L241–243 | 从回执里取回复文本 | `run_one` ×2 |
+| 14 | `Campaign.run_one` | L245–379 | **核心**：一个案例 × 一个模式的完整评估 | `main`（线程池） |
+| 15 | `aggregate` | L382–404 | 结果按 模式 × 层 聚合（pass/reward/幻觉率） | `main` |
+| 16 | `token_totals` | L407–413 | 回执列表 → token 合计 | `mode_call_stats`、`main` |
+| 17 | `mode_call_stats` | L416–429 | 每模式的调用数/token/延迟统计 | `main` |
+| 18 | `build_parser` | L432–459 | CLI 参数（模型/端点/预算/检查点目录） | `main` |
+| 19 | `main` | L462–557 | 编排：加载→并发执行→聚合→落证据 | 入口 |
 
-"长期记忆"要证明的不是"能存"，而是**旧会话的原文可以丢**——从第二个会话起，写手只拿得到上一轮的*记忆状态*和*新会话*。如果记忆没把关键事实带过去，它就永远丢了。
-
-**设计思路**
-
-把每个案例做成多个会话（conversation_histories），逐个喂给写手；每轮的输入里**刻意不含**旧会话原文，并把这件事记录进证据。
-
-**关键代码**
-
-**课程源码原文** · [run_evaluation.py · L292–L328](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L292)：
-
-```python linenums="292"
-states = list(checkpoint.get("memory_states", []))
-memory: Any = states[-1]["memory"] if states else initial_memory(mode)
-for index, history in enumerate(case["conversation_histories"], start=1):
-    if index <= len(states):
-        continue
-    messages = memory_prompt(mode, memory, history, index)
-    purpose = f"3-1/3-2 memory update {case['test_id']} {mode} session {index}"
-    ...
-    parsed = parse_json(content)
-    memory = parsed.get("memory", parsed)
-    states.append(
-        {
-            "session_index": index,
-            "conversation_id": history.get("conversation_id"),
-            "memory": memory,
-            "isolation": {
-                "prior_raw_histories_supplied": 0,
-                "current_memory_supplied": True,
-                "new_history_supplied": history.get("conversation_id"),
-            },
-        }
-    )
-```
-
-**执行过程：看数据怎样变**
-
-一个 3 会话案例的流转（教学示意）：
-
-```text
-会话1 → 写手(旧记忆=空, 会话1) → 记忆状态 S1
-会话2 → 写手(旧记忆=S1,  会话2) → 记忆状态 S2   ← 会话1 的原文从此不可见
-会话3 → 写手(旧记忆=S2,  会话3) → 记忆状态 S3
-新会话 → 答题者(只有 S3, 用户问题) → 答案
-评审(全部会话原文 + 答案) → 四维分数 + 幻觉否决
-```
-
-`isolation.prior_raw_histories_supplied: 0` 是每轮落盘的**自我声明**，验收时全量核查（`isolation_ok`，L496–L500）——"只靠记忆"不是口头承诺，是逐状态检查的字段。
-
-**接回真实源码**
-
-注意评审反而拿到**全部会话原文**（`judge_prompt` 里 `case["conversation_histories"]` 全量格式化，L149）——评审是"事后审计者"，可以看一切；被评的人不行。这是模拟器和考官的信息不对称设计。
-
-**动手验证**
-
-如果写手在第 2 轮不小心把会话 1 的原文整段塞进记忆，`isolation` 字段能发现吗？
-
-??? tip "先预测，再展开对照"
-    发现不了——isolation 只记录**请求里带了什么**（由课程代码构造，必然合规），不检查记忆**内容**是否泄漏原文。会话原文若被复制进记忆，效果上等于绕过了"只靠记忆"的约束。课程把构造权收在代码里（模型只产 JSON），所以这条通道实际堵死了；但若自己实现，"记忆里抄原文"是要单独设防的（例如长度/重叠率检查）。
+配套文件 `experiment_utils.py` 的两个类（用到处再细讲）：`ChatRecorder`（L90–131，记回执的客户端包装）、`write_campaign_evidence`（L135–211，证据落盘 + latest.json）。
 
 ---
 
-## 2. 四模式：指令即 schema
+## 1. `parse_json`（L62–69）：模型输出的第一道清洗
 
-**遇到的问题**
-
-"记忆用数组还是对象、一条记多细"没有唯一答案。与其实现四套存储引擎，不如让**同一段写手逻辑**配四种指令，比的就是数据形状本身。
-
-**关键代码**
-
-**课程源码原文** · [run_evaluation.py · L41–L59](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L41)：
-
-```python linenums="41"
-MODE_INSTRUCTIONS = {
-    "notes": (
-        "Store memory as an array of minimal standalone factual notes. Split a "
-        "complex statement into atomic facts; keep exact names, identifiers and dates."
-    ),
-    "enhanced_notes": (
-        "Store memory as an array of contextual paragraphs. Each paragraph must retain "
-        "the entity, event, time, status, and relationships needed to interpret it."
-    ),
-    "json_cards": (
-        "Store memory as a hierarchical JSON object using category/subcategory/key/value "
-        "organization. Preserve multi-entity distinctions and historical status."
-    ),
-    "advanced_json_cards": (
-        "Store memory as an array of cards. Every card must include category, card_key, "
-        "backstory, person, relationship, timestamp, status, and a facts object. Keep "
-        "conflicting instructions as ordered versions rather than silently merging them."
-    ),
-}
+```python linenums="62"
+def parse_json(text: str) -> Dict[str, Any]:
+    text = (text or "").strip()
+    if "```" in text:
+        parts = text.split("```")
+        text = parts[1]
+        if text.startswith("json"):
+            text = text[4:]
+    return json.loads(text.strip())
 ```
 
-**执行过程：看数据怎样变**
+把模型回复变成字典。两处容错：空文本变成空串再报错（`text or ""` 防 None）；模型无视"JSON only"指令加了 \`\`\`json 围栏时，切出围栏中间那段、剥掉 `json` 语言标记。**注意它不容忍畸形 JSON**——`json.loads` 直接抛，异常会一路传到 `run_one` 之外记为该格错误（学习版 json_cards 的两格就死在这里，见[实测](evidence.md#memory-modes)）。
 
-同一句话"10 月 5 日 Jessica 打电话给 Chase 把副卡持有人换成她妹妹"在四种模式里的形状：
-
-| 模式 | 形状 | 保留了什么 | 丢了什么 |
-| --- | --- | --- | --- |
-| notes | `["Jessica 的 Chase 副卡持有人于 10-05 换为其妹"]` | 原子事实、精确值 | 事件间关系、状态演变 |
-| enhanced_notes | 一段含人物/时间/动作/状态/关联的段落 | 上下文完整 | ——（体积大） |
-| json_cards | `{finance: {credit_card: {authorized_user: ...}}}` 层级 | 分类结构 | 跨类别的关联 |
-| advanced_json_cards | 卡片对象数组（含 backstory/status/facts） | 演变史（冲突保序） | ——（体积最大） |
-
-`initial_memory`（L106–L107）还有一个易漏的细节：json_cards 的初始状态是**对象** `{}`，其余是**数组** `[]`——模式的差别连初始类型都不同。
-
-**接回真实源码**
-
-写手 system prompt（L111–L116）在指令后追加统一的硬约束：`"Apply updates without losing still-valid facts. Never answer the conversation. Return JSON only as {\"memory\": ...}"`——更新不丢旧事实、**绝不回答对话**（写手只做记忆，答题是另一个角色）。
-
-**动手验证**
-
-"用户上周说用工资卡还款，这周改用新办的储蓄卡"——哪种模式最不可能把旧卡号弄丢或错误覆盖？
-
-??? tip "先预测，再展开对照"
-    advanced_json_cards（`Keep conflicting instructions as ordered versions`——冲突保序，新旧并存）。notes 只会各存一条原子事实，关系靠答题者自己拼；enhanced_notes 靠段落叙述保留演变。这正是它在 layer2/3 复杂案例上不输的原因——代价是体积与写手出错的表面积（见第 9 节）。
+被调用三次：写手回复、答题（不经过它，直接取 content）、评审回复。
 
 ---
 
-## 3. 记忆写手的请求：状态替换语义
+## 2. `load_cases`（L72–91）：评测集的三种取法
 
-**关键代码**
+```python linenums="72"
+def load_cases(root: Path, args: argparse.Namespace) -> List[Dict[str, Any]]:
+    paths = sorted(root.glob("layer*/*.yaml"))
+    cases = []
+    wanted = set(args.case or [])
+    by_layer: Dict[str, int] = defaultdict(int)
+    for path in paths:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if wanted and data.get("test_id") not in wanted:
+            continue
+        layer = data.get("category")
+        if not args.all and not wanted and by_layer[layer] >= args.per_layer:
+            continue
+        data["_path"] = str(path.resolve())
+        cases.append(data)
+        by_layer[layer] += 1
+    if wanted:
+        missing = wanted - {c["test_id"] for c in cases}
+        if missing:
+            raise ValueError(f"Unknown test ids: {sorted(missing)}")
+    return cases
+```
 
-**课程源码原文** · [run_evaluation.py · L110–L124](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L110)：
+三种取法互斥：`--case id` 指定单案例（重复实验用）、`--all` 全量 60 案例、默认每层取前 `--per-layer` 个（smoke 模式，学习版走的就是这个：2/层）。两个细节：`sorted(glob)` 保证案例顺序稳定（可复现）；`data["_path"]` 把 YAML 的绝对路径塞进案例 dict——最后 `write_campaign_evidence` 用它把每个案例文件哈希进证据。指定的 id 不存在直接 `ValueError`，不静默跳过。
+
+---
+
+## 3. `format_history`（L94–103）：会话字典 → 写手能读的文本
+
+```python linenums="94"
+def format_history(history: Dict[str, Any]) -> str:
+    metadata = json.dumps(history.get("metadata") or {}, ensure_ascii=False)
+    lines = [
+        f"conversation_id={history.get('conversation_id')}",
+        f"timestamp={history.get('timestamp')}",
+        f"metadata={metadata}",
+    ]
+    for message in history.get("messages", []):
+        lines.append(f"{str(message.get('role', '')).upper()}: {message.get('content', '')}")
+    return "\n".join(lines)
+```
+
+评测集里每个会话是个 dict（id/时间戳/元数据/消息列表），写手和评审都要读它。格式是"头部三行元数据 + 每条消息一行 `ROLE: 内容`"。**role 大写**是个容易被忽略的选择——`USER:`/`ASSISTANT:` 在纯文本里更醒目，降低模型把角色看漏的概率。这个函数被 `memory_prompt` 和 `judge_prompt` 共用：写手看单个会话，评审看全部会话拼起来的长文本。
+
+---
+
+## 4. `initial_memory`（L106–107）：模式差异的第一处体现
+
+```python linenums="106"
+def initial_memory(mode: str) -> Any:
+    return [] if mode != "json_cards" else {}
+```
+
+一行函数，但它是模式差异的**类型级**体现：json_cards 是层级对象（初始 `{}`），其余三种是数组（初始 `[]`）。后面 `run_one` 里 `json.dumps(memory)` 对两种类型都能序列化，所以类型分歧不会炸——但它提醒你：四模式不止指令不同，连数据结构都不同。
+
+---
+
+## 5. `memory_prompt`（L110–124）：写手的完整请求
 
 ```python linenums="110"
 def memory_prompt(mode: str, memory: Any, history: Dict[str, Any], session_index: int) -> List[Dict[str, str]]:
@@ -161,40 +141,77 @@ def memory_prompt(mode: str, memory: Any, history: Dict[str, Any], session_index
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 ```
 
-**执行过程：看数据怎样变**
+system 是**通用约束 + 模式指令**拼接：通用部分管纪律（保留精确值/所有权/状态/日期/来源/关系；更新不丢旧事实；**绝不回答对话**；只返回 `{"memory": ...}`），`MODE_INSTRUCTIONS[mode]` 管形状（这就是实验唯一自变量）。user 部分三段式：模式与轮次 → 当前状态（`json.dumps` 重新序列化）→ 新会话文本。括号里那句 "the only retained information" 是说给模型听的语境说明——旧会话原文**不在这个请求里的任何地方**。
 
-- **"replace the memory state"** 是替换语义不是追加语义：写手返回的 JSON 整体成为新状态。做对了，更新天然生效；做错了（漏抄旧事实），**丢失无法恢复**——记忆系统没有"回收站"；
-- 请求里 `json.dumps(memory)` 每轮重新序列化当前状态——第 k 轮请求的体积 ≈ 状态k-1 + 会话k。对比 [2-3 KV Cache](../task2/kv-cache-code.md)：这是**追加式重建**，前缀（system + 旧状态）逐轮变化，缓存命中率天然不高——记忆压缩（让状态别膨胀）在这里同时也是缓存优化；
-- 写手调用参数（L303–L311）：`temperature=0, seed=args.seed, response_format={"type":"json_object"}, max_tokens=6000`——零温 + 固定种子 + JSON 强制格式，把随机性压到最低。
-
-**动手验证**
-
-第 3 轮写手请求的 prompt 里，会话 1 的内容以什么形式存在？
-
-??? tip "先预测，再展开对照"
-    只以"写手当时选择保留进 S1 的那些事实"存在。如果写手第 1 轮漏记了某个事实，第 3 轮**不可能**再见到它——错误会随轮次单调放大。这也是评审四维里单独设 recall（漏没漏）的原因。
+**写手看不到未来问题**——它必须自己猜什么值得记，这是记忆任务的本质难度。
 
 ---
 
-## 4. 问答与评审：信息不对称的对局
-
-**关键代码**
-
-**课程源码原文** · [run_evaluation.py · L127–L145](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L127)（答题）：
+## 6. `answer_prompt`（L127–145）：换一个"人生"来答题
 
 ```python linenums="127"
-{
-    "role": "system",
-    "content": (
-        "You are an assistant in a brand-new session. The supplied long-term memory "
-        "is your only source about this user: you cannot access earlier raw dialogue. "
-        "Answer accurately, resolve ambiguity, connect sessions, and proactively warn "
-        "about material risks. Do not invent facts."
-    ),
-},
+def answer_prompt(mode: str, memory: Any, question: str) -> List[Dict[str, str]]:
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are an assistant in a brand-new session. The supplied long-term memory "
+                "is your only source about this user: you cannot access earlier raw dialogue. "
+                "Answer accurately, resolve ambiguity, connect sessions, and proactively warn "
+                "about material risks. Do not invent facts."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"MEMORY MODE: {mode}\nLONG-TERM MEMORY:\n"
+                f"{json.dumps(memory, ensure_ascii=False)}\n\nUSER QUESTION:\n{question}"
+            ),
+        },
+    ]
 ```
 
-**课程源码原文** · [run_evaluation.py · L179–L188](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L179)（评分口径）：
+答题者和写手用**同一个模型**（都是 `writer_client`），但扮演完全不同的角色。system 里的四个动词就是评分维度的前身：answer accurately（precision）、resolve ambiguity（reasoning）、connect sessions（recall）、**proactively warn**（proactivity——主动预警，layer3 考的就是这个）。"you cannot access earlier raw dialogue" 把信息边界说死：除了记忆你别无所有。
+
+---
+
+## 7. `judge_prompt`（L148–176）：评审独享全部原文
+
+```python linenums="148"
+def judge_prompt(case: Dict[str, Any], answer: str) -> List[Dict[str, str]]:
+    source = "\n\n".join(format_history(h) for h in case["conversation_histories"])
+    system = (
+        "You are a strict independent judge of a memory assistant. Use only the authoritative "
+        "conversation source. Score precision, recall, reasoning, and proactivity from 1 to 4. "
+        "A material unsupported or contradicted factual claim is a hallucination veto. Return "
+        "JSON only."
+    )
+    user = f"""AUTHORITATIVE SOURCE:
+{source}
+
+QUESTION: {case['user_question']}
+ANSWER: {answer}
+EVALUATION CRITERIA: {case['evaluation_criteria']}
+EXPECTED BEHAVIOR: {case.get('expected_behavior', '')}
+
+Return exactly:
+{{"dimensions": {{"precision": {{"score": 1, "reasoning": "...", "evidence": []}},
+...
+Scale: 4 fully meets the concrete criterion; 3 meets the core with only a minor
+defect; 2 has a material omission; 1 misses/contradicts the core. Asking a
+targeted clarification is correct when several entities plausibly match.
+"""
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+```
+
+三方信息不对称在这里完成闭环：评审拿到**全部会话原文**（`conversation_histories` 全量 `format_history` 拼接）+ 案例 YAML 里的评分标准（`evaluation_criteria`）和期望行为。两个值得背下来的细节：
+
+- 评分标准**来自数据集**而不是写死在代码里——每个案例可以定义自己"什么算对"，加新案例不用改代码；
+- 末尾那句 "Asking a targeted clarification is correct..."——多实体歧义时**追问是正确行为**，宁可问不可猜。
+
+---
+
+## 8. `judge_summary`（L179–188）：JSON → 分数与一票否决
 
 ```python linenums="179"
 def judge_summary(raw: Dict[str, Any]) -> Dict[str, Any]:
@@ -206,143 +223,360 @@ def judge_summary(raw: Dict[str, Any]) -> Dict[str, Any]:
     hallucination = bool((raw.get("hallucination") or {}).get("detected"))
     passed = not hallucination and all(scores[x] >= 3 for x in ("precision", "recall", "reasoning"))
     reward = 0.0 if hallucination else statistics.mean(scores.values()) / 4.0
+    return {"scores": scores, "hallucination_veto": hallucination, "passed": passed, "reward": reward}
 ```
 
-**执行过程：看数据怎样变**
-
-三方信息结构：
-
-```text
-写手   : 看到 旧状态 + 新会话        （看不到未来问题！）
-答题者 : 看到 最终状态 + 用户问题    （看不到任何原文）
-评审   : 看到 全部会话原文 + 答案    （独享 ground truth）
-```
-
-注意**写手看不到未来会问什么**——它必须猜测"什么值得记"。而 proactivity（主动性）维度考的是答题者能否利用记忆里的时间敏感信息**主动预警**（比如护照下周到期）。
-
-评分口径两个细节：
-
-- **幻觉一票否决**：`reward = 0.0 if hallucination`——四维全 4 分但编造一个事实，reward 归零。`passed` 同样要求无幻觉且 precision/recall/reasoning ≥ 3（proactivity 不影响 pass，只影响 reward）；
-- 分数被 `min(4, max(1, ...))` 钳制——评审 JSON 里超界的分数（0 或 5）不会炸聚合，只会被夹回量程。
-
-**接回真实源码**
-
-学习版的评审是 DashScope 的 qwen3.7-plus、写手/答题是 DeepSeek——**跨厂商**满足"independent judge"门槛（课程配置块记 `judge_is_external_to_writer: True`）。评审 prompt 只允许依据给出的法条式证据源，不允许外部知识。
-
-**动手验证**
-
-答题者反问澄清（"您说的是 2020 年的护照还是 2024 年新办的？"）而不是直接作答，会得低分吗？
-
-??? tip "先预测，再展开对照"
-    不会。judge prompt 明文：`Asking a targeted clarification is correct when several entities plausibly match`——**在多实体歧义时，澄清是正确行为**。宁可问清，不可猜编。这是记忆系统"知道自己不知道"的评分激励。
+评审输出到战绩的翻译层，三个规则：分数钳制在 [1,4]（评审说 5 或 0 都被夹回量程，聚合不炸）；**幻觉一票否决**（`reward = 0.0`，`passed = False`——四维全 4 分但编了一个日期，全盘作废）；`passed` 只看三维（precision/recall/reasoning ≥ 3），proactivity 只进 reward 不卡 pass——主动预警是加分项不是及格线。
 
 ---
 
-## 5. 检查点：purpose 命名与"长度截断不算成功"
+## 9–13. `Campaign` 类：客户端、检查点与续跑
 
-**遇到的问题**
+### `__init__`（L191–212）
 
-24 个评估并发跑，中途任何一格崩溃怎么办？重跑谁、跳过谁，判据必须精确到**单次调用**。
+```python linenums="191"
+class Campaign:
+    def __init__(self, args: argparse.Namespace):
+        ark_key = os.getenv("ARK_API_KEY") or os.getenv("DOUBAO_API_KEY")
+        moonshot_key = os.getenv("MOONSHOT_API_KEY")
+        if not ark_key or not moonshot_key:
+            raise RuntimeError("ARK_API_KEY and MOONSHOT_API_KEY are both required")
+        self.args = args
+        self.writer_client = OpenAI(
+            api_key=ark_key, base_url=args.writer_endpoint, timeout=args.timeout, max_retries=3
+        )
+        self.judge_client = OpenAI(
+            api_key=moonshot_key, base_url=args.judge_endpoint, timeout=args.timeout, max_retries=3
+        )
+        self.checkpoint_dir = args.checkpoint_dir.resolve()
+        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.checkpoint_signature = {
+            "writer_endpoint": args.writer_endpoint,
+            "writer_model": args.writer_model,
+            "judge_endpoint": args.judge_endpoint,
+            "judge_model": args.judge_model,
+            "seed": args.seed,
+        }
+```
 
-**关键代码**
+两个客户端：写手（记忆更新 + 答题）和评审，端点/模型全部来自 CLI 参数——**代码只规定"要有两把不同的钥匙"，不规定钥匙属于谁**（学习版就是从这里接进 DeepSeek + DashScope 的）。`checkpoint_signature` 把五个影响结果的参数锁进签名：续跑时签名对不上直接拒绝，防止"换模型续旧跑"的混装证据。
 
-**课程源码原文** · [run_evaluation.py · L227–L239](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/user-memory/run_evaluation.py#L227)：
+### `_checkpoint_path` / `_write_checkpoint`（L214–225）
+
+```python linenums="214"
+    def _checkpoint_path(self, test_id: str, mode: str) -> Path:
+        safe_id = "".join(c if c.isalnum() or c in "-_" else "_" for c in test_id)
+        return self.checkpoint_dir / f"{safe_id}--{mode}.json"
+
+    @staticmethod
+    def _write_checkpoint(path: Path, payload: Dict[str, Any]) -> None:
+        temporary = path.with_suffix(f".{threading.get_ident()}.tmp")
+        temporary.write_text(
+            json.dumps(jsonable(payload), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(path)
+```
+
+文件名 = 安全化的 test_id + 模式（一个案例 × 一个模式 = 一个独立检查点文件，24 格互不干扰）。原子写的两个要点：临时文件名带**线程 id**（多线程同时写不同检查点不会互相踩 tmp 文件）；`replace` 是原子重命名——读方永远看到完整文件，不会读到半截 JSON。`jsonable`（experiment_utils L46–62）负责把 SDK 响应对象递归转成可序列化的 dict。
+
+### `_successful_call` / `_content_from_call`（L227–243）
 
 ```python linenums="227"
-@staticmethod
-def _successful_call(calls: List[Dict[str, Any]], purpose: str) -> Dict[str, Any] | None:
-    for call in reversed(calls):
-        choices = (call.get("response") or {}).get("choices") or []
-        finish_reason = choices[0].get("finish_reason") if choices else None
-        if (
-            call.get("purpose") == purpose
-            and "response" in call
-            and "error" not in call
-            and finish_reason != "length"
-        ):
-            return call
-    return None
+    @staticmethod
+    def _successful_call(calls: List[Dict[str, Any]], purpose: str) -> Dict[str, Any] | None:
+        for call in reversed(calls):
+            choices = (call.get("response") or {}).get("choices") or []
+            finish_reason = choices[0].get("finish_reason") if choices else None
+            if (
+                call.get("purpose") == purpose
+                and "response" in call
+                and "error" not in call
+                and finish_reason != "length"
+            ):
+                return call
+        return None
+
+    @staticmethod
+    def _content_from_call(call: Dict[str, Any]) -> str:
+        return call["response"]["choices"][0]["message"]["content"]
 ```
 
-**执行过程：看数据怎样变**
-
-- 每次调用带唯一 `purpose` 字符串（`"3-1/3-2 memory update <test_id> <mode> session <n>"`）——恢复时按 purpose 精确找回"这一步"的响应，**倒序**取最近一次成功；
-- `finish_reason != "length"`：**被 max_tokens 截断的响应不算成功**，恢复时会重新调用。截断的记忆状态 JSON 解析必炸，重调是唯一出路；
-- `JobRecorder`（L280–L285）在**每次调用后**（finally）把 calls 写回检查点文件——崩溃点之前的工作全部保住；
-- 检查点签名（L206–L212）锁端点/模型/种子：换模型后旧检查点拒绝复用（`checkpoint signature mismatch`）。
-
-学习版踩过的坑值得记录：检查点目录默认 `HERE/validation/checkpoints/...`，HERE 重定向后**每个新时间戳目录都是空检查点**——想续跑必须显式 `--checkpoint-dir` 指回旧目录，否则等于全量重跑。
-
-**动手验证**
-
-一个记忆更新调用成功了但返回的 JSON 缺 `memory` 键，`parsed.get("memory", parsed)` 会怎么处理？
-
-??? tip "先预测，再展开对照"
-    回退到整个解析结果当状态（模型可能直接返回了数组）。**成功调用 + 异常形状**静默通过——这是宽容解析的代价：状态形状从"包一层"变"裸数组"后，下一轮 `json.dumps(memory)` 仍能工作，模式间形状漂移不会被发现。要更严就校验形状再接受。
+续跑的核心查询：给一个 purpose（比如 `"... memory update layer3_01 enhanced_notes session 2"`），在历史回执里**倒序**找最近一次满足三条件的调用——purpose 匹配、有响应、无错误，且 **`finish_reason != "length"`**。最后这条最微妙：被 max_tokens 截断的回复不算成功，续跑时这一步会重新调用（截断的 JSON 解析必炸，重调是唯一出路）。`_content_from_call` 就是从回执 dict 里挖出文本的便捷读法。
 
 ---
 
-## 6. 证据落盘：latest.json 最后写，partial 冒充不了 current
+## 14. `run_one`（L245–379）：一个格子的完整生命
 
-**关键代码**
+这是最长的函数（135 行），按执行阶段拆开看。
 
-**课程源码原文** · [experiment_utils.py · L204–L211](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/experiment_utils.py#L204)：
+**阶段一：恢复或新建检查点（L245–269）**
 
-```python linenums="204"
-    manifest_path = run_dir / "manifest.json"
-    manifest_path.write_text(...)
-    manifest["artifacts"]["manifest.json"] = sha256_file(manifest_path)
-
-    latest_path = project_dir / "validation" / "latest.json"
-    latest_path.parent.mkdir(parents=True, exist_ok=True)
-    latest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return manifest
+```python linenums="245"
+    def run_one(self, case: Dict[str, Any], mode: str) -> Dict[str, Any]:
+        checkpoint_path = self._checkpoint_path(case["test_id"], mode)
+        if checkpoint_path.exists():
+            checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+            if checkpoint.get("signature") != self.checkpoint_signature:
+                raise RuntimeError(
+                    f"checkpoint signature mismatch for {case['test_id']} {mode}; "
+                    "use a different --checkpoint-dir"
+                )
+        else:
+            checkpoint = {..."status": "running", "memory_states": [], "writer_calls": [], "judge_calls": []...}
+        if checkpoint.get("status") == "completed" and checkpoint.get("result"):
+            result = dict(checkpoint["result"])
+            result["_receipts"] = checkpoint.get("writer_calls", []) + checkpoint.get("judge_calls", [])
+            result["_resumed"] = True
+            return result
 ```
 
-**执行过程：看数据怎样变**
+已有检查点 → 验签名 → 已完成的直接返回缓存结果（`_resumed=True` 标记，最终打印时区分 live/resumed）。
 
-写入顺序：`evidence.json` → `receipts.json`（全部原始调用，无凭据）→ `manifest.json`（三者哈希 + 声明输入的哈希）→ **最后** `latest.json`（指向本次 run 的指针）。docstring 写明用意：*"latest.json is written last, so a partial campaign can never look current"*——半途崩溃的 run 留在 `runs/<id>/` 里可查，但不会占据"最新"位。
+**阶段二：包装录音客户端（L271–290）**
 
-`ChatRecorder`（[experiment_utils.py · L90–L131](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/experiment_utils.py#L90)）是全章共享的回执层：包装任意 OpenAI 兼容客户端，逐调用记 request/response/usage/latency，**设计上从不序列化凭据**——学习版的密钥扫描因此总是干净。
+```python linenums="271"
+        def persist_calls() -> None:
+            checkpoint["writer_calls"] = writer.calls
+            checkpoint["judge_calls"] = judge.calls
+            checkpoint["updated_at_epoch"] = time.time()
+            self._write_checkpoint(checkpoint_path, checkpoint)
 
-**接回真实源码**
+        class JobRecorder(ChatRecorder):
+            def create(inner_self, *, purpose: str, **request: Any) -> Any:
+                try:
+                    return super(JobRecorder, inner_self).create(purpose=purpose, **request)
+                finally:
+                    persist_calls()
 
-学习版注入与此的关系：`write_campaign_evidence(HERE, ...)` 的 HERE 是课程项目目录（会把 latest.json 写进课程仓库覆盖书方证据！）——所以学习脚本第一件事就是 `run_eval.HERE = OUT` 重定向，并把 `input_paths` 引用到的入口脚本复制到运行目录（`run_evaluation.py` 的哈希与课程原文一致）。
+        writer = JobRecorder(self.writer_client, "ark", self.args.writer_endpoint)
+        judge = JobRecorder(self.judge_client, "moonshot", self.args.judge_endpoint)
+        writer.calls = list(checkpoint.get("writer_calls", []))
+        judge.calls = list(checkpoint.get("judge_calls", []))
+```
+
+`ChatRecorder`（[experiment_utils.py · L90–L131](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/experiment_utils.py#L90)）是全章共享的回执层：包装任意 OpenAI 兼容客户端，`create(purpose=..., **request)` 转发调用并记录 request/response/usage/latency——**设计上从不序列化凭据**。子类 `JobRecorder` 用 `finally` 保证**每次调用后（无论成败）都把全部回执写回检查点**——崩溃点之前的每一次 API 调用都有据可查。注意 recorder 的 provider 标签是课程硬编码的 `"ark"`/`"moonshot"`，学习版的真实端点在回执的 endpoint 字段里。
+
+**阶段三：会话循环——状态替换（L292–328）**
+
+```python linenums="292"
+        states = list(checkpoint.get("memory_states", []))
+        memory: Any = states[-1]["memory"] if states else initial_memory(mode)
+        for index, history in enumerate(case["conversation_histories"], start=1):
+            if index <= len(states):
+                continue
+            messages = memory_prompt(mode, memory, history, index)
+            purpose = f"3-1/3-2 memory update {case['test_id']} {mode} session {index}"
+            prior_call = self._successful_call(writer.calls, purpose)
+            if prior_call:
+                content = self._content_from_call(prior_call)
+            else:
+                response = writer.create(
+                    purpose=purpose,
+                    model=self.args.writer_model,
+                    messages=messages,
+                    temperature=0,
+                    seed=self.args.seed,
+                    max_tokens=self.args.memory_max_tokens,
+                    response_format={"type": "json_object"},
+                )
+                content = response.choices[0].message.content
+            parsed = parse_json(content)
+            memory = parsed.get("memory", parsed)
+            states.append(
+                {
+                    "session_index": index,
+                    "conversation_id": history.get("conversation_id"),
+                    "memory": memory,
+                    "isolation": {
+                        "prior_raw_histories_supplied": 0,
+                        "current_memory_supplied": True,
+                        "new_history_supplied": history.get("conversation_id"),
+                    },
+                }
+            )
+            checkpoint["memory_states"] = states
+            persist_calls()
+```
+
+四步循环：跳过已完成的会话（`index <= len(states)`——断点续跑的粒度到**单个会话**）；优先复用上次成功的调用（`_successful_call`）；否则真调用（`temperature=0, seed, json_object`——把随机性压死）；`parsed.get("memory", parsed)` 容忍模型漏包一层键。每个状态的 `isolation` 字段是**自我声明**：旧原文供给数 0、当前记忆已供给、新会话的 conversation_id——验收时全量核查（`isolation_ok`），"只靠记忆"从口头承诺变成逐状态检查的字段。
+
+**阶段四：答题与评审（L330–372）**
+
+```python linenums="330"
+        answer_purpose = f"3-1/3-2 answer {case['test_id']} {mode}"
+        answer_call = self._successful_call(writer.calls, answer_purpose)
+        if answer_call:
+            answer = self._content_from_call(answer_call) or ""
+        else:
+            answer_response = writer.create(
+                purpose=answer_purpose,
+                model=self.args.writer_model,
+                messages=answer_prompt(mode, memory, case["user_question"]),
+                temperature=0,
+                seed=self.args.seed,
+                max_tokens=self.args.answer_max_tokens,
+            )
+            answer = answer_response.choices[0].message.content or ""
+        checkpoint["answer"] = answer
+        persist_calls()
+
+        judge_purpose = f"3-1/3-2 independent judge {case['test_id']} {mode}"
+        ...
+            judge_response = judge.create(
+                purpose=judge_purpose,
+                model=self.args.judge_model,
+                messages=judge_prompt(case, answer),
+                temperature=0,
+                seed=self.args.seed,
+                max_tokens=self.args.judge_max_tokens,
+                response_format={"type": "json_object"},
+            )
+            judge_content = judge_response.choices[0].message.content
+        judge_raw = parse_json(judge_content)
+        result = {
+            "test_id": case["test_id"],
+            "layer": case["category"],
+            "title": case["title"],
+            "mode": mode,
+            "session_count": len(case["conversation_histories"]),
+            "memory_states": states,
+            "answer": answer,
+            "judge": judge_summary(judge_raw),
+            "judge_raw": judge_raw,
+        }
+        checkpoint["status"] = "completed"
+        checkpoint["result"] = result
+        persist_calls()
+        result["_receipts"] = writer.calls + judge.calls
+        result["_resumed"] = False
+        return result
+```
+
+答题（注意**没有** `response_format`——自由文本回答）和评审（有 json_object）各自走一遍"复用或真调"。最后 `status="completed"` 落盘，回执随 result 一起返回给 main 层。**答对的功劳记在谁头上**？写手（状态质量）、答题者（利用状态的能力）、评审（打分）——三者被回执和状态分别记录，复盘时可拆开归因。
 
 ---
 
-## 7. 学习版实测：layer3 是分水岭，json_cards 双重翻车
+## 15–17. 聚合与统计：`aggregate` / `token_totals` / `mode_call_stats`
 
-**执行过程：看数据怎样变**
+```python linenums="382"
+def aggregate(results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    groups: Dict[str, Dict[str, List[Dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
+    for result in results:
+        groups[result["mode"]][result["layer"]].append(result)
+    output: Dict[str, Any] = {}
+    for mode, layers in groups.items():
+        output[mode] = {}
+        all_rows = []
+        for layer, rows in sorted(layers.items()):
+            all_rows.extend(rows)
+            output[mode][layer] = {
+                "n": len(rows),
+                "pass_rate": sum(r["judge"]["passed"] for r in rows) / len(rows),
+                "mean_reward": statistics.mean(r["judge"]["reward"] for r in rows),
+                "hallucination_rate": sum(r["judge"]["hallucination_veto"] for r in rows) / len(rows),
+            }
+        output[mode]["overall"] = {...同上，对 all_rows...}
+```
 
-DeepSeek 写手/答题 + qwen3.7-plus 评审，每层 2 案例 × 4 模式 = 24 评估（书方为 60×4）：
+双层 defaultdict 按 模式 → 层 分桶，每桶算三个数：pass 率、平均 reward、幻觉率。`sum(bool)` 是 Python 里数 True 的惯用法。
 
-| 模式 \ 层 | layer1 单实体 | layer2 多实体 | layer3 跨会话协调 | 总体 pass | 幻觉率 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| notes | 1.0 | 0.5 | 0.5（幻觉 0.5） | 0.67 | 0.17 |
-| enhanced_notes | 1.0 | 1.0 | 1.0 | **1.00** | **0.00** |
-| json_cards | 0.5（幻觉 0.5） | 2 格写手 JSON 失败 | 1.0 | 0.75* | 0.25 |
-| advanced_json_cards | 0.5（幻觉 0.5） | 1.0 | 1.0 | 0.83 | 0.17 |
+```python linenums="407"
+def token_totals(calls: Iterable[Dict[str, Any]]) -> Dict[str, int]:
+    totals = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    for call in calls:
+        usage = call.get("usage") or {}
+        for key in totals:
+            totals[key] += int(usage.get(key) or 0)
+    return totals
 
-\* json_cards 的 layer2 两格因写手故障缺失（22/24 完成，status=partial）。
+def mode_call_stats(calls: List[Dict[str, Any]]) -> Dict[str, Any]:
+    output = {}
+    for mode in MODES:
+        selected = [call for call in calls if f" {mode}" in str(call.get("purpose", ""))]
+        latencies = [float(call.get("latency_ms") or 0) for call in selected]
+        output[mode] = {
+            "api_calls": len(selected),
+            "token_usage": token_totals(selected),
+            "latency_ms": {"total": sum(latencies),
+                           "mean_per_call": statistics.mean(latencies) if latencies else 0},
+        }
+    return output
+```
 
-逐条解读（完整数据见 [evidence](evidence.md#memory-modes)）：
-
-- **layer3 是照妖镜**：跨会话协调（护照到期预警、医保衔接）要求把"会话 1 的事实"和"会话 3 的事实"连起来。原子化 notes 在这里幻觉率 50%——**事实都对但连接丢了，模型选择编一个**。enhanced_notes 的段落自带关联，满分通过；
-- **layer1 反转**：单实体简单案例上，两种 JSON 卡片模式反而各幻觉一例——结构化开销在简单场景是负资产（为了填满 card 字段而脑补 backstory）；
-- **json_cards 的双重失败**：写手在 layer2 多实体案例上产出**畸形长 JSON**（finish_reason=stop、非截断——json_object 模式没兜住 4.7K 字符处的语法滑丝）。这不是课程代码问题，是写手模型的长 JSON 可靠性边界；书方写手（doubao）在同一格通过；
-- **成本**（每模式 tokens/均延迟）：enhanced_notes 78.8K/5.3s 最省，advanced_json_cards 108K/6.9s 最贵——高分不是免费的，但 enhanced_notes 同时拿走了最低成本和最高分；
-- 答案质量示例：layer3 enhanced_notes 的记忆里存着"Jessica 10-05 来电确认副卡持有人……护照 2025-03-02 到期"，答题者主动给出"护照是最紧急的一项"——proactivity 维度正来自这种可操作的时间上下文。
-
-**动手验证**
-
-把 notes 模式的指令改成"每个原子事实后附 3 句背景"，它会在 layer3 追上 enhanced_notes 吗？
-
-??? tip "先预测，再展开对照"
-    形状上会趋同，但那等于把 notes 重定义成 enhanced_notes——实验变量就没了。更干净的做法是保留两模式、把评测集 layer3 加厚（本次每层只有 2 案例，单格翻转就是 ±50%）。四模式排序在 n=6/模式下只能报方向：**带上下文的记忆赢在跨会话连接**，这与书方 60 案例战役的结论方向一致（书方 advanced_json_cards 总体领先；本次它 0.83 次于 enhanced_notes——样本量差异内）。
+`mode_call_stats` 的筛选条件 `f" {mode}" in purpose` 利用了 purpose 命名规范（`... {test_id} {mode} session {n}`）——**按模式统计成本不需要另记账本，purpose 字符串就是账本**。这就是前面所有 `purpose=f"..."` 命名纪律的回报。
 
 ---
 
-## 最后回到项目
+## 18–19. `build_parser` 与 `main`：编排与证据
 
-学习脚本 HERE 重定向 → 课程 run_one 会话循环 → 写手/答题/评审三方 prompt → 检查点与 latest.json → [看真实实验结果](evidence.md#memory-modes)。
+`build_parser`（L432–459）的参数分三组：范围（`--all/--case/--per-layer/--mode`）、模型（`--writer-model/--judge-model/--writer-endpoint/--judge-endpoint`，**端点和钥匙解耦**是学习版能换 provider 的全部原因）、预算与检查点（`--memory-max-tokens` 6000 / `--answer-max-tokens` 1200 / `--judge-max-tokens` 1800 / `--checkpoint-dir` / `--workers` 4 / `--seed` 37）。
+
+```python linenums="462"
+def main() -> int:
+    args = build_parser().parse_args()
+    cases = load_cases(args.test_cases_dir.resolve(), args)
+    modes = tuple(args.mode or MODES)
+    expected_total = len(cases) * len(modes)
+    print(f"Running {len(cases)} cases × {len(modes)} modes = {expected_total} evaluations")
+    campaign = Campaign(args)
+    results = []
+    calls: List[Dict[str, Any]] = []
+    errors = []
+    jobs = [(case, mode) for case in cases for mode in modes]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+        future_map = {pool.submit(campaign.run_one, case, mode): (case["test_id"], mode) for case, mode in jobs}
+        for future in concurrent.futures.as_completed(future_map):
+            test_id, mode = future_map[future]
+            try:
+                result = future.result()
+                calls.extend(result.pop("_receipts", []))
+                resumed = result.pop("_resumed", False)
+                results.append(result)
+                marker = "resumed" if resumed else "live"
+                print(f"[{len(results)}/{expected_total}] {test_id} {mode}: reward={result['judge']['reward']:.3f} ({marker})")
+            except Exception as exc:
+                errors.append({"test_id": test_id, "mode": mode, "type": type(exc).__name__, "error": str(exc)})
+                print(f"[ERROR] {test_id} {mode}: {exc}", file=sys.stderr)
+```
+
+`main` 的编排：案例 × 模式展开成 job 列表，4 线程并发 `run_one`；**单格异常不炸全场**——记进 errors，其余格继续（`_receipts`/`_resumed` 这两个下划线字段在这里被 pop 掉，不进最终结果）。收尾处三件事：按 (test_id, mode) 排序保证输出稳定；算 `full_suite`（60 案例 × 4 模式 = 240 且零错误才 passed，否则 partial/blocked）；组装 evidence（status/scope/configuration/acceptance/summary/results）。
+
+最后调用 `write_campaign_evidence(HERE, "3-1-and-3-2", evidence, calls, input_paths=[run_evaluation.py, *案例文件])`——[experiment_utils.py · L135–211](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/experiment_utils.py#L135) 写四个文件：`evidence.json` → `receipts.json` → `manifest.json`（三者哈希 + 输入文件哈希）→ **最后** `latest.json`。写入顺序就是语义：*"latest.json is written last, so a partial campaign can never look current"*——半途崩溃的 run 留在 runs/ 里可查，但不会占据"最新"位。
+
+!!! warning "学习版踩过的坑（复跑必读）"
+    `input_paths` 引用 `HERE/run_evaluation.py`。学习脚本重定向 `HERE` 到自己的运行目录后，这个文件**不存在**——全部 API 调用完成后在写证据时崩溃（本任务踩过，回执全丢）。修法：把入口脚本复制进运行目录。同理，检查点目录默认在 `HERE/validation/checkpoints/` 下，**每个新时间戳目录都是空检查点**——想续跑必须 `--checkpoint-dir` 显式指回旧目录。
+
+---
+
+## 完整执行回放（学习版一次真实运行）
+
+把上面所有函数按真实调用顺序串起来（layer3_01 × enhanced_notes 这一格）：
+
+```text
+main
+ ├─ build_parser → args（writer=deepseek-flash @ deepseek, judge=qwen3.7-plus @ dashscope）
+ ├─ load_cases → 6 案例（每层前 2）
+ ├─ Campaign(args) → writer_client / judge_client / 检查点签名
+ └─ ThreadPool(4) → run_one(layer3_01, enhanced_notes)
+      ├─ _checkpoint_path → layer3_01_travel_coordination--enhanced_notes.json（不存在 → 新建）
+      ├─ JobRecorder × 2 包装客户端
+      ├─ 会话1: memory_prompt(notes→enhanced, 初始[], 会话1)
+      │    └─ writer.create(temperature=0, seed=37, json_object) → parse_json → 记忆 S1
+      ├─ 会话2: memory_prompt(S1, 会话2) → S2        ← 会话1 原文从此消失
+      ├─ 会话3: memory_prompt(S2, 会话3) → S3
+      ├─ answer_prompt(S3, "旅行安排有什么要注意的？") → 答案（含"护照最紧急"）
+      ├─ judge_prompt(全部3个会话原文 + 答案) → 四维分 + 幻觉判定
+      ├─ judge_summary → passed=True, reward=0.969
+      └─ _write_checkpoint(completed)
+ → aggregate → 四模式×三层表     → mode_call_stats → 每模式成本
+ → write_campaign_evidence → evidence/receipts/manifest/latest.json
+```
+
+实测数字见 [evidence.md#memory-modes](evidence.md#memory-modes)：enhanced_notes 这一格 6 次调用（3 写手 + 1 答题 + 1 评审 + …），全战役 88 次调用。
+
+## 动手验证
+
+1. **把 `--seed` 从 37 改成别的**：检查点签名变了——所有旧检查点拒绝续跑，全量重跑。签名机制防的就是"半路换条件还当同一场实验"。
+2. **删掉 `finish_reason != "length"` 这个条件**：续跑会把截断的半截 JSON 当成功复用，`parse_json` 当场炸——这个条件是续跑正确性的隐性守卫。
+3. **给 `run_one` 的会话循环里加一行打印 memory**：你能亲眼看到状态从 `[]` 一步步长成带 Jessica 保单细节的段落——这比任何图表都直观。

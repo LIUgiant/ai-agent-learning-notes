@@ -1,31 +1,122 @@
-# 上下文感知检索源码精读 · 前缀生成、双索引与 RRF 混合
+# 上下文感知检索源码精读 · campaign.py 逐函数通读
 
 [实验说明](contextual-retrieval.md) · [实测结果](evidence.md#contextual-retrieval) · [学习运行脚本](../assets/task3/run_contextual_retrieval.py)
 
-<div class="design-lead"><span>逐步搭建 / READ THE CODE</span><p>先看前缀生成的请求里为什么必须放整份源文档，再读本地 Qwen3-Embedding 的取向量细节，最后看 recall/MRR 怎么从排序里算出来、RRF 怎么把两套排序融成一套。</p></div>
+<div class="design-lead"><span>逐函数通读 / READ EVERY FUNCTION</span><p>本页按源码顺序把 contextual-retrieval/campaign.py 的每个函数过一遍——本地编码器、语料装载、前缀生成、三种排序、指标、验收与 main 的编排，一个不漏。</p></div>
 
 !!! note "先分清三种代码"
     **课程源码原文**附文件与行号（chapter3/contextual-retrieval/campaign.py）；**学习运行脚本原文**来自 `run_contextual_retrieval.py`；**教学示意**仅用于理解数据形状。
 
-## 本页阅读路线
-
-前缀生成 → 双索引对照 → 本地编码器 → 三种排序 → 指标计算 → 验收门槛 → document_store 重建 → 实测解读。
+**主文件**：[chapter3/contextual-retrieval/campaign.py](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/contextual-retrieval/campaign.py)（284 行）。依赖两个外部件：`experiment_utils`（全章共享的 ChatRecorder/证据落盘，见[记忆实验的讲解](memory-modes-code.md)第 14/19 节）和同目录 `compare_retrieval.tokenize`（BM25 的中文分词，本页只当黑盒用）。
 
 ---
 
-## 1. 前缀生成：整份源文档 + 目标块，缺一不可
+## 0. 函数清单（一个不漏）
 
-**遇到的问题**
+| # | 函数/常量 | 行号 | 一句话作用 | 谁调用它 |
+| --- | --- | --- | --- | --- |
+| — | `HERE` / `CHAPTER` | L20–21 | 本目录 / chapter3 根 | 全文件 |
+| — | `ARK_ENDPOINT` | L29 | 前缀 LLM 默认端点 | `main` |
+| 1 | `TransformerEncoder.__init__` | L33–42 | 装载本地 HF 编码模型，记 revision | `main` |
+| 2 | `TransformerEncoder.encode` | L44–55 | 文本 → 归一化句向量（query 侧加指令前缀） | `main` ×3 |
+| 3 | `load_chunks` | L57–72 | document_store.json → chunk 列表 | `main` |
+| 4 | `source_documents` | L74–84 | 每个 chunk 找到唯一源文档全文 | `main` |
+| 5 | `prefix_one` | L86–111 | 一个 chunk 的 LLM 前缀生成（整份文档 + 目标块） | 线程池（main） |
+| 6 | `rankings_bm25` | L113–116 | BM25 排序（每个查询对全部文本） | `main` |
+| 7 | `rankings_dense` | L118–120 | 向量点积排序 | `main` |
+| 8 | `rrf` | L122–128 | 两套排序的倒数排名融合 | `main` |
+| 9 | `metrics` | L130–152 | 排序 → recall@1/3/5 + MRR | `main` |
+| 10 | `token_usage` | L154–161 | 回执 → token 合计 | `main` |
+| 11 | `main` | L163–284 | 编排：装载→并发前缀→六套排序→验收→落证据 | 入口 |
 
-给文本块写"它是谁"的说明，模型只看块本身会**编造出处**（猜一个文档名）。前缀里的每个事实都必须有依据。
+---
 
-**设计思路**
+## 1–2. `TransformerEncoder`（L32–55）：本地编码器
 
-请求里同时放**完整源文档**和**目标块**，用显式标签包裹；系统提示明文"不得添加源文没有的事实"。
+```python linenums="33"
+class TransformerEncoder:
+    def __init__(self, model_name: str, device: str):
+        import torch
+        from transformers import AutoModel, AutoTokenizer
 
-**关键代码**
+        self.torch = torch
+        self.model_name = model_name
+        self.device = device
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
+        self.model = AutoModel.from_pretrained(model_name).to(device).eval()
+        self.revision = getattr(self.model.config, "_commit_hash", None)
 
-**课程源码原文** · [campaign.py · L86–L110](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/contextual-retrieval/campaign.py#L86)：
+    def encode(self, texts: Sequence[str], *, query: bool, batch_size: int = 8) -> np.ndarray:
+        prefix = "Instruct: Retrieve semantically relevant passages.\nQuery:" if query else ""
+        vectors = []
+        for start in range(0, len(texts), batch_size):
+            batch = [prefix + text for text in texts[start : start + batch_size]]
+            tokens = self.tokenizer(batch, padding=True, truncation=True, max_length=512, return_tensors="pt").to(self.device)
+            with self.torch.no_grad():
+                output = self.model(**tokens).last_hidden_state[:, -1].float()
+            output = self.torch.nn.functional.normalize(output, p=2, dim=1)
+            vectors.append(output.cpu().numpy())
+        return np.concatenate(vectors).astype("float32")
+```
+
+`import torch` 放在 `__init__` 里而不是文件头——**torch 是可选依赖**：只用 BM25 的场景不必装 2GB 的栈。四个细节全是 Qwen3-Embedding 的官方用法，不是通用写法：
+
+- `padding_side="left"`（左填充）配合 `last_hidden_state[:, -1]`（取最后一个 token）：保证"最后一个 token"是真实文本末尾而非填充符。右填充时取 `[:, -1]` 拿到的是 padding 的表示，向量全废；
+- `query=True` 时加 `Instruct: ... Query:` 前缀、文档侧裸文本：Qwen3-Embedding 是指令感知检索模型；
+- `normalize(p=2)` 后点积 = 余弦相似度——`rankings_dense` 里直接矩阵乘的前提；
+- `self.revision` 记录 HF 模型 commit 哈希，验收门槛 `real_dense_model` 检查它非空——"用了真模型"要有版本号背书（与 [task2 回执校验](../task2/kv-cache-code.md)同一思路）。
+
+本实验三次调用：plain 文档 22 段、contextual 文档 22 段、查询 15 条（学习版 CPU 实测共 408 秒）。
+
+---
+
+## 3. `load_chunks`（L57–72）：语料入口
+
+```python linenums="57"
+def load_chunks(path: Path) -> List[Dict[str, Any]]:
+    store = json.loads(path.read_text(encoding="utf-8"))
+    rows = []
+    for chunk_id, entry in store.items():
+        if "_chunk_" not in chunk_id:
+            continue
+        meta = entry.get("metadata") or {}
+        rows.append(
+            {
+                "chunk_id": chunk_id,
+                "doc_title": meta.get("doc_title") or chunk_id.split("_chunk_")[0],
+                "plain": meta.get("original_text") or entry.get("content", ""),
+            }
+        )
+    return sorted(rows, key=lambda row: row["chunk_id"])
+```
+
+document_store.json 是 `{chunk_id: {content, metadata}}` 的字典。两处防御：键里没有 `_chunk_` 的条目跳过（store 可能混有文档级条目）；`doc_title`/`plain` 都有**回退链**（metadata 没有就从 chunk_id 切、original_text 没有就用 content）——装载器对容器形状的容忍。返回按 chunk_id 排序——**顺序稳定**是后面所有指标可比的前提（plain 和 contextual 的向量矩阵必须同序）。
+
+!!! info "学习版的前置：document_store 从哪来"
+    课程仓库不带这个文件（原版由需 localhost:4242 检索服务的索引流水线生成）。学习版从**书方已通过战役的 evidence.json**（`chunks` 字段保留了 22 块原文与标题）无损重建，chunk 内容与评测集 `gold_chunk_id` 精确对齐——见 [run_contextual_retrieval.py](../assets/task3/run_contextual_retrieval.py) L52–58。
+
+---
+
+## 4. `source_documents`（L74–84）：给每块找全文
+
+```python linenums="74"
+def source_documents(chunks: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    laws = CHAPTER / "agentic-rag" / "laws"
+    output = {}
+    for title in sorted({row["doc_title"] for row in chunks}):
+        candidates = [path for path in laws.rglob("*.md") if path.stem == title]
+        if len(candidates) != 1:
+            raise RuntimeError(f"expected one official bundled source for {title!r}, found {len(candidates)}")
+        path = candidates[0]
+        output[title] = {"path": path, "text": path.read_text(encoding="utf-8")}
+    return output
+```
+
+从 chunk 集合提取**去重的文档标题**，到 `agentic-rag/laws`（复用 3-8 的法条库）里按文件名找源文件。`len(candidates) != 1` 就抛——找到 0 个或 2 个同名文件都算数据错误，**宁可不跑也不猜出处**。本实验命中两份：《宪法》《检察官法》。
+
+---
+
+## 5. `prefix_one`（L86–111）：前缀生成的最小单元
 
 ```python linenums="86"
 def prefix_one(args: argparse.Namespace, chunk: Dict[str, Any], source: Dict[str, Any]):
@@ -55,119 +146,39 @@ def prefix_one(args: argparse.Namespace, chunk: Dict[str, Any], source: Dict[str
     return {**chunk, "prefix": prefix, "contextual": f"{prefix}\n\n{chunk['plain']}"}, recorder.calls
 ```
 
-**执行过程：看数据怎样变**
+一个 chunk 一次独立调用，天然可并发（main 里 4 线程）。三个设计点：
 
-- 每块一次独立调用（22 块 = 22 次），`max_tokens=220` 把前缀钉在"简短"上；
-- 输出拼成 `contextual = 前缀 + 空行 + 原文`——前缀不是元数据字段，是**和原文一起被索引的文本**；
-- 实测样例：宪法 chunk_0 的前缀是"《中华人民共和国宪法》序言（1982年通过，含历次修正案）"——文档名、章节、时期，全是块里没有但检索时决定性的词。
+- 请求里**整份源文档 + 目标块**，用 `<document>`/`<chunk>` 标签包裹——模型看得到块在文档里的位置语境，"不得添加源文没有的事实"才有依据。验收门槛逐字检查这两个标签出现在每个请求里；
+- `max_tokens=220` 把前缀钉在"简短"；system 里的三连要求（来自哪/哪一节/讲什么）就是前缀的信息规格；
+- 返回值把 chunk 扩展成 `{..., prefix, contextual}`——**contextual = 前缀 + 空行 + 原文**，前缀不是旁路元数据，是直接进索引的文本。
 
-**接回真实源码**
-
-`source_documents()`（L67–L83）从 `agentic-rag/laws` 找到每份 chunk 的**唯一**源文件（`len(candidates) != 1` 直接报错——同名文档会污染出处），整篇读入作为 `<document>`。22 次调用的 token 结构：180,423 prompt tokens（每次都带整份宪法/检察官法原文）对 759 completion tokens——**前缀的成本几乎全在输入侧**。
-
-**动手验证**
-
-为什么不给模型只看"文档标题 + 目标块"（省掉整份文档的输入）？
-
-??? tip "先预测，再展开对照"
-    标题说得出文档名，说不出"这一块属于第几章、讲哪个主体"——块在文档里的**位置语境**只有全文能提供。而且课程验收门槛 `full_source_document_and_target_chunk_in_requests` 逐字检查每个请求里同时有 `<document>` 和 `<chunk>` 标签：**截断输入的前缀不算数**。代价就是上面那 18 万 prompt tokens——索引一次、查询零成本，这是典型的"索引期换查询期"。
+实测样例：宪法 chunk_0 的前缀"《中华人民共和国宪法》序言（1982年通过，含历次修正案）"——文档名、章节、时期，全是块里没有但检索决定性的词。22 次调用共 181K tokens，其中输入 180K（每次都带整份文档）——**前缀的成本几乎全在输入侧，一次性付清**。
 
 ---
 
-## 2. 双索引对照：同块同查询，唯一变量是索引文本
+## 6–8. 三种排序：`rankings_bm25` / `rankings_dense` / `rrf`
 
-**关键代码**
+```python linenums="113"
+def rankings_bm25(texts: List[str], queries: List[str]) -> List[List[int]]:
+    index = BM25Okapi([tokenize(text) for text in texts])
+    return [np.argsort(-index.get_scores(tokenize(query))).tolist() for query in queries]
 
-**课程源码原文** · [campaign.py · L208–L228](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/contextual-retrieval/campaign.py#L208)：
+def rankings_dense(vectors: np.ndarray, query_vectors: np.ndarray) -> List[List[int]]:
+    return [np.argsort(-(query @ vectors.T)).tolist() for query in query_vectors]
 
-```python linenums="208"
-if len(contextual) == len(chunks) and not errors:
-    plain_texts = [row["plain"] for row in contextual]
-    contextual_texts = [row["contextual"] for row in contextual]
-    plain_bm25 = rankings_bm25(plain_texts, query_texts)
-    contextual_bm25 = rankings_bm25(contextual_texts, query_texts)
-    encoder = TransformerEncoder(args.embedding_model, args.device)
-    ...
-    plain_vectors = encoder.encode(plain_texts, query=False)
-    contextual_vectors = encoder.encode(contextual_texts, query=False)
-    query_vectors = encoder.encode(query_texts, query=True)
-    plain_dense = rankings_dense(plain_vectors, query_vectors)
-    contextual_dense = rankings_dense(contextual_vectors, query_vectors)
-    ranking_sets = {
-        "plain_bm25": plain_bm25,
-        "contextual_bm25": contextual_bm25,
-        "plain_dense": plain_dense,
-        "contextual_dense": contextual_dense,
-        "plain_hybrid": [rrf(a, b) for a, b in zip(plain_bm25, plain_dense)],
-        "contextual_hybrid": [rrf(a, b) for a, b in zip(contextual_bm25, contextual_dense)],
-    }
+def rrf(a: List[int], b: List[int], constant: int = 60) -> List[int]:
+    scores: Dict[int, float] = {}
+    for ranking in (a, b):
+        for rank, item in enumerate(ranking, start=1):
+            scores[item] = scores.get(item, 0.0) + 1.0 / (constant + rank)
+    return sorted(scores, key=lambda item: scores[item], reverse=True)
 ```
 
-**执行过程：看数据怎样变**
-
-六套排序共享**同一个 chunk 列表顺序和同一批查询**——`id_to_pos` 按 chunk_id 建位次映射，六套排序在同一坐标系里比 rank。任何一个前缀生成失败，整场比较直接不做（`len(contextual) == len(chunks)` 守门）——**部分前缀的双索引没有对照意义**。
-
-三 × 二的结构：
-
-```text
-        BM25（词面）      稠密（语义）      RRF 混合
-plain   排序 A1           排序 A2           fuse(A1, A2)
-ctx     排序 B1           排序 B2           fuse(B1, B2)
-```
-
-`rrf`（L122–L127）：两套排序里名次换算成分数 `1/(60+rank)` 相加——**不用调权重的融合**，常数 60 是 RRF 论文的默认。名次越靠前贡献越大，两套都认可的块浮到顶。
+三个函数同构：输入文本/向量 + 查询，输出"每个查询对全部文本的**完整排序**"（不是只取 top-k——`metrics` 要算任意名次）。BM25 用 `rank_bm25` 库 + 课程自己的 `tokenize` 分词；稠密就是归一化向量矩阵乘（`query @ vectors.T` 一个查询一行）；`np.argsort(-分数)` 统一做降序。`rrf` 是倒数排名融合：两套排序里第 r 名得 `1/(60+r)` 分、同 item 累加——**无权重、无调参**的融合，常数 60 来自 RRF 论文默认。注意它对**全长排序**求和（不只 top-k），两个通道都认可的块浮到顶。
 
 ---
 
-## 3. 本地编码器：last-token 池化 + Instruct 前缀
-
-**关键代码**
-
-**课程源码原文** · [campaign.py · L23–L48](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/contextual-retrieval/campaign.py#L23)：
-
-```python linenums="23"
-class TransformerEncoder:
-    def __init__(self, model_name: str, device: str):
-        import torch
-        from transformers import AutoModel, AutoTokenizer
-        ...
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
-        self.model = AutoModel.from_pretrained(model_name).to(device).eval()
-        self.revision = getattr(self.model.config, "_commit_hash", None)
-
-    def encode(self, texts: Sequence[str], *, query: bool, batch_size: int = 8) -> np.ndarray:
-        prefix = "Instruct: Retrieve semantically relevant passages.\nQuery:" if query else ""
-        ...
-            tokens = self.tokenizer(batch, padding=True, truncation=True, max_length=512, return_tensors="pt").to(self.device)
-            with self.torch.no_grad():
-                output = self.model(**tokens).last_hidden_state[:, -1].float()
-            output = self.torch.nn.functional.normalize(output, p=2, dim=1)
-```
-
-**执行过程：看数据怎样变**
-
-三处细节都是 Qwen3-Embedding 的**官方用法**，不是通用写法：
-
-- **`padding_side="left"` + `last_hidden_state[:, -1]`**：取**最后一个 token**的隐状态当句向量。左填充保证"最后一个 token"是真实文本的末尾而不是 padding——right-padding 时取 `[:, -1]` 会拿到一堆填充符的表示，向量全废；
-- **查询侧加 `Instruct: ... Query:` 前缀、文档侧不加**：Qwen3-Embedding 是指令感知的检索模型，查询前缀告诉它"这是检索意图"；文档保持裸文本；
-- **L2 归一化后点积 = 余弦相似度**：`rankings_dense` 里 `query @ vectors.T` 直接矩阵乘。
-
-`self.revision` 记录 HF 模型的 commit 哈希——验收门槛 `real_dense_model` 检查它非空，**"用了真模型"要有版本号背书**，与第 2 章回执校验同一个思路。
-
-**动手验证**
-
-文档块和查询的 `max_length=512` 截断，前缀会不会反而挤掉原文内容？
-
-??? tip "先预测，再展开对照"
-    会挤——前缀平均几十 token，长块（本语料 ≤2048 字符）512 token 截断时尾部内容本来就会丢一部分，前缀让窗口更紧。但前缀带来的"文档名/条款号"信号通常比块尾的一小段更值钱；若块很长，正确工程做法是给文档侧单独放宽 max_length。本实验语料块短（均值 ~1000 字符），影响有限——这是缩尺语料的宽容度，长文档场景要重新评估。
-
----
-
-## 4. 指标：从排序算 recall@k 与 MRR
-
-**关键代码**
-
-**课程源码原文** · [campaign.py · L130–L151](https://github.com/bojeli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter3/contextual-retrieval/campaign.py#L130)：
+## 9. `metrics`（L130–152）：排序 → 指标
 
 ```python linenums="130"
 def metrics(rankings: List[List[int]], queries: List[Dict[str, Any]], id_to_pos: Dict[str, int]) -> Dict[str, Any]:
@@ -177,7 +188,15 @@ def metrics(rankings: List[List[int]], queries: List[Dict[str, Any]], id_to_pos:
         gold = id_to_pos[query["gold_chunk_id"]]
         rank = ranking.index(gold) + 1 if gold in ranking else None
         reciprocal.append(1.0 / rank if rank else 0.0)
-        per_query.append({...})
+        per_query.append(
+            {
+                "id": query["id"],
+                "query": query["query"],
+                "gold_chunk_id": query["gold_chunk_id"],
+                "rank": rank,
+                "top5_chunk_ids": ranking[:5],
+            }
+        )
     return {
         "n": len(queries),
         "recall_at_k": {str(k): statistics.mean(1.0 if row["rank"] and row["rank"] <= k else 0.0 for row in per_query) for k in (1, 3, 5)},
@@ -186,71 +205,78 @@ def metrics(rankings: List[List[int]], queries: List[Dict[str, Any]], id_to_pos:
     }
 ```
 
-**执行过程：看数据怎样变**
-
-每条查询有一个**金标 chunk**（单目标）：金标排在第 `rank` 位 → recall@k = 金标进前 k 的查询占比；MRR = 平均 `1/rank`。注意这是**单金标**口径——多跳问题（一条查询对应多个正确块）要换成 recall@k over gold set（如 3-8 的法条召回）。`per_query` 保留每条查询的名次和 top-5，失败案例可以逐条复盘。
+单金标口径：每条查询有一个 `gold_chunk_id`，在排序里找它的名次（`ranking.index(gold) + 1`；找不到记 None，MRR 贡献 0）。recall@k = 金标进前 k 的查询占比；MRR = 平均倒数名次。`per_query` 全量保留——哪个查询掉队、掉到第几名，复盘时逐条可查（main 里还会把 `top5_chunk_ids` 从位置换算回 chunk_id）。
 
 ---
 
-## 5. 验收门槛与 document_store 重建
+## 10. `token_usage`（L154–161）
 
-**执行过程：看数据怎样变**
+回执 → 三项 token 合计，与 3-8 的 `usage` 同款小工具。
 
-九道门槛里三道值得细读（L237–L247）：
+---
 
-- `full_source_document_and_target_chunk_in_requests`：把**每个请求** JSON 化后逐字找 `<document>` 和 `<chunk>` 标签——证明前缀是看着全文生成的，不是看了个摘要；
-- `live_prefix_for_every_chunk`：每个 chunk 的前缀非空且数量对齐——**手写前缀的结果不被接受**（书稿门槛原文）；
-- `real_dense_model`：编码器的 HF revision 非空。
+## 11. `main`（L163–284）：编排与验收
 
-**学习版的 document_store 重建**：课程仓库不带这个文件（原版由需要 localhost:4242 检索服务的索引流水线生成）。书方已通过战役的 evidence.json 保留了全部 22 块的原文与文档标题，学习脚本按 `load_chunks` 的读取形状重组：
+按执行顺序拆四段。
 
-**学习运行脚本原文** · [run_contextual_retrieval.py · L52–L58](../assets/task3/run_contextual_retrieval.py)：
+**装载（L164–204）**：解析参数（`--context-model` 前缀 LLM、`--embedding-model` 默认 `Qwen/Qwen3-Embedding-0.6B`、`--device`、`--endpoint`、两个价格参数）；`load_chunks` + `source_documents`；然后是**前缀生成池**：
 
-```python linenums="52"
-store = {}
-for c in book_chunks:
-    store[c["chunk_id"]] = {
-        "content": c["plain"],
-        "metadata": {"doc_title": c["doc_title"], "original_text": c["plain"]},
-    }
-(OUT / "document_store.json").write_text(json.dumps(store, ensure_ascii=False, indent=2))
+```python linenums="186"
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+        futures = {pool.submit(prefix_one, args, chunk, docs[chunk["doc_title"]]): chunk["chunk_id"] for chunk in chunks}
+        for future in concurrent.futures.as_completed(futures):
+            chunk_id = futures[future]
+            try:
+                row, calls = future.result()
+                contextual.append(row)
+                receipts.extend(calls)
+                print(f"prefix {chunk_id} ({len(contextual)}/{len(chunks)})", flush=True)
+            except Exception as exc:
+                errors.append({"chunk_id": chunk_id, "type": type(exc).__name__, "error": str(exc)})
+    prefix_ms = (time.perf_counter() - prefix_start) * 1000
+    contextual.sort(key=lambda row: row["chunk_id"])
 ```
 
-chunk 内容与书方证据**逐字节相同**、与评测集 `gold_chunk_id` 精确对齐；前缀由 DeepSeek 现场生成（live 门槛原样满足）。与 [task1 教学语料](../task1/context-code.md)的区别：这次不是合成数据，是从书方证据无损搬运的真实分块。
+22 个 chunk 并发生成前缀，单块失败记 errors 不炸全场。完成后**按 chunk_id 重排**——`as_completed` 的完成顺序是乱的，必须重排回与 `load_chunks` 相同的顺序，plain/contextual 两套向量才能逐位对齐。
+
+**六套排序（L205–233）**：守门条件 `len(contextual) == len(chunks) and not errors`——**任何一块前缀缺失，整场比较不做**（部分前缀的双索引没有对照意义）。然后三步：BM25 两套（plain 文本 / contextual 文本）→ 编码器三批向量（plain 22 段、contextual 22 段、查询 15 条）→ 稠密两套 + RRF 两套，全部走 `metrics`。
+
+**验收门槛（L237–247）**，三条最值得读：
+
+```python linenums="238"
+    acceptance = {
+        "live_prefix_for_every_chunk": len(contextual) == len(chunks) and all(row["prefix"] for row in contextual),
+        "full_source_document_and_target_chunk_in_requests": len(receipts) == len(chunks) and all("<document>" in json.dumps(call.get("request", {}), ensure_ascii=False) and "<chunk>" in json.dumps(call.get("request", {}), ensure_ascii=False) for call in receipts),
+        ...
+        "real_dense_model": bool(encoder and encoder.revision),
+```
+
+`live_prefix_for_every_chunk`：手写前缀的结果**不被接受**（书稿门槛原文）；`full_source...`：每个请求 JSON 化后逐字找两个标签——截断输入的前缀不算数；`real_dense_model`：HF revision 非空。
+
+**落证据（L249–276）**：evidence 里除了配置/验收/汇总，还带 `source_documents`（每份源文档的路径 + sha256）、`chunks`（22 块的 plain/prefix/contextual 全文——这正是学习版日后重建 document_store 的材料源，证据自闭环）、`results`（六方法逐查询名次）。最后 `write_campaign_evidence(HERE, "3-10", ...)`——HERE 重定向 + 入口脚本复制的坑同前两个实验。
 
 ---
 
-## 6. 实测：三通道全升，混合追平稠密
+## 完整执行回放（学习版一次真实运行）
 
-**执行过程：看数据怎样变**
+```text
+main
+ ├─ load_chunks(OUT/document_store.json) → 22 块（按 chunk_id 排序）
+ ├─ source_documents → 宪法.md / 检察官法（2019-04-23）.md 全文
+ ├─ ThreadPool(4) × prefix_one × 22 → 前缀全部 live 生成（deepseek-flash，181K tokens，5.5s）
+ │    └─ contextual.sort(chunk_id) → 与 plain 同序
+ ├─ rankings_bm25(plain 文本) / rankings_bm25(前缀+原文)
+ ├─ TransformerEncoder(Qwen3-Embedding-0.6B, cpu)
+ │    ├─ encode(plain 22 段) ├─ encode(contextual 22 段) └─ encode(15 查询, query=True)
+ ├─ rankings_dense ×2 → rrf ×2 → 六套排序
+ ├─ metrics ×6 → recall@1/3/5 + MRR（+per_query 名次）
+ └─ 验收（9 门槛全过）→ write_campaign_evidence
+```
 
-DeepSeek 前缀 + 本地 Qwen3-Embedding（CPU），全量 22 块/15 查询：
+实测（[evidence](evidence.md#contextual-retrieval)）：MRR plain_bm25 0.833→contextual 0.872、plain_dense 0.933→0.967、plain_hybrid 0.889→contextual_hybrid 0.967——前缀三通道全升，方向与书方 doubao 前缀完全一致。
 
-| 方法 | MRR | R@1 | R@3 | R@5 |
-| --- | ---: | ---: | ---: | ---: |
-| plain_bm25 | 0.833 | 0.73 | 0.87 | 1.00 |
-| contextual_bm25 | 0.872 | 0.80 | 0.93 | 1.00 |
-| plain_dense | 0.933 | 0.87 | 1.00 | 1.00 |
-| contextual_dense | **0.967** | **0.93** | 1.00 | 1.00 |
-| plain_hybrid | 0.889 | 0.80 | 1.00 | 1.00 |
-| contextual_hybrid | **0.967** | **0.93** | 1.00 | 1.00 |
+## 动手验证
 
-- **前缀三通道全部提升**：BM25 +0.039、稠密 +0.034、混合 +0.078（MRR）。R@1 普涨 0.07——前缀把"金标排第一"的查询从 11/15 提到 14/15；
-- **BM25 受益的机制最直观**：前缀塞进了块里没有的词（"宪法""序言""1982"），字面匹配多了一条命中路径。稠密通道的提升说明前缀也帮了**语义**定位（孤立的条文片段获得了文档语境）；
-- **contextual_hybrid 追平 contextual_dense**（0.967）：稠密通道已经很强时，混合的边际收益趋零——但在 plain 侧 hybrid（0.889）明显不如 dense（0.933），说明混合救的是"某一通道弱"的场景，不是无条件加成；
-- **索引成本**：22 次前缀调用共 181K tokens（输入 180K——每次带整份源文档）、5.5 秒（4 并发）；CPU 编码 59 段文本 408 秒。**一次性索引成本，查询零增量**。
-
-**与书方对照**：书方（doubao 前缀 + 同款编码器）MRR：plain_bm25 0.751→ctx 0.856、plain_dense 0.922→0.967、plain_hybrid 0.844→0.913。方向完全一致（三通道全升、稠密最强、混合收敛到稠密水平），数值在同一区间——前缀的收益对前缀模型不敏感，更像**机制性**收益而非模型运气。
-
-**动手验证**
-
-R@5 全部 1.00，说明什么？这个评测集还能分辨更好的检索器吗？
-
-??? tip "先预测，再展开对照"
-    金标块都能进前 5——天花板已到，**R@5 失去区分度**，真正拉开差距的是 R@1/MRR（第一名 vs 第五名，在 RAG 里意味着带进上下文的证据排位）。想要更难的评测：加大语料（22 块 → 全量法条库）、查询改写成同义改写（BM25 的死穴）、或者像 3-8 那样多金标。课程用 2 文档小语料是为了"前缀效应可控可观察"，不是检索器的终极考场。
-
----
-
-## 最后回到项目
-
-学习脚本 document_store 重建 → 课程 prefix_one 生成前缀 → 双索引 × 三排序 → recall/MRR → [看真实实验结果](evidence.md#contextual-retrieval)。
+1. **把 `prefix_one` 的 `max_tokens` 从 220 改成 2000**：前缀会变长（更详细），但 BM25 通道的收益未必涨——前缀越长，"前缀词稀释原文词"的反作用越强。这把"简短"从风格要求变成实验变量。
+2. **把 `encode` 的 `query=True` 前缀删掉**：Qwen3-Embedding 的查询/文档不对称用法被破坏，dense 通道的 MRR 会掉多少？这是检验"官方用法不是玄学"的直接办法。
+3. **只保留 rrf 的 top-50 再融合**：`rrf` 现在对全长排序求和——截断到 top-50 后结果几乎不变（长尾贡献 1/(60+r) 微小），但省计算。想想什么场景下这个省法会出错（提示：某通道的金标排在 50 名以外）。
