@@ -7,6 +7,7 @@
 | Task 0 | Agent 基础与环境 | 已完成当前学习记录；实验限制见导读 | [进入](task0/index.md) |
 | Task 1 | 上下文工程与 Memory / RAG | 核心学习变体已运行并做参数对照；原版范围见导读 | [进入](task1/index.md) |
 | Task 2 | 第 2 章上下文工程实验 | 五个 API 实验学习版（KV Cache/注入/System-Hint/消融/压缩）已运行并精读源码；本地模型实验未执行 | [进入](task2/index.md) |
+| Task 3 | 第 3 章用户记忆与知识库 | 记忆四模式/Agentic RAG/上下文感知检索已运行并精读源码；3-4 待跑（Docker），其余未执行见导读 | [进入](task3/index.md) |
 | 后续 Task | 等待课程任务确定 | 待添加 | [使用模板](template.md) |
 
 ## 新增约定

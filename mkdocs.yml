@@ -93,6 +93,19 @@ nav:
           - 实验说明: task2/context-compression.md
           - 一步步读源码: task2/context-compression-code.md
       - 运行证据与复现: task2/evidence.md
+  - Task 3 · 第 3 章用户记忆与知识库实验:
+      - 学习任务与范围: task3/index.md
+      - 概念：记忆与检索的分层: task3/concepts.md
+      - 记忆四模式:
+          - 实验说明: task3/memory-modes.md
+          - 一步步读源码: task3/memory-modes-code.md
+      - Agentic RAG:
+          - 实验说明: task3/agentic-rag.md
+          - 一步步读源码: task3/agentic-rag-code.md
+      - 上下文感知检索:
+          - 实验说明: task3/contextual-retrieval.md
+          - 一步步读源码: task3/contextual-retrieval-code.md
+      - 运行证据与复现: task3/evidence.md
   - 持续学习:
       - Task 索引: tasks.md
       - 新 Task 写作模板: template.md

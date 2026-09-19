@@ -1,0 +1,605 @@
+{
+  "experiment": "3-1/3-2 memory modes learning variant",
+  "note": "course run_evaluation reused verbatim; writer=deepseek-flash, judge=dashscope qwen3.7-plus (cross-vendor); smoke scale 2 cases/layer x 4 modes, not the authoritative 60x4",
+  "writer": {
+    "provider": "deepseek",
+    "endpoint": "https://api.deepseek.com",
+    "model": "deepseek-flash"
+  },
+  "judge": {
+    "provider": "dashscope",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "model": "qwen3.7-plus"
+  },
+  "source_hashes": {
+    "chapter3/user-memory/run_evaluation.py": "a69f0039de306cbda2ef8920195a9720b7435e9a072b7c7f1823c5e3d61dc286"
+  },
+  "credential_scan_findings": [],
+  "course_evidence": {
+    "status": "partial",
+    "scope": {
+      "dataset_cases_available": 60,
+      "cases_run": 6,
+      "modes": [
+        "notes",
+        "enhanced_notes",
+        "json_cards",
+        "advanced_json_cards"
+      ],
+      "evaluations_completed": 22,
+      "evaluations_expected": 24,
+      "layers": [
+        "layer1",
+        "layer2",
+        "layer3"
+      ]
+    },
+    "acceptance": {
+      "all_60_cases": false,
+      "twenty_per_layer": false,
+      "all_four_modes": true,
+      "sequential_memory_only": true,
+      "independent_llm_judge": true,
+      "all_calls_succeeded": false,
+      "passed": false
+    },
+    "summary": {
+      "aggregate": {
+        "advanced_json_cards": {
+          "layer1": {
+            "n": 2,
+            "pass_rate": 0.5,
+            "mean_reward": 0.46875,
+            "hallucination_rate": 0.5
+          },
+          "layer2": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 1.0,
+            "hallucination_rate": 0.0
+          },
+          "layer3": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 0.96875,
+            "hallucination_rate": 0.0
+          },
+          "overall": {
+            "n": 6,
+            "pass_rate": 0.8333333333333334,
+            "mean_reward": 0.8125,
+            "hallucination_rate": 0.16666666666666666
+          }
+        },
+        "enhanced_notes": {
+          "layer1": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 1.0,
+            "hallucination_rate": 0.0
+          },
+          "layer2": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 0.9375,
+            "hallucination_rate": 0.0
+          },
+          "layer3": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 0.96875,
+            "hallucination_rate": 0.0
+          },
+          "overall": {
+            "n": 6,
+            "pass_rate": 1.0,
+            "mean_reward": 0.96875,
+            "hallucination_rate": 0.0
+          }
+        },
+        "json_cards": {
+          "layer1": {
+            "n": 2,
+            "pass_rate": 0.5,
+            "mean_reward": 0.5,
+            "hallucination_rate": 0.5
+          },
+          "layer3": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 0.96875,
+            "hallucination_rate": 0.0
+          },
+          "overall": {
+            "n": 4,
+            "pass_rate": 0.75,
+            "mean_reward": 0.734375,
+            "hallucination_rate": 0.25
+          }
+        },
+        "notes": {
+          "layer1": {
+            "n": 2,
+            "pass_rate": 1.0,
+            "mean_reward": 1.0,
+            "hallucination_rate": 0.0
+          },
+          "layer2": {
+            "n": 2,
+            "pass_rate": 0.5,
+            "mean_reward": 0.8125,
+            "hallucination_rate": 0.0
+          },
+          "layer3": {
+            "n": 2,
+            "pass_rate": 0.5,
+            "mean_reward": 0.46875,
+            "hallucination_rate": 0.5
+          },
+          "overall": {
+            "n": 6,
+            "pass_rate": 0.6666666666666666,
+            "mean_reward": 0.7604166666666666,
+            "hallucination_rate": 0.16666666666666666
+          }
+        }
+      },
+      "token_usage": {
+        "prompt_tokens": 248523,
+        "completion_tokens": 93500,
+        "total_tokens": 342023
+      },
+      "by_mode": {
+        "notes": {
+          "api_calls": 24,
+          "token_usage": {
+            "prompt_tokens": 67189,
+            "completion_tokens": 24104,
+            "total_tokens": 91293
+          },
+          "latency_ms": {
+            "total": 137443.81100000002,
+            "mean_per_call": 5726.825458333334
+          }
+        },
+        "enhanced_notes": {
+          "api_calls": 24,
+          "token_usage": {
+            "prompt_tokens": 61010,
+            "completion_tokens": 17794,
+            "total_tokens": 78804
+          },
+          "latency_ms": {
+            "total": 126462.671,
+            "mean_per_call": 5269.277958333333
+          }
+        },
+        "json_cards": {
+          "api_calls": 16,
+          "token_usage": {
+            "prompt_tokens": 45377,
+            "completion_tokens": 18415,
+            "total_tokens": 63792
+          },
+          "latency_ms": {
+            "total": 94740.318,
+            "mean_per_call": 5921.269875
+          }
+        },
+        "advanced_json_cards": {
+          "api_calls": 24,
+          "token_usage": {
+            "prompt_tokens": 74947,
+            "completion_tokens": 33187,
+            "total_tokens": 108134
+          },
+          "latency_ms": {
+            "total": 165198.45500000002,
+            "mean_per_call": 6883.268958333333
+          }
+        }
+      },
+      "api_calls": 88,
+      "errors": 2
+    },
+    "results": [
+      {
+        "test_id": "layer1_01_bank_account",
+        "layer": "layer1",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 3
+          },
+          "hallucination_veto": true,
+          "passed": false,
+          "reward": 0.0
+        },
+        "answer_chars": 541,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_01_bank_account",
+        "layer": "layer1",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 176,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_01_bank_account",
+        "layer": "layer1",
+        "mode": "json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 474,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_01_bank_account",
+        "layer": "layer1",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 802,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_02_insurance_claim",
+        "layer": "layer1",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 3,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.9375
+        },
+        "answer_chars": 774,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_02_insurance_claim",
+        "layer": "layer1",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 364,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_02_insurance_claim",
+        "layer": "layer1",
+        "mode": "json_cards",
+        "judge": {
+          "scores": {
+            "precision": 2,
+            "recall": 2,
+            "reasoning": 2,
+            "proactivity": 3
+          },
+          "hallucination_veto": true,
+          "passed": false,
+          "reward": 0.0
+        },
+        "answer_chars": 908,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer1_02_insurance_claim",
+        "layer": "layer1",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 464,
+        "session_count": 1
+      },
+      {
+        "test_id": "layer2_01_multiple_vehicles",
+        "layer": "layer2",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 1413,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer2_01_multiple_vehicles",
+        "layer": "layer2",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 3,
+            "proactivity": 3
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.875
+        },
+        "answer_chars": 1804,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer2_01_multiple_vehicles",
+        "layer": "layer2",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 2,
+            "reasoning": 2,
+            "proactivity": 2
+          },
+          "hallucination_veto": false,
+          "passed": false,
+          "reward": 0.625
+        },
+        "answer_chars": 1308,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer2_02_multiple_properties",
+        "layer": "layer2",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 2598,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer2_02_multiple_properties",
+        "layer": "layer2",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 2663,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer2_02_multiple_properties",
+        "layer": "layer2",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 2420,
+        "session_count": 2
+      },
+      {
+        "test_id": "layer3_01_travel_coordination",
+        "layer": "layer3",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 3077,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_01_travel_coordination",
+        "layer": "layer3",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 3179,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_01_travel_coordination",
+        "layer": "layer3",
+        "mode": "json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 1.0
+        },
+        "answer_chars": 3621,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_01_travel_coordination",
+        "layer": "layer3",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 4,
+            "reasoning": 3,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.9375
+        },
+        "answer_chars": 3402,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_02_medical_insurance_coordination",
+        "layer": "layer3",
+        "mode": "advanced_json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 3,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.9375
+        },
+        "answer_chars": 3788,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_02_medical_insurance_coordination",
+        "layer": "layer3",
+        "mode": "enhanced_notes",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 3,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.9375
+        },
+        "answer_chars": 4012,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_02_medical_insurance_coordination",
+        "layer": "layer3",
+        "mode": "json_cards",
+        "judge": {
+          "scores": {
+            "precision": 4,
+            "recall": 3,
+            "reasoning": 4,
+            "proactivity": 4
+          },
+          "hallucination_veto": false,
+          "passed": true,
+          "reward": 0.9375
+        },
+        "answer_chars": 3460,
+        "session_count": 3
+      },
+      {
+        "test_id": "layer3_02_medical_insurance_coordination",
+        "layer": "layer3",
+        "mode": "notes",
+        "judge": {
+          "scores": {
+            "precision": 2,
+            "recall": 2,
+            "reasoning": 2,
+            "proactivity": 3
+          },
+          "hallucination_veto": true,
+          "passed": false,
+          "reward": 0.0
+        },
+        "answer_chars": 3889,
+        "session_count": 3
+      }
+    ]
+  },
+  "completed": true
+}
