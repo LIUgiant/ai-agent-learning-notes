@@ -1,0 +1,373 @@
+{
+  "experiment": "2-4 prompt-engineering learning variant",
+  "note": "course run_full_suite reused verbatim; DeepSeek provider, 4 airline tasks x 6 arms instead of 10 x 6; temperature 0.3 instead of kimi-forced 1.0",
+  "model": "deepseek-flash",
+  "source_hashes": {
+    "chapter2/prompt-engineering/run_ablation.py": "dbdd636e2443f154031eaba510ece4310e20ba457841b8de1acd12c03e1bfd8a",
+    "chapter2/prompt-engineering/ablation_agent.py": "23cd2fc45afe5ca9d4f557cbedb9fcceceb97ed748125e169d9e7533796750c8",
+    "chapter2/prompt-engineering/ablation_utils.py": "b931056a26592e703545e154f2e34b45ac0ddae3911e5a07dac64ce3003cdd32"
+  },
+  "credential_scan_findings_deepseek": [],
+  "summary": {
+    "experiment_id": "2-4",
+    "created_at": "2026-09-19T16:59:37.473252+08:00",
+    "protocol_sha256": "dc1ffd5ef8d519f581d07662d427637eff00829f33cd98288d147968969d1b32",
+    "protocol_copy": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/experiment_protocol.json",
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "user_model": "deepseek-flash",
+    "objective_scoring": "vendored tau-bench environment reward",
+    "arms": {
+      "baseline": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-baseline_0919165429.json",
+          "sha256": "4854ac5e95aa80e3706ddef821df4531f6f28f17bdae03d1b16a98005828fc30"
+        },
+        "rewards": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 25.0,
+        "total": 4,
+        "successes": 1,
+        "failures": 3,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [
+          {
+            "task_id": 2,
+            "error": "Unterminated string starting at: line 1 column 13 (char 12)"
+          }
+        ],
+        "agent_steps": [
+          15,
+          10,
+          null,
+          29
+        ],
+        "tool_calls": [
+          7,
+          5,
+          null,
+          15
+        ],
+        "tool_errors": [
+          0,
+          0,
+          null,
+          1
+        ],
+        "real_api_calls": 88,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 407711,
+          "completion_tokens": 7077,
+          "total_tokens": 414788
+        },
+        "observed_litellm_cost_usd": 0.020393412,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": false
+      },
+      "tone_trump": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-tone_trump_0919165520.json",
+          "sha256": "28b57127812dfe211cc206a18ef18336fec42f3b980f880db5623b0424310589"
+        },
+        "rewards": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 25.0,
+        "total": 4,
+        "successes": 1,
+        "failures": 3,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [],
+        "agent_steps": [
+          11,
+          11,
+          30,
+          21
+        ],
+        "tool_calls": [
+          4,
+          5,
+          25,
+          12
+        ],
+        "tool_errors": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "real_api_calls": 104,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 617505,
+          "completion_tokens": 12436,
+          "total_tokens": 629941
+        },
+        "observed_litellm_cost_usd": 0.031922028,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": true
+      },
+      "tone_casual": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-tone_casual_0919165609.json",
+          "sha256": "158d9eab7ed864d251ff894751d42abdfd0df478064841df4f79f4653df98d93"
+        },
+        "rewards": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 25.0,
+        "total": 4,
+        "successes": 1,
+        "failures": 3,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [],
+        "agent_steps": [
+          11,
+          11,
+          4,
+          16
+        ],
+        "tool_calls": [
+          4,
+          5,
+          1,
+          10
+        ],
+        "tool_errors": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "real_api_calls": 68,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 281995,
+          "completion_tokens": 8012,
+          "total_tokens": 290007
+        },
+        "observed_litellm_cost_usd": 0.02064234,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": true
+      },
+      "wiki_random": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-wiki_random_0919165645.json",
+          "sha256": "e5af4f2e0d14ce952195d52a020649b539dc3e13c3a27303e9170dded54008ff"
+        },
+        "rewards": [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 25.0,
+        "total": 4,
+        "successes": 1,
+        "failures": 3,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [],
+        "agent_steps": [
+          27,
+          20,
+          21,
+          21
+        ],
+        "tool_calls": [
+          16,
+          9,
+          14,
+          13
+        ],
+        "tool_errors": [
+          1,
+          1,
+          0,
+          2
+        ],
+        "real_api_calls": 130,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 738258,
+          "completion_tokens": 14305,
+          "total_tokens": 752563
+        },
+        "observed_litellm_cost_usd": 0.038290632,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": true
+      },
+      "no_tool_desc": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-no_tool_desc_0919165744.json",
+          "sha256": "5f63962b3475b7c437fc4de29a8c965d0d37331520dc2f135ce3c2b93c270bac"
+        },
+        "rewards": [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 25.0,
+        "total": 4,
+        "successes": 1,
+        "failures": 3,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [],
+        "agent_steps": [
+          9,
+          11,
+          30,
+          30
+        ],
+        "tool_calls": [
+          5,
+          5,
+          25,
+          14
+        ],
+        "tool_errors": [
+          0,
+          0,
+          6,
+          2
+        ],
+        "real_api_calls": 115,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 509845,
+          "completion_tokens": 9500,
+          "total_tokens": 519345
+        },
+        "observed_litellm_cost_usd": 0.025002204,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": true
+      },
+      "all_ablations": {
+        "artifact": {
+          "path": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task2/runs/2-4_prompt_engineering/20260919T085427Z/tool-calling-deepseek-flash-tone_casual_wiki_random_no_tool_desc_0919165833.json",
+          "sha256": "7e4de920fda288a5dbf33e8fca79bf9e9b5e3e1f3cc82e8b4817af23cf67a37b"
+        },
+        "rewards": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "success_rate": 50.0,
+        "total": 4,
+        "successes": 2,
+        "failures": 2,
+        "tasks_completed": 4,
+        "expected_tasks": 4,
+        "task_errors": [],
+        "agent_steps": [
+          16,
+          11,
+          30,
+          30
+        ],
+        "tool_calls": [
+          9,
+          5,
+          26,
+          19
+        ],
+        "tool_errors": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "real_api_calls": 119,
+        "response_ids_present": true,
+        "usage": {
+          "prompt_tokens": 653927,
+          "completion_tokens": 15528,
+          "total_tokens": 669455
+        },
+        "observed_litellm_cost_usd": 0.035570484,
+        "all_calls_priced": true,
+        "native_cost_cny": null,
+        "arm_complete": true
+      }
+    },
+    "credential_scan_passed": true,
+    "credential_findings": [],
+    "usage_and_cost": {
+      "total_real_api_calls": 624,
+      "prompt_tokens": 3209241,
+      "completion_tokens": 66858,
+      "total_tokens": 3276099,
+      "observed_litellm_cost_usd": 0.1718211,
+      "all_calls_priced": true,
+      "native_cost_cny": 0,
+      "native_cost_complete": false,
+      "qualification": "learning variant: DeepSeek pricing not configured; native cost intentionally zero"
+    },
+    "campaign_complete": false,
+    "hypothesis_results": {
+      "historical_percentages_reproduced": false,
+      "qualification": "Current fixed ten-task campaign only; compare arm metrics directly."
+    }
+  },
+  "suite_results": {
+    "baseline": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "tone_trump": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "tone_casual": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "wiki_random": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "no_tool_desc": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "all_ablations": [
+      1.0,
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "completed": true
+}

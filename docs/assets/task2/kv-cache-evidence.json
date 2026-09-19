@@ -1,0 +1,2483 @@
+{
+  "experiment": "2-3 kv-cache learning variant",
+  "note": "six context-construction modes of the course KVCacheAgent, run on DeepSeek; not the book's Kimi K2.6 campaign",
+  "model": "deepseek-v4-flash",
+  "modes": [
+    {
+      "mode": "correct",
+      "course_metrics": {
+        "ttft": 0.7977578639984131,
+        "ttft_per_iteration": [
+          0.7977578639984131,
+          1.2127177715301514,
+          1.0819990634918213,
+          6.108950138092041
+        ],
+        "total_time": 9.209770917892456,
+        "iterations": 4,
+        "tool_calls": 9,
+        "cache_hits": 3,
+        "cache_misses": 1,
+        "prompt_tokens": 11899,
+        "completion_tokens": 1803,
+        "cached_tokens": 6016
+      },
+      "iterations": 4,
+      "n_calls": 4,
+      "success": true,
+      "final_answer_chars": 5347,
+      "tool_call_names": [
+        [
+          "find",
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "grep",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.797,
+        1.211,
+        1.08,
+        6.107
+      ],
+      "per_call_prompt_tokens": [
+        747,
+        950,
+        4179,
+        6023
+      ],
+      "per_call_cache_hit_tokens": [
+        0,
+        768,
+        1024,
+        4224
+      ],
+      "per_call_cache_miss_tokens": [
+        747,
+        182,
+        3155,
+        1799
+      ],
+      "per_call_tools_order": [
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        2,
+        5,
+        11,
+        14
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        2,
+        5,
+        11
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    },
+    {
+      "mode": "dynamic_system",
+      "course_metrics": {
+        "ttft": 0.847944974899292,
+        "ttft_per_iteration": [
+          0.847944974899292,
+          1.1184840202331543,
+          0.8480970859527588,
+          6.226474285125732
+        ],
+        "total_time": 9.048924207687378,
+        "iterations": 4,
+        "tool_calls": 9,
+        "cache_hits": 0,
+        "cache_misses": 4,
+        "prompt_tokens": 13930,
+        "completion_tokens": 1833,
+        "cached_tokens": 0
+      },
+      "iterations": 4,
+      "n_calls": 4,
+      "success": true,
+      "final_answer_chars": 5460,
+      "tool_call_names": [
+        [
+          "find",
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "grep",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.846,
+        1.116,
+        0.845,
+        6.224
+      ],
+      "per_call_prompt_tokens": [
+        768,
+        970,
+        4202,
+        7990
+      ],
+      "per_call_cache_hit_tokens": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_call_cache_miss_tokens": [
+        768,
+        970,
+        4202,
+        7990
+      ],
+      "per_call_tools_order": [
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        2,
+        5,
+        11,
+        14
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    },
+    {
+      "mode": "shuffled_tools",
+      "course_metrics": {
+        "ttft": 0.9311940670013428,
+        "ttft_per_iteration": [
+          0.9311940670013428,
+          0.9174489974975586,
+          1.0559110641479492,
+          6.309576034545898
+        ],
+        "total_time": 9.221165895462036,
+        "iterations": 4,
+        "tool_calls": 8,
+        "cache_hits": 4,
+        "cache_misses": 0,
+        "prompt_tokens": 11246,
+        "completion_tokens": 1763,
+        "cached_tokens": 1536
+      },
+      "iterations": 4,
+      "n_calls": 4,
+      "success": true,
+      "final_answer_chars": 5458,
+      "tool_call_names": [
+        [
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "grep",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.927,
+        0.914,
+        1.053,
+        6.305
+      ],
+      "per_call_prompt_tokens": [
+        747,
+        861,
+        4092,
+        5546
+      ],
+      "per_call_cache_hit_tokens": [
+        128,
+        640,
+        640,
+        128
+      ],
+      "per_call_cache_miss_tokens": [
+        619,
+        221,
+        3452,
+        5418
+      ],
+      "per_call_tools_order": [
+        [
+          "grep",
+          "read_file",
+          "find"
+        ],
+        [
+          "grep",
+          "read_file",
+          "find"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "find",
+          "read_file",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        2,
+        4,
+        10,
+        13
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        1,
+        3,
+        9
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    },
+    {
+      "mode": "dynamic_profile",
+      "course_metrics": {
+        "ttft": 0.7530617713928223,
+        "ttft_per_iteration": [
+          0.7530617713928223,
+          0.7138381004333496,
+          1.155945062637329,
+          6.284610033035278
+        ],
+        "total_time": 8.917253971099854,
+        "iterations": 4,
+        "tool_calls": 8,
+        "cache_hits": 4,
+        "cache_misses": 0,
+        "prompt_tokens": 13643,
+        "completion_tokens": 1746,
+        "cached_tokens": 2432
+      },
+      "iterations": 4,
+      "n_calls": 4,
+      "success": true,
+      "final_answer_chars": 5166,
+      "tool_call_names": [
+        [
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "grep",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.75,
+        0.709,
+        1.152,
+        6.281
+      ],
+      "per_call_prompt_tokens": [
+        759,
+        877,
+        4110,
+        7897
+      ],
+      "per_call_cache_hit_tokens": [
+        512,
+        640,
+        640,
+        640
+      ],
+      "per_call_cache_miss_tokens": [
+        247,
+        237,
+        3470,
+        7257
+      ],
+      "per_call_tools_order": [
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        3,
+        5,
+        11,
+        14
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    },
+    {
+      "mode": "sliding_window",
+      "course_metrics": {
+        "ttft": 0.8024721145629883,
+        "ttft_per_iteration": [
+          0.8024721145629883,
+          0.9041197299957275,
+          0.8240780830383301,
+          6.42657995223999
+        ],
+        "total_time": 8.962713718414307,
+        "iterations": 4,
+        "tool_calls": 9,
+        "cache_hits": 4,
+        "cache_misses": 0,
+        "prompt_tokens": 10396,
+        "completion_tokens": 1760,
+        "cached_tokens": 5504
+      },
+      "iterations": 4,
+      "n_calls": 4,
+      "success": true,
+      "final_answer_chars": 5227,
+      "tool_call_names": [
+        [
+          "find",
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "find",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.799,
+        0.9,
+        0.82,
+        6.422
+      ],
+      "per_call_prompt_tokens": [
+        747,
+        949,
+        3971,
+        4729
+      ],
+      "per_call_cache_hit_tokens": [
+        512,
+        640,
+        640,
+        3712
+      ],
+      "per_call_cache_miss_tokens": [
+        235,
+        309,
+        3331,
+        1017
+      ],
+      "per_call_tools_order": [
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        2,
+        5,
+        8,
+        11
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        1,
+        1,
+        7
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    },
+    {
+      "mode": "text_format",
+      "course_metrics": {
+        "ttft": 0.6746461391448975,
+        "ttft_per_iteration": [
+          0.6746461391448975,
+          1.130439043045044,
+          0.5921289920806885,
+          0.7927381992340088,
+          0.8953967094421387,
+          5.969104290008545
+        ],
+        "total_time": 10.063055753707886,
+        "iterations": 6,
+        "tool_calls": 10,
+        "cache_hits": 6,
+        "cache_misses": 0,
+        "prompt_tokens": 19357,
+        "completion_tokens": 1759,
+        "cached_tokens": 13568
+      },
+      "iterations": 6,
+      "n_calls": 6,
+      "success": true,
+      "final_answer_chars": 4888,
+      "tool_call_names": [
+        [
+          "find"
+        ],
+        [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        [
+          "find"
+        ],
+        [
+          "find"
+        ],
+        [
+          "grep",
+          "grep"
+        ],
+        []
+      ],
+      "per_call_elapsed_s": [
+        0.669,
+        1.124,
+        0.586,
+        0.791,
+        0.89,
+        5.965
+      ],
+      "per_call_prompt_tokens": [
+        747,
+        849,
+        4000,
+        4097,
+        4198,
+        5466
+      ],
+      "per_call_cache_hit_tokens": [
+        512,
+        640,
+        768,
+        3712,
+        3840,
+        4096
+      ],
+      "per_call_cache_miss_tokens": [
+        235,
+        209,
+        3232,
+        385,
+        358,
+        1370
+      ],
+      "per_call_tools_order": [
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ],
+        [
+          "read_file",
+          "find",
+          "grep"
+        ]
+      ],
+      "per_call_n_messages": [
+        2,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "prefix_common_len_with_previous": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "usage_field_names": [
+        "completion_tokens",
+        "completion_tokens_details",
+        "prompt_cache_hit_tokens",
+        "prompt_cache_miss_tokens",
+        "prompt_tokens",
+        "prompt_tokens_details",
+        "total_tokens"
+      ],
+      "checks": {
+        "made_real_calls": true,
+        "usage_reports_cache_fields": true,
+        "hit_plus_miss_equals_prompt": true
+      }
+    }
+  ],
+  "calls": [
+    {
+      "elapsed_s": 0.797,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find",
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 81,
+        "prompt_tokens": 747,
+        "total_tokens": 828,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 747
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 2
+    },
+    {
+      "elapsed_s": 1.211,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 174,
+        "prompt_tokens": 950,
+        "total_tokens": 1124,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 768
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 182
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        }
+      ],
+      "n_messages": 5
+    },
+    {
+      "elapsed_s": 1.08,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "grep",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 136,
+        "prompt_tokens": 4179,
+        "total_tokens": 4315,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 1024
+        },
+        "prompt_cache_hit_tokens": 1024,
+        "prompt_cache_miss_tokens": 3155
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "assistant",
+          "chars": 71,
+          "sha": "f09965416b54",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        }
+      ],
+      "n_messages": 11
+    },
+    {
+      "elapsed_s": 6.107,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1412,
+        "prompt_tokens": 6023,
+        "total_tokens": 7435,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 4224
+        },
+        "prompt_cache_hit_tokens": 4224,
+        "prompt_cache_miss_tokens": 1799
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "assistant",
+          "chars": 71,
+          "sha": "f09965416b54",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "assistant",
+          "chars": 105,
+          "sha": "aa7a2dd7616a",
+          "tool_calls": [
+            "grep",
+            "grep"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1823,
+          "sha": "8e28273bf275"
+        },
+        {
+          "role": "tool",
+          "chars": 3401,
+          "sha": "1e2af54fb4ec"
+        }
+      ],
+      "n_messages": 14
+    },
+    {
+      "elapsed_s": 0.846,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find",
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 81,
+        "prompt_tokens": 768,
+        "total_tokens": 849,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 768
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 749,
+          "sha": "68e143685e58"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 2
+    },
+    {
+      "elapsed_s": 1.116,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 177,
+        "prompt_tokens": 970,
+        "total_tokens": 1147,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 970
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 749,
+          "sha": "b8db85a5cefe"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 5
+    },
+    {
+      "elapsed_s": 0.845,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "grep",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 140,
+        "prompt_tokens": 4202,
+        "total_tokens": 4342,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 4202
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 749,
+          "sha": "51adf2f3eba4"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "5688d32771c5",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 11
+    },
+    {
+      "elapsed_s": 6.224,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1435,
+        "prompt_tokens": 7990,
+        "total_tokens": 9425,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 7990
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 749,
+          "sha": "bf175721ceb4"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "5688d32771c5",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "assistant",
+          "chars": 116,
+          "sha": "ec8ff0e60224",
+          "tool_calls": [
+            "grep",
+            "grep"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1830,
+          "sha": "c7059a5126a6"
+        },
+        {
+          "role": "tool",
+          "chars": 9114,
+          "sha": "fed3cfeec449"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 14
+    },
+    {
+      "elapsed_s": 0.927,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 53,
+        "prompt_tokens": 747,
+        "total_tokens": 800,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 619
+      },
+      "tools_order": [
+        "grep",
+        "read_file",
+        "find"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 2
+    },
+    {
+      "elapsed_s": 0.914,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 176,
+        "prompt_tokens": 861,
+        "total_tokens": 1037,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 221
+      },
+      "tools_order": [
+        "grep",
+        "read_file",
+        "find"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 4
+    },
+    {
+      "elapsed_s": 1.053,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "grep",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 133,
+        "prompt_tokens": 4092,
+        "total_tokens": 4225,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 3452
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "assistant",
+          "chars": 74,
+          "sha": "b64ff00b9aa5",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 10
+    },
+    {
+      "elapsed_s": 6.305,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1401,
+        "prompt_tokens": 5546,
+        "total_tokens": 6947,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 5418
+      },
+      "tools_order": [
+        "find",
+        "read_file",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "assistant",
+          "chars": 74,
+          "sha": "b64ff00b9aa5",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "assistant",
+          "chars": 109,
+          "sha": "4a97fcf48f54",
+          "tool_calls": [
+            "grep",
+            "grep"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1823,
+          "sha": "8e28273bf275"
+        },
+        {
+          "role": "tool",
+          "chars": 2189,
+          "sha": "a9104d45ed7d"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 13
+    },
+    {
+      "elapsed_s": 0.75,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 56,
+        "prompt_tokens": 759,
+        "total_tokens": 815,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 512
+        },
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 247
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 54,
+          "sha": "600831f8163a"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    },
+    {
+      "elapsed_s": 0.709,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 178,
+        "prompt_tokens": 877,
+        "total_tokens": 1055,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 237
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 54,
+          "sha": "70a74ac61e10"
+        },
+        {
+          "role": "assistant",
+          "chars": 101,
+          "sha": "aa9508df37f7",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 5
+    },
+    {
+      "elapsed_s": 1.152,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "grep",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 139,
+        "prompt_tokens": 4110,
+        "total_tokens": 4249,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 3470
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 54,
+          "sha": "4fb09d918f11"
+        },
+        {
+          "role": "assistant",
+          "chars": 101,
+          "sha": "aa9508df37f7",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "assistant",
+          "chars": 90,
+          "sha": "07de838a1642",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 11
+    },
+    {
+      "elapsed_s": 6.281,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1373,
+        "prompt_tokens": 7897,
+        "total_tokens": 9270,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 7257
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 54,
+          "sha": "3a6ac734097f"
+        },
+        {
+          "role": "assistant",
+          "chars": 101,
+          "sha": "aa9508df37f7",
+          "tool_calls": [
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "assistant",
+          "chars": 90,
+          "sha": "07de838a1642",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "assistant",
+          "chars": 115,
+          "sha": "a5aaeddf9ff9",
+          "tool_calls": [
+            "grep",
+            "grep"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1830,
+          "sha": "c7059a5126a6"
+        },
+        {
+          "role": "tool",
+          "chars": 9114,
+          "sha": "fed3cfeec449"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 14
+    },
+    {
+      "elapsed_s": 0.799,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find",
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 81,
+        "prompt_tokens": 747,
+        "total_tokens": 828,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 512
+        },
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 235
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 2
+    },
+    {
+      "elapsed_s": 0.9,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 170,
+        "prompt_tokens": 949,
+        "total_tokens": 1119,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 309
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 84,
+          "sha": "bda2be9855ff",
+          "tool_calls": [
+            "find",
+            "find"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 161,
+          "sha": "06fdcdcee2a5"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 5
+    },
+    {
+      "elapsed_s": 0.82,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 99,
+        "prompt_tokens": 3971,
+        "total_tokens": 4070,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 3331
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 58,
+          "sha": "d18bb1421974",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 8
+    },
+    {
+      "elapsed_s": 6.422,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1410,
+        "prompt_tokens": 4729,
+        "total_tokens": 6139,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 3712
+        },
+        "prompt_cache_hit_tokens": 3712,
+        "prompt_cache_miss_tokens": 1017
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "assistant",
+          "chars": 58,
+          "sha": "d18bb1421974",
+          "tool_calls": [
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 1895,
+          "sha": "2ae15101027d"
+        },
+        {
+          "role": "tool",
+          "chars": 2569,
+          "sha": "fc640cadd415"
+        },
+        {
+          "role": "tool",
+          "chars": 1983,
+          "sha": "fcd42d657419"
+        },
+        {
+          "role": "tool",
+          "chars": 2354,
+          "sha": "205ea72de9f3"
+        },
+        {
+          "role": "tool",
+          "chars": 2050,
+          "sha": "d2c7e5f19651"
+        },
+        {
+          "role": "assistant",
+          "chars": 66,
+          "sha": "502dbcc1686d",
+          "tool_calls": [
+            "find",
+            "grep"
+          ]
+        },
+        {
+          "role": "tool",
+          "chars": 158,
+          "sha": "af9fcbae89af"
+        },
+        {
+          "role": "tool",
+          "chars": 1830,
+          "sha": "c7059a5126a6"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 11
+    },
+    {
+      "elapsed_s": 0.669,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 53,
+        "prompt_tokens": 747,
+        "total_tokens": 800,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 512
+        },
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 235
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 2
+    },
+    {
+      "elapsed_s": 1.124,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "usage": {
+        "completion_tokens": 175,
+        "prompt_tokens": 849,
+        "total_tokens": 1024,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 209
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 369,
+          "sha": "fdbd1da4db96"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    },
+    {
+      "elapsed_s": 0.586,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 51,
+        "prompt_tokens": 4000,
+        "total_tokens": 4051,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 768
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 3232
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 11722,
+          "sha": "93c82826c4bf"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    },
+    {
+      "elapsed_s": 0.791,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "find"
+      ],
+      "usage": {
+        "completion_tokens": 52,
+        "prompt_tokens": 4097,
+        "total_tokens": 4149,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 3712
+        },
+        "prompt_cache_hit_tokens": 3712,
+        "prompt_cache_miss_tokens": 385
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 12071,
+          "sha": "530e889df0b6"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    },
+    {
+      "elapsed_s": 0.89,
+      "model": "deepseek-flash",
+      "finish_reason": "tool_calls",
+      "tool_calls": [
+        "grep",
+        "grep"
+      ],
+      "usage": {
+        "completion_tokens": 132,
+        "prompt_tokens": 4198,
+        "total_tokens": 4330,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 3840
+        },
+        "prompt_cache_hit_tokens": 3840,
+        "prompt_cache_miss_tokens": 358
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 12426,
+          "sha": "91ac5de4ce06"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    },
+    {
+      "elapsed_s": 5.965,
+      "model": "deepseek-flash",
+      "finish_reason": "stop",
+      "tool_calls": [],
+      "usage": {
+        "completion_tokens": 1296,
+        "prompt_tokens": 5466,
+        "total_tokens": 6762,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 1370
+      },
+      "tools_order": [
+        "read_file",
+        "find",
+        "grep"
+      ],
+      "messages_digest": [
+        {
+          "role": "system",
+          "chars": 707,
+          "sha": "d02c9407f048"
+        },
+        {
+          "role": "user",
+          "chars": 16442,
+          "sha": "1b02b34b4344"
+        },
+        {
+          "role": "user",
+          "chars": 291,
+          "sha": "2f99b24e5de0"
+        }
+      ],
+      "n_messages": 3
+    }
+  ],
+  "source_hashes": {
+    "chapter2/kv-cache/agent.py": "28dde0d9ca788abef00eb6145eff5f8a140f2d461ba3ddec79ad3f430e442931"
+  },
+  "base_url_host": "api.deepseek.com",
+  "completed": true,
+  "total_prompt_tokens": 80471,
+  "total_completion_tokens": 10664
+}
