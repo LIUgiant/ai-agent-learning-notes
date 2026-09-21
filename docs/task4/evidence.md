@@ -152,7 +152,7 @@ active 5/10、4,956 token、5.07s。
 5. **Excel 门禁需要 `soffice`**：LibreOffice 安装目录要前置到 PATH。
 6. **Docker 沙盒首次运行要拉镜像**，30 秒超时会误判为失败——先 `docker pull python:3.11-slim`。
 
-## MCP SDK 版本分叉
+## MCP SDK 版本分叉 {#mcp-sdk-版本分叉}
 
 | 环境 | 用于 | 原因 |
 | --- | --- | --- |
