@@ -106,6 +106,28 @@ nav:
           - 实验说明: task3/contextual-retrieval.md
           - 一步步读源码: task3/contextual-retrieval-code.md
       - 运行证据与复现: task3/evidence.md
+  - Task 4 · 第 4 章工具与 MCP 实验:
+      - 学习任务与范围: task4/index.md
+      - 概念：能力形态与披露策略: task4/concepts.md
+      - 主动工具发现:
+          - 实验说明: task4/tool-discovery.md
+          - 一步步读源码: task4/tool-discovery-code.md
+      - 感知工具 MCP:
+          - 实验说明: task4/perception-mcp.md
+          - 一步步读源码: task4/perception-mcp-code.md
+      - 多模态三范式:
+          - 实验说明: task4/multimodal.md
+          - 一步步读源码: task4/multimodal-code.md
+      - 执行工具与安全门:
+          - 实验说明: task4/execution-tools.md
+          - 一步步读源码: task4/execution-tools-code.md
+      - 协作工具与人在回路:
+          - 实验说明: task4/collaboration.md
+          - 一步步读源码: task4/collaboration-code.md
+      - 工具选型三策略:
+          - 实验说明: task4/tool-selection.md
+          - 一步步读源码: task4/tool-selection-code.md
+      - 运行证据与复现: task4/evidence.md
   - 持续学习:
       - Task 索引: tasks.md
       - 新 Task 写作模板: template.md

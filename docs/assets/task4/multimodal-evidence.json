@@ -1,0 +1,112 @@
+{
+  "experiment": "4-3 multimodal three paradigms (learning variant)",
+  "run_dir": "learning/task4/runs/4-3_multimodal/20260921T111923Z",
+  "providers": {
+    "vision": {
+      "provider": "dashscope",
+      "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-vl-max"
+    },
+    "text": {
+      "provider": "deepseek",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-flash"
+    },
+    "judge_vision_rows": {
+      "provider": "deepseek",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-flash"
+    },
+    "judge_text_rows": {
+      "provider": "dashscope",
+      "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen3.7-plus"
+    }
+  },
+  "local_tools": {
+    "pdf_text": "PyMuPDF (course uses pdftotext; poppler absent on this machine)",
+    "pdf_render": "PyMuPDF get_pixmap(dpi=180) (course uses pdftoppm)",
+    "png_ocr": "unavailable: tesseract not installed"
+  },
+  "summary": {
+    "native-multimodal": {
+      "cases": 4,
+      "exact_accuracy": 1.0,
+      "judge_accuracy": 1.0,
+      "mean_latency_ms": 3519.308
+    },
+    "extract-to-text": {
+      "cases": 4,
+      "exact_accuracy": 0.0,
+      "judge_accuracy": 0.0,
+      "mean_latency_ms": 1136.02425
+    },
+    "tool-on-demand": {
+      "cases": 4,
+      "exact_accuracy": 1.0,
+      "judge_accuracy": 1.0,
+      "mean_latency_ms": 7695.60575
+    }
+  },
+  "acceptance": {
+    "same_two_questions_all_paradigms_and_artifacts": true,
+    "png_and_pdf_used": true,
+    "chart_answers_absent_from_pdf_body_text": true,
+    "real_native_vision_calls_on_dashscope": true,
+    "tool_selected_on_demand": true,
+    "real_tool_vision_calls_on_dashscope": true,
+    "cross_vendor_judging": true,
+    "all_calls_checkpointed": true,
+    "local_extraction_receipts_recorded": true
+  },
+  "judge_receipts": [
+    {
+      "group": "vision-rows-judged-by-deepseek",
+      "model": "deepseek-flash",
+      "rows": 4,
+      "returned": 4
+    },
+    {
+      "group": "text-rows-judged-by-dashscope",
+      "model": "qwen3.7-plus",
+      "rows": 8,
+      "returned": 8
+    }
+  ],
+  "course_evidence": {
+    "source": "chapter4/multimodal-agent/campaign.py (12-row matrix, questions, tool definition, exactness grading and judge prompt reused verbatim)",
+    "status": "passed",
+    "run_dir": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/learning/task4/runs/4-3_multimodal/20260921T111923Z/validation/runs/20260921T112042Z-4_3-64cee491",
+    "manifest_sha256": "522913989e872ebd6afc911b7e5f20a4b76750c879226ef133055ffa3bc3c0b4",
+    "extract_to_text_answers": [
+      {
+        "id": "png:extract:highest",
+        "exact_correct": false,
+        "answer": "The extracted text does not include any revenue data or quarters, so the answer is unavailable."
+      },
+      {
+        "id": "png:extract:lowest_gap",
+        "exact_correct": false,
+        "answer": "The extracted text is unavailable, so I cannot determine which quarter had the lowest revenue, its value, or how much Q4 exceeded it."
+      },
+      {
+        "id": "pdf:extract:highest",
+        "exact_correct": false,
+        "answer": "Based on the extracted text, the fourth quarter had the strongest performance/surge, but the exact revenue value is not provided in the extracted text."
+      },
+      {
+        "id": "pdf:extract:lowest_gap",
+        "exact_correct": false,
+        "answer": "The extracted text does not include the quarterly revenue values from the chart. It only states that there was a “mid-year dip” and a “strong recovery in the final quarter,” with a “fourth-quarter surge.” Therefore, the exact lowest-revenue quarter, its value, and how much Q4 exceeded it are unavail"
+      }
+    ]
+  },
+  "source_hashes": {
+    "chapter4/multimodal-agent/campaign.py": "437d517251d86821961e01b27885910c17e188b97491d84b48333dca89ddf503",
+    "chapter4/multimodal-agent/create_sample.py": "23ff477904437196ef2b3a28b10a4eded30f077110c51102f6a5af1ce26ae83d",
+    "chapter3/experiment_utils.py": "736968d4844624b13647de1f907426a7098b5696f7865257c86bab2225cd064b",
+    "learning/task4/run_4_3_multimodal.py": "1d8c5cb8dca59ad5e5beaf78b06225822506994aa60144cdab0f856ab6c7e989"
+  },
+  "credential_scan_findings": [],
+  "completed": true
+}

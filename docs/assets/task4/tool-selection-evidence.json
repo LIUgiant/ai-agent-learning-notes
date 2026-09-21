@@ -1,0 +1,635 @@
+{
+  "experiment": "tool selection three strategies (learning variant)",
+  "run_dir": "learning/task4/runs/tool_selection/20260921T112429Z",
+  "online_model": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "endpoint": "https://api.deepseek.com",
+    "thinking": "disabled",
+    "temperature": 0
+  },
+  "catalog_tools": 35,
+  "top_k": 5,
+  "benchmark_tasks": 10,
+  "offline": {
+    "strategies": {
+      "all-tools": {
+        "tools_in_context": 35,
+        "avg_schema_tokens": 3857,
+        "recall": 1.0
+      },
+      "retrieval": {
+        "tools_in_context": 5,
+        "avg_schema_tokens": 516.6,
+        "recall": 1.0
+      }
+    },
+    "per_task": [
+      {
+        "name": "GitHub repo search",
+        "gold_tools": [
+          "github_search_repos"
+        ],
+        "retrieved": [
+          "github_search_repos",
+          "analytics_predict",
+          "cloud_create_vm",
+          "github_get_file",
+          "github_create_issue"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Read config file",
+        "gold_tools": [
+          "fs_read_file"
+        ],
+        "retrieved": [
+          "fs_read_file",
+          "github_get_file",
+          "web_download",
+          "fs_write_file",
+          "comm_read_email"
+        ],
+        "hit": true
+      },
+      {
+        "name": "List directory",
+        "gold_tools": [
+          "fs_list_directory"
+        ],
+        "retrieved": [
+          "fs_list_directory",
+          "fs_delete_file",
+          "github_list_issues",
+          "cloud_upload_storage",
+          "cloud_list_resources"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Summary statistics",
+        "gold_tools": [
+          "analytics_summarize"
+        ],
+        "retrieved": [
+          "analytics_correlation",
+          "analytics_summarize",
+          "analytics_predict",
+          "analytics_visualize"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Send email",
+        "gold_tools": [
+          "comm_send_email"
+        ],
+        "retrieved": [
+          "comm_send_email",
+          "analytics_summarize",
+          "comm_send_slack",
+          "comm_schedule_meeting",
+          "comm_read_email"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Deploy to production",
+        "gold_tools": [
+          "devops_deploy"
+        ],
+        "retrieved": [
+          "devops_deploy",
+          "devops_logs",
+          "devops_run_pipeline",
+          "devops_monitor"
+        ],
+        "hit": true
+      },
+      {
+        "name": "SQL query",
+        "gold_tools": [
+          "db_query"
+        ],
+        "retrieved": [
+          "db_query",
+          "devops_logs",
+          "db_delete",
+          "db_update",
+          "db_insert"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Upload to cloud",
+        "gold_tools": [
+          "cloud_upload_storage"
+        ],
+        "retrieved": [
+          "cloud_upload_storage",
+          "web_download",
+          "fs_read_file",
+          "fs_write_file",
+          "github_get_file"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Scrape prices",
+        "gold_tools": [
+          "web_scrape"
+        ],
+        "retrieved": [
+          "web_scrape",
+          "fs_list_directory",
+          "web_download",
+          "web_post",
+          "web_get"
+        ],
+        "hit": true
+      },
+      {
+        "name": "Monitor service",
+        "gold_tools": [
+          "devops_monitor"
+        ],
+        "retrieved": [
+          "devops_monitor",
+          "devops_run_pipeline",
+          "devops_logs",
+          "devops_deploy"
+        ],
+        "hit": true
+      }
+    ],
+    "scaling": [
+      {
+        "num_tools": 35,
+        "all_tools_tokens": 3857,
+        "retrieval_tokens": 516.6,
+        "retrieval_recall": 1.0
+      },
+      {
+        "num_tools": 50,
+        "all_tools_tokens": 5342,
+        "retrieval_tokens": 521.7,
+        "retrieval_recall": 1.0
+      },
+      {
+        "num_tools": 100,
+        "all_tools_tokens": 10292,
+        "retrieval_tokens": 521.7,
+        "retrieval_recall": 1.0
+      },
+      {
+        "num_tools": 200,
+        "all_tools_tokens": 20258,
+        "retrieval_tokens": 521.7,
+        "retrieval_recall": 1.0
+      },
+      {
+        "num_tools": 400,
+        "all_tools_tokens": 40258,
+        "retrieval_tokens": 521.7,
+        "retrieval_recall": 1.0
+      }
+    ]
+  },
+  "online": {
+    "summary": [
+      {
+        "strategy": "all",
+        "accuracy_calls_gold": 0.5,
+        "tasks": 10,
+        "tokens_total": 98126,
+        "tokens_mean": 9812.6,
+        "latency_mean_s": 2.9170000000000003,
+        "hits": 5
+      },
+      {
+        "strategy": "retrieval",
+        "accuracy_calls_gold": 0.7,
+        "tasks": 10,
+        "tokens_total": 19266,
+        "tokens_mean": 1926.6,
+        "latency_mean_s": 1.97,
+        "hits": 7
+      },
+      {
+        "strategy": "active",
+        "accuracy_calls_gold": 0.5,
+        "tasks": 10,
+        "tokens_total": 49563,
+        "tokens_mean": 4956.3,
+        "latency_mean_s": 5.069,
+        "hits": 5
+      }
+    ],
+    "per_task": {
+      "all": [
+        {
+          "task": "GitHub repo search",
+          "gold": [
+            "github_search_repos"
+          ],
+          "called": [
+            "github_search_repos"
+          ],
+          "hit": true,
+          "tokens": 8522,
+          "latency": 2.61
+        },
+        {
+          "task": "Read config file",
+          "gold": [
+            "fs_read_file"
+          ],
+          "called": [
+            "fs_read_file"
+          ],
+          "hit": true,
+          "tokens": 8443,
+          "latency": 2.63
+        },
+        {
+          "task": "List directory",
+          "gold": [
+            "fs_list_directory"
+          ],
+          "called": [
+            "fs_list_directory"
+          ],
+          "hit": true,
+          "tokens": 8369,
+          "latency": 2.35
+        },
+        {
+          "task": "Summary statistics",
+          "gold": [
+            "analytics_summarize"
+          ],
+          "called": [
+            "db_schema",
+            "fs_list_directory",
+            "db_query",
+            "fs_search_files"
+          ],
+          "hit": false,
+          "tokens": 12912,
+          "latency": 3.71
+        },
+        {
+          "task": "Send email",
+          "gold": [
+            "comm_send_email"
+          ],
+          "called": [
+            "comm_read_email",
+            "fs_list_directory"
+          ],
+          "hit": false,
+          "tokens": 8560,
+          "latency": 2.76
+        },
+        {
+          "task": "Deploy to production",
+          "gold": [
+            "devops_deploy"
+          ],
+          "called": [
+            "devops_monitor",
+            "devops_logs"
+          ],
+          "hit": false,
+          "tokens": 8745,
+          "latency": 3.37
+        },
+        {
+          "task": "SQL query",
+          "gold": [
+            "db_query"
+          ],
+          "called": [
+            "db_schema",
+            "db_query",
+            "db_query",
+            "db_query"
+          ],
+          "hit": true,
+          "tokens": 17420,
+          "latency": 5.36
+        },
+        {
+          "task": "Upload to cloud",
+          "gold": [
+            "cloud_upload_storage"
+          ],
+          "called": [
+            "fs_search_files",
+            "fs_list_directory"
+          ],
+          "hit": false,
+          "tokens": 12608,
+          "latency": 2.84
+        },
+        {
+          "task": "Scrape prices",
+          "gold": [
+            "web_scrape"
+          ],
+          "called": [],
+          "hit": false,
+          "tokens": 4128,
+          "latency": 0.8
+        },
+        {
+          "task": "Monitor service",
+          "gold": [
+            "devops_monitor"
+          ],
+          "called": [
+            "devops_monitor"
+          ],
+          "hit": true,
+          "tokens": 8419,
+          "latency": 2.74
+        }
+      ],
+      "retrieval": [
+        {
+          "task": "GitHub repo search",
+          "gold": [
+            "github_search_repos"
+          ],
+          "called": [
+            "github_search_repos"
+          ],
+          "hit": true,
+          "tokens": 2463,
+          "latency": 3.0
+        },
+        {
+          "task": "Read config file",
+          "gold": [
+            "fs_read_file"
+          ],
+          "called": [
+            "fs_read_file"
+          ],
+          "hit": true,
+          "tokens": 1926,
+          "latency": 1.59
+        },
+        {
+          "task": "List directory",
+          "gold": [
+            "fs_list_directory"
+          ],
+          "called": [
+            "fs_list_directory"
+          ],
+          "hit": true,
+          "tokens": 2013,
+          "latency": 1.7
+        },
+        {
+          "task": "Summary statistics",
+          "gold": [
+            "analytics_summarize"
+          ],
+          "called": [
+            "analytics_summarize"
+          ],
+          "hit": true,
+          "tokens": 1992,
+          "latency": 2.97
+        },
+        {
+          "task": "Send email",
+          "gold": [
+            "comm_send_email"
+          ],
+          "called": [
+            "comm_read_email"
+          ],
+          "hit": false,
+          "tokens": 2125,
+          "latency": 1.64
+        },
+        {
+          "task": "Deploy to production",
+          "gold": [
+            "devops_deploy"
+          ],
+          "called": [
+            "devops_deploy"
+          ],
+          "hit": true,
+          "tokens": 1837,
+          "latency": 1.55
+        },
+        {
+          "task": "SQL query",
+          "gold": [
+            "db_query"
+          ],
+          "called": [
+            "db_query"
+          ],
+          "hit": true,
+          "tokens": 2079,
+          "latency": 2.58
+        },
+        {
+          "task": "Upload to cloud",
+          "gold": [
+            "cloud_upload_storage"
+          ],
+          "called": [],
+          "hit": false,
+          "tokens": 983,
+          "latency": 0.87
+        },
+        {
+          "task": "Scrape prices",
+          "gold": [
+            "web_scrape"
+          ],
+          "called": [
+            "web_get"
+          ],
+          "hit": false,
+          "tokens": 1947,
+          "latency": 1.99
+        },
+        {
+          "task": "Monitor service",
+          "gold": [
+            "devops_monitor"
+          ],
+          "called": [
+            "devops_monitor"
+          ],
+          "hit": true,
+          "tokens": 1901,
+          "latency": 1.81
+        }
+      ],
+      "active": [
+        {
+          "task": "GitHub repo search",
+          "gold": [
+            "github_search_repos"
+          ],
+          "called": [
+            "github_search_repos"
+          ],
+          "hit": true,
+          "tokens": 3610,
+          "latency": 5.41
+        },
+        {
+          "task": "Read config file",
+          "gold": [
+            "fs_read_file"
+          ],
+          "called": [
+            "fs_read_file",
+            "fs_list_directory",
+            "fs_read_file"
+          ],
+          "hit": true,
+          "tokens": 4326,
+          "latency": 3.91
+        },
+        {
+          "task": "List directory",
+          "gold": [
+            "fs_list_directory"
+          ],
+          "called": [
+            "fs_list_directory",
+            "fs_list_directory"
+          ],
+          "hit": true,
+          "tokens": 4949,
+          "latency": 3.8
+        },
+        {
+          "task": "Summary statistics",
+          "gold": [
+            "analytics_summarize"
+          ],
+          "called": [
+            "fs_list_directory",
+            "fs_search_files",
+            "fs_search_files",
+            "fs_read_file",
+            "fs_read_file",
+            "fs_read_file"
+          ],
+          "hit": false,
+          "tokens": 7584,
+          "latency": 6.14
+        },
+        {
+          "task": "Send email",
+          "gold": [
+            "comm_send_email"
+          ],
+          "called": [],
+          "hit": false,
+          "tokens": 1811,
+          "latency": 3.44
+        },
+        {
+          "task": "Deploy to production",
+          "gold": [
+            "devops_deploy"
+          ],
+          "called": [
+            "fs_list_directory",
+            "fs_search_files",
+            "fs_read_file",
+            "fs_read_file",
+            "fs_read_file",
+            "fs_read_file",
+            "fs_list_directory",
+            "fs_search_files",
+            "fs_search_files",
+            "cloud_list_resources",
+            "cloud_list_resources"
+          ],
+          "hit": false,
+          "tokens": 9535,
+          "latency": 9.83
+        },
+        {
+          "task": "SQL query",
+          "gold": [
+            "db_query"
+          ],
+          "called": [
+            "db_schema",
+            "db_query",
+            "db_query",
+            "db_query"
+          ],
+          "hit": true,
+          "tokens": 7287,
+          "latency": 5.58
+        },
+        {
+          "task": "Upload to cloud",
+          "gold": [
+            "cloud_upload_storage"
+          ],
+          "called": [
+            "fs_list_directory",
+            "cloud_list_resources"
+          ],
+          "hit": false,
+          "tokens": 4203,
+          "latency": 4.4
+        },
+        {
+          "task": "Scrape prices",
+          "gold": [
+            "web_scrape"
+          ],
+          "called": [],
+          "hit": false,
+          "tokens": 1762,
+          "latency": 2.56
+        },
+        {
+          "task": "Monitor service",
+          "gold": [
+            "devops_monitor"
+          ],
+          "called": [
+            "devops_monitor",
+            "devops_monitor",
+            "devops_monitor"
+          ],
+          "hit": true,
+          "tokens": 4496,
+          "latency": 5.62
+        }
+      ]
+    }
+  },
+  "course_evidence": {
+    "source": "chapter4/active-tool-selection/{benchmark,demo_comparison,agent}.py (three strategies, 10 gold-labeled tasks and TF-IDF semantic routing reused verbatim; only the LLM endpoint and temperature changed)"
+  },
+  "source_hashes": {
+    "chapter4/active-tool-selection/benchmark.py": "496ef5ab0792a044f7bd1ccd01b6fc3e11ad95f0040cffd9284fc4987e2c09c8",
+    "chapter4/active-tool-selection/demo_comparison.py": "c32ce1dbc9301771c7554c703a7e803503b8441c33f98c77678988104d9fd330",
+    "chapter4/active-tool-selection/agent.py": "8293b9ff7d8d3bb9e9756d81ecbb9b9161c562e57212da1dd0c57ad2608ce90f",
+    "chapter4/active-tool-selection/config.py": "3621e6c9ba94c427db912393b6f04db45ef71e039f4285f720b349e7c5723b8e",
+    "learning/task4/run_tool_selection.py": "d3d5b1ab4f7e325735a93c66793dc20c2ae0e10a2f76c8a142c2df470e4626a1"
+  },
+  "credential_scan_findings": [],
+  "completed": true
+}

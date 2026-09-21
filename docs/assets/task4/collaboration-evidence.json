@@ -1,0 +1,109 @@
+{
+  "experiment": "4-5 collaboration tools MCP (learning variant)",
+  "run_dir": "learning/task4/runs/4-5_collaboration/20260921T112238Z",
+  "campaign_id": "20260921T112238Z",
+  "subagent_llm": {
+    "name": "dashscope",
+    "model": "qwen3.7-plus",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  "interactive_human": false,
+  "manifest_file_count": 35,
+  "manifest_sha256": "f46162a9feb15683c5c032bcc4a44cb2f12f326ad16919334b1adc41995997b2",
+  "course_evidence": {
+    "source": "chapter4/collaboration-tools/run_experiment_4_5.py (9 gates, lifecycle calls, two context strategies and HITL probes reused verbatim)",
+    "status": "blocked",
+    "official_complete": false,
+    "gates": {
+      "real_mcp_catalog_has_required_primitives": true,
+      "two_real_context_strategies_compared": true,
+      "raw_model_usage_latency_receipts": true,
+      "sync_async_message_cancel_status_lifecycle": true,
+      "hitl_pending_response_and_conservative_timeout": true,
+      "real_human_decision": false,
+      "real_email_notification": false,
+      "real_im_notification": false,
+      "real_slack_notification": false
+    },
+    "blockers": [
+      "real_human_decision",
+      "real_email_notification",
+      "real_im_notification",
+      "real_slack_notification"
+    ],
+    "tool_call_count": 30,
+    "model_call_count": 5
+  },
+  "context_strategy_comparison": {
+    "minimal_sync": {
+      "context_strategy": "minimal",
+      "prep_tokens": 0,
+      "prepared_context": "[FROM_MAIN_AGENT] 子任务：Decide whether the refund meets the supplied policy and explain.\n[FROM_MAIN_AGENT] 手动挑选的必要信息：{\"policy\": \"Refunds within 7 days and below SGD 100 may be approved\"}",
+      "canary_leaked": false
+    },
+    "llm_generated_sync": {
+      "context_strategy": "llm_generated",
+      "prep_tokens": 642,
+      "prepared_context": "[FROM_MAIN_AGENT] 子任务：Decide whether the refund meets the supplied policy and explain.\n[FROM_MAIN_AGENT] 由 LLM 依据业务规则生成的移交上下文：\nCustomer: Ada\nRequest: Refund an item bought 3 days ago for SGD 80\nPolicy: Refunds within 7 days and below SGD 100 may be approved",
+      "canary_leaked": false
+    }
+  },
+  "llm_receipts": [
+    {
+      "purpose": "subagent_turn",
+      "provider": null,
+      "model": "qwen3.7-plus",
+      "total_tokens": 608,
+      "latency_seconds": 6.033
+    },
+    {
+      "purpose": "llm_generated_context",
+      "provider": null,
+      "model": "qwen3.7-plus",
+      "total_tokens": 642,
+      "latency_seconds": 5.246
+    },
+    {
+      "purpose": "subagent_turn",
+      "provider": null,
+      "model": "qwen3.7-plus",
+      "total_tokens": 878,
+      "latency_seconds": 7.807
+    },
+    {
+      "purpose": "subagent_turn",
+      "provider": null,
+      "model": "qwen3.7-plus",
+      "total_tokens": 1092,
+      "latency_seconds": 9.261
+    },
+    {
+      "purpose": "subagent_turn",
+      "provider": null,
+      "model": "qwen3.7-plus",
+      "total_tokens": 446,
+      "latency_seconds": 3.773
+    }
+  ],
+  "hitl": {
+    "pending_observed": true,
+    "approval_success": true,
+    "approval_timeout": null,
+    "timeout_probe_timeout": true,
+    "timeout_probe_approved": false
+  },
+  "blocked_gate_reasons": {
+    "real_email_notification": "no SMTP/SendGrid credentials (credential-free preflight)",
+    "real_im_notification": "no Telegram bot token/chat id",
+    "real_slack_notification": "no Slack webhook URL"
+  },
+  "source_hashes": {
+    "chapter4/collaboration-tools/run_experiment_4_5.py": "7ee37bdafe231bcd166c8ce08ec4e11f8d65027f7402b8eed4d296cf97fc3483",
+    "chapter4/collaboration-tools/experiment_protocol.json": "502c4157faf748c669b96434fc6c4dd50518f7d180c1bafb87eb18b85da7e20e",
+    "chapter4/collaboration-tools/src/main.py": "f96e17b15d28d4eef8498b4c8e4fd374c1034fa9721c147c584fcacdb634566f",
+    "chapter4/collaboration-tools/src/llm_fallback.py": "0684124fd89c9e5717a7133406f2c9ce204c6c979d90cf0ce2cc00d89d216b60",
+    "learning/task4/run_4_5_collaboration.py": "0d14287c702aa78fcc736d126ad0384d30bca53e37c0c9e18f23b6c085bf31ee"
+  },
+  "credential_scan_findings": [],
+  "completed": true
+}

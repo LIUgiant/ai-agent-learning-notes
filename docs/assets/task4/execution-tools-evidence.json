@@ -1,0 +1,98 @@
+{
+  "experiment": "4-4 execution tools MCP (learning variant)",
+  "run_dir": "learning/task4/runs/4-4_execution_tools/20260921T112329Z",
+  "campaign_id": "20260921T112329Z",
+  "danger_review_model": {
+    "provider": "dashscope",
+    "model": "qwen3.7-plus",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  },
+  "manifest_file_count": 33,
+  "manifest_sha256": "01497a8ae048c456a031dcc54372ec1059490e3fda8f45e4f1fc2259ffed97d2",
+  "course_evidence": {
+    "source": "chapter4/execution-tools/run_experiment_4_4.py (20 fixed real calls, 15 gates and status rules reused verbatim)",
+    "status": "blocked",
+    "official_complete": false,
+    "gates": {
+      "real_mcp_catalog_and_calls": true,
+      "python_and_javascript_linter": true,
+      "file_edit_verified_and_escape_rejected": true,
+      "terminal_timeout_and_llm_danger_review": true,
+      "real_python_container_sandbox": true,
+      "long_output_truncated_and_persisted": true,
+      "real_excel_formula_and_screenshot": true,
+      "real_webhook": true,
+      "real_browser": true,
+      "real_calendar_mutation": false,
+      "real_github_pr_mutation": false,
+      "real_email_mutation": false,
+      "real_virtual_desktop_session": false,
+      "real_virtual_mobile_session": false,
+      "credential_free_usage_latency_receipts": true
+    },
+    "blockers": [
+      "real_calendar_mutation",
+      "real_github_pr_mutation",
+      "real_email_mutation",
+      "real_virtual_desktop_session",
+      "real_virtual_mobile_session"
+    ],
+    "receipt_count": 20,
+    "llm_call_count": 2
+  },
+  "llm_receipts": [
+    {
+      "purpose": "dangerous_operation_review",
+      "provider": "dashscope",
+      "model": "qwen3.7-plus",
+      "total_tokens": 1634,
+      "latency_seconds": 19.985,
+      "response_id": "chatcmpl-88b6cb7a-2da6-929c-a041-4ba8b1e0dc48"
+    },
+    {
+      "purpose": "dangerous_operation_review",
+      "provider": "dashscope",
+      "model": "qwen3.7-plus",
+      "total_tokens": 1228,
+      "latency_seconds": 13.603,
+      "response_id": "chatcmpl-08178344-41a9-928c-9aff-4bc410f66ab5"
+    }
+  ],
+  "danger_review_receipts": 2,
+  "sandbox_kind": {
+    "python_docker_sandbox": {
+      "kind": "docker",
+      "image": "python:3.11-slim",
+      "network": "none",
+      "rootfs": "read-only",
+      "memory": "256m",
+      "cpus": 1,
+      "pids_limit": 64
+    },
+    "long_output_persisted": {
+      "kind": "docker",
+      "image": "python:3.11-slim",
+      "network": "none",
+      "rootfs": "read-only",
+      "memory": "256m",
+      "cpus": 1,
+      "pids_limit": 64
+    }
+  },
+  "blocked_gate_reasons": {
+    "real_calendar_mutation": "no Google OAuth credential/token on this machine",
+    "real_github_pr_mutation": "no GITHUB_TOKEN; course accepts a rejected preflight here",
+    "real_email_mutation": "course hard-codes this gate to False (no SMTP/SendGrid)",
+    "real_virtual_desktop_session": "macOS host: no Xvfb/xdotool/headful X11 desktop",
+    "real_virtual_mobile_session": "no AndroidWorld container / KVM emulator"
+  },
+  "source_hashes": {
+    "chapter4/execution-tools/run_experiment_4_4.py": "90b846cbcf9dc08ee8900844c4ee5686293d0d4cfcb5ac776a3846ed14121535",
+    "chapter4/execution-tools/experiment_protocol.json": "9f699d9bbd38c70cf6eede124e832a31cfd46bad8319dc28c1bce545e250bf49",
+    "chapter4/execution-tools/server.py": "54e0e21eead1c8499b82e7778c018ba74fa945df48a02a1c589e890f75b406f8",
+    "chapter4/execution-tools/config.py": "8f4b0964cae1472d3f134de5393baef4a50629fc70217a0530a1d7634eb1b1c7",
+    "learning/task4/run_4_4_execution_tools.py": "a57a93cb3effc952accedd714bff034c2004140a54fffe45b71ed51346eaacf3"
+  },
+  "credential_scan_findings": [],
+  "completed": true
+}
