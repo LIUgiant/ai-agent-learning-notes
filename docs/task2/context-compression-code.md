@@ -1,369 +1,274 @@
-# 上下文压缩源码精读 · 六种策略与一条会爆的上下文
+# 上下文压缩源码精读 · compression_strategies.py 逐函数通读
 
 [实验说明](context-compression.md) · [实测结果](evidence.md#context-compression) · [学习运行脚本](../assets/task2/run_context_compression.py)
 
-<div class="design-lead"><span>逐步搭建 / READ THE CODE</span><p>先分清"立即压缩"与"老化压缩"两类策略，再读每个摘要 prompt 的差别，最后看溢出判定为什么必须用最后一次请求的 prompt 数而不是累计值。</p></div>
+<div class="design-lead"><span>逐函数通读 / READ EVERY FUNCTION</span><p>主文件 compression_strategies.py（694 行）的十四个函数按源码顺序逐个讲——六个压缩策略一个不漏；配套 run_all_strategies.py（战役入口）与 agent.py（溢出判定/老化压缩）跟在后面。</p></div>
 
 !!! note "先分清三种代码"
-    **课程源码原文**附文件与行号（compression_strategies.py / agent.py / config.py / run_all_strategies.py 均在 chapter2/context-compression/）；**学习运行脚本原文**来自 `run_context_compression.py`；**教学示意**仅用于理解数据形状。task1 的 [上下文源码精读](../task1/context-code.md) 已走过其中三条策略的请求细节，本页聚焦六策略全景与 Agent 侧机制。
-
-## 本页阅读路线
-
-六策略地图 → 两类压缩时机 → 摘要 prompt 逐个拆 → 压缩器构造与计数 → 溢出判定的口径 → windowed 的标记与恢复 → 主循环 → 战役入口与指标 → 学习版缩尺设计 → 实测解读。
+    **课程源码原文**附文件与行号（均在 chapter2/context-compression/）；**学习运行脚本原文**来自 `run_context_compression.py`；**教学示意**仅用于理解数据形状。task1 的 [上下文精读](../task1/context-code.md) 走过三条策略的请求细节，本页补全六策略与 Agent 侧机制。
 
 ---
 
-## 1. 六策略地图：每个策略压缩"什么、何时"
+## 0. 函数清单（一个不漏）
 
-**遇到的问题**
+**主文件**：[compression_strategies.py](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/compression_strategies.py)（694 行，14 项）
 
-"上下文压缩"是个大词。压什么（搜索结果/历史工具输出）、何时压（进入历史前/满了才压）、按什么压（通用/按问题/带引用），是三个独立的设计轴。
+| # | 函数/类 | 行号 | 一句话作用 |
+| --- | --- | --- | --- |
+| 1 | `_reasoning_safe_temperature` | L16–21 | 推理模型强制 temp=1（同前几章） |
+| 2 | `_reasoning_safe_max_tokens` | L24–34 | 推理模型补推理预算（+2048） |
+| — | `CompressionStrategy` | L41–48 | 六策略枚举 |
+| — | `CompressedContent` | L51–59 | 压缩结果（原始/压缩长度、内容、引用） |
+| 3 | `ContextCompressor.__init__` | L65–90 | 解析 provider + tiktoken 分词器 |
+| 4 | `count_tokens` | L92–98 | tiktoken 计数（失败退字符估算） |
+| 5 | `compress_search_results` | L100–131 | ★策略分发入口 |
+| 6 | `compress_for_history` | L133–228 | ★windowed 专用：历史工具输出的摘要 |
+| 7 | `_no_compression` | L230–258 | 策略 1：格式化全文 |
+| 8 | `_non_context_aware_individual_summary` | L260–346 | 策略 2A：逐页摘要 |
+| 9 | `_non_context_aware_combined_summary` | L348–452 | 策略 2B：合并摘要 |
+| 10 | `_context_aware_summary` | L454–557 | 策略 3：按 query 聚焦摘要 |
+| 11 | `_context_aware_with_citations` | L559–681 | 策略 4：带内联引用 |
+| 12 | `estimate_tokens` | L683–694 | 粗估（字符/4） |
 
-**关键代码**
+**配套**：[run_all_strategies.py](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/run_all_strategies.py)（458 行，战役入口）+ [agent.py](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py)（675 行，溢出判定与老化压缩）+ config.py
 
-**课程源码原文** · [compression_strategies.py · L41–L48](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/compression_strategies.py#L41)：
+---
 
-```python linenums="41"
-class CompressionStrategy(Enum):
-    NO_COMPRESSION = "no_compression"
-    NON_CONTEXT_AWARE_INDIVIDUAL = "non_context_aware_individual_summary"  # 逐页摘要再拼接
-    NON_CONTEXT_AWARE_COMBINED = "non_context_aware_combined_summary"     # 全部拼接一次摘要
-    CONTEXT_AWARE = "context_aware_summary"
-    CONTEXT_AWARE_CITATIONS = "context_aware_with_citations"
-    WINDOWED_CONTEXT = "windowed_context"
+## 1–2. 兼容层（L16–34）
+
+与 2-3 的同款函数多了一个参数：`_reasoning_safe_max_tokens(model, requested, reasoning_budget=2048)` 用**加法**（`requested + 2048`）而不是 `max(requested, 4096)`——摘要预算只有 300–500 时，加法保证推理模型还有完整预算留给正文。
+
+## 3. `ContextCompressor.__init__`（L65–90）
+
+```python linenums="77"
+        resolved_key, resolved_base_url, resolved_model = Config.resolve_llm()
+        self.client = OpenAI(api_key=resolved_key, base_url=resolved_base_url)
+        self.model = resolved_model
+        try:
+            self.encoding = tiktoken.encoding_for_model("gpt-4")
+        except Exception:
+            self.encoding = tiktoken.get_encoding("cl100k_base")
 ```
 
-**执行过程：看数据怎样变**
+`Config.resolve_llm()`（config.py L82–96）走 agentbook 注册表——**这是 task1 和本实验学习版的注入点**（打补丁指向 DeepSeek；.env 的 `LLM_PROVIDER=deepseek` 会让 `MODEL_NAME` 默认错配 kimi-k3，须显式覆写）。tiktoken 的 cl100k 是 **GPT-4 的分词器**——对 DeepSeek 的 token 数只是估算，报表里要当"估计值"读。
 
-| 策略 | 压什么 | 何时 | 摘要看不看问题 |
-| --- | --- | --- | --- |
-| no_compression | 不压 | — | — |
-| individual | 每页各摘要一次（300 tok/页） | 工具返回**立即** | 否 |
-| combined | 全部页拼接后摘要一次 | 立即 | 否 |
-| context_aware | 拼接后按 query 聚焦摘要 | 立即 | 是 |
-| citations | 按 query 摘要 + [1][2] 内联引用 | 立即 | 是 |
-| windowed | **历史里的旧工具输出** | 上下文超 80% 阈值**才**压 | 按触发时的 query |
+## 4. `count_tokens`（L92–98）
 
-两类的本质区别：**立即压缩**牺牲"当场信息的完整度"换"历史永久瘦身"；**老化压缩（windowed）**让最近的信息保持原样、旧信息降级——和人整理笔记的方式一致。
+tiktoken 编码取长度，异常退 `len(text)//4`（字符/4 的粗估）——**计数失败不炸摘要流程**。
 
-**接回真实源码**
+## 5. `compress_search_results`（L100–131）—— 策略分发
 
-分发入口 `compress_search_results()`（[L100–L131](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/compression_strategies.py#L100)）里有个容易漏看的分支：windowed 在这里**返回全文**（L127–L129 注释 "compression happens later"）——它对搜索结果的"压缩"发生在历史老化时。
+```python linenums="117"
+        if self.strategy == CompressionStrategy.NO_COMPRESSION:
+            return self._no_compression(search_results)
+        elif self.strategy == CompressionStrategy.NON_CONTEXT_AWARE_INDIVIDUAL:
+            return self._non_context_aware_individual_summary(search_results)
+        ...
+        elif self.strategy == CompressionStrategy.WINDOWED_CONTEXT:
+            # For windowed context, return full content (compression happens later)
+            return self._no_compression(search_results)
+```
 
-**动手验证**
+纯分发，但 **windowed 走 `_no_compression`**（L127–129 注释 "compression happens later"）——它对搜索结果不压缩，压缩发生在历史老化时（agent.py 第 22 节）。一个入口、两个压缩时机：**立即压缩**（策略 2–4，工具返回瞬间）与**老化压缩**（windowed，上下文满了才动历史）。
 
-同样 5 页搜索结果，individual 和 combined 各发几次摘要请求？tokens 花在哪边？
+## 6. `compress_for_history`（L133–228）—— windowed 的摘要器
 
-??? tip "先预测，再展开对照"
-    individual 发 5 次（每页一次，每次 300 tok 预算）；combined 发 1 次（预算 SUMMARY_MAX_TOKENS=500）。individual 总摘要预算更大（5×300）但每次只见单页——跨页事实（"A 公司和 B 公司都投了 C"）它拼不出来；combined 一次见全量但 500 tok 装不下 5 页细节。各有各的丢失方式。
+```python linenums="155"
+            prompt = f"""Compress the following {tool_name} results into a concise summary that preserves key information.
+Focus on information relevant to: {query}
 
----
+Original content:
+{content[:10000]}
 
-## 2. 摘要 prompt 逐个拆：一字之差改变保留什么
+Requirements:
+1. Keep all important facts, names, dates, and affiliations
+2. Remove redundant information
+3. Maintain clarity and coherence
+{"4. Include [Source: URL] citations for important facts" if preserve_citations else ""}
+5. Maximum length: {Config.SUMMARY_MAX_TOKENS} tokens
 
-**遇到的问题**
+Provide a focused summary:"""
+```
 
-所有摘要策略共用"调一次 LLM"的骨架，实验变量全在 prompt 里。要读懂结果，必须逐字看这些 prompt。
+```python linenums="219"
+        except Exception as e:
+            logger.error(f"Error compressing for history: {str(e)}")
+            # Fallback to truncation
+            truncated = content[:2000] + "\n\n[Content truncated for history...]"
+            return CompressedContent(..., content=truncated, strategy=CompressionStrategy.WINDOWED_CONTEXT)
+```
 
-**关键代码**
+输入截 10000 字符、按**触发时的 query** 聚焦（agent.py 会按 tool_call_id 找回当初的查询）、失败回退"前 2000 字符 + 截断标记"（降级仍有内容）。流式分支里 L191–194 的注释记录了一个命名教训：增量变量若叫 `content` 会**遮蔽**传入参数、让截断回退拿错对象——所以改叫 `delta_text`。
 
-**课程源码原文** · [compression_strategies.py · L486–L501](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/compression_strategies.py#L486)（context_aware 的 prompt，节选）：
+## 7. `_no_compression`（L230–258）
+
+把每条结果格式化成 `===== Search Result =====\nTitle/URL/Snippet/Full Content` 的分节文本。注意 `original_length` 累计的是**裸 content**、`compressed_length` 是**格式化后全文**——所以 no_compression 的"压缩比"是 1.10（格式化包装比原文还长 10%），这不是 bug 是口径：**这个策略本来就什么都没压**。
+
+## 8. `_non_context_aware_individual_summary`（L260–346）—— 策略 2A
+
+每页独立摘要：prompt 只要"2-3 段"（L276–L284，**不提 query**），每页输入截 5000 字符、输出预算 300 tok。摘要后拼上 `Source/URL/Summary` 头。跨页事实（"A 和 B 都投了 C"）它拼不出来——每页只见自己。异常回退：该页的 snippet 顶上（L330–L337）。
+
+## 9. `_non_context_aware_combined_summary`（L348–452）—— 策略 2B
+
+全部页拼接（每页仍截 5000 字符）后**一次**摘要，预算 `SUMMARY_MAX_TOKENS`（500 tok）——一次见全量但 500 tok 装不下多页细节。回退：全部 snippet 拼接（L440–452）。与 2A 的对照是"多次小摘要 vs 一次大摘要"，各有各的丢失方式。
+
+## 10. `_context_aware_summary`（L454–557）—— 策略 3
 
 ```python linenums="486"
-prompt = f"""Given the search query: "{query}"
+            prompt = f"""Given the search query: "{query}"
 {f"Current context: {current_context[:1000]}" if current_context else ""}
 
 Analyze the following search results and provide a focused summary that directly addresses the query.
 Focus on extracting information most relevant to answering: {query}
-
-Search Results:
-{combined_content}
-
+...
 Requirements:
 1. Focus only on information relevant to the query
 2. Prioritize current/recent information
 3. Include specific names, dates, and affiliations
 4. Maximum length: {Config.SUMMARY_MAX_TOKENS} tokens
-
-Provide a query-focused summary:"""
 ```
 
-**执行过程：看数据怎样变**
+三个 prompt 变量齐了：**query**（当前在问什么）、**current_context**（agent.py 传入的"最近 3 个搜索 query"——轻量的"我之前查过什么"信号，避免摘要器重复保留已知信息）、**聚焦要求**。四个摘要 prompt 的差异一张表看完：
 
-四个摘要 prompt 的差异点：
-
-| | 提到 query？ | 给当前上下文？ | 特别要求 |
+| | 提 query？ | 给当前上下文？ | 特别要求 |
 | --- | --- | --- | --- |
-| individual（L276–L284） | 否 | 否 | "2-3 段" |
-| combined（L383–L393） | 否 | 否 | "覆盖每一页的关键信息" |
-| context_aware（L486–L501） | **是** | **是**（最近 3 次搜索的 query，见 agent.py `_get_current_context_summary`） | "只保留与问题相关的" |
-| citations（L598–L613） | 是 | 是 | "每个事实带 [1][2] 内联引用" |
+| individual | 否 | 否 | "2-3 段" |
+| combined | 否 | 否 | "覆盖每一页" |
+| context_aware | **是** | **是** | "只保留相关" |
+| citations | 是 | 是 | "每个事实带 [1][2]" |
 
-`current_context` 不是对话全文，是**最近 3 个搜索 query 拼的摘要行**（[agent.py · L237–L249](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L237)）——轻量的"我之前在查什么"信号，避免摘要器重复保留已知信息。
+## 11. `_context_aware_with_citations`（L559–681）—— 策略 4
 
-每页输入有 5000 字符截断（L355/L466/L572 的 `max_chars_per_page`）；citations 策略额外把带 `[1]` 编号的来源清单**追加在摘要尾部**（L653–L658），citations 字段也存进 CompressedContent 供程序读取。
+在策略 3 基础上两处增强：每页带 `[i]` 编号进输入（L589–592）；要求**内联引用**（"Include inline citations using [1], [2]"）。摘要尾部追加来源清单（L653–658）：
 
-**接回真实源码**
+```python linenums="653"
+            source_list = "\n\nSources:\n"
+            for source in sources:
+                source_list += f"{source['id']} {source['title']} - {source['url']}\n"
+            final_content = summary + source_list
+```
 
-所有策略的异常回退都是**拼接 snippet**（如 L548–L557）——摘要失败 ≠ 没有内容，降级到搜索摘要行。证据上要区分"策略成功了"和"回退了"：看 `compress_search_results` 是否真的产生过模型调用。
+`citations` 字段同时存进 CompressedContent 供程序读取。实测它拿下了**最低压缩比 0.42**——引用约束附带压紧了摘要长度。
 
-**动手验证**
+## 12. `estimate_tokens`（L683–694）
 
-context_aware 摘要丢掉"与问题无关但可能之后有用"的信息，这个风险怎么缓解？
-
-??? tip "先预测，再展开对照"
-    三道防线：`current_context` 让摘要器知道你之前问过什么（但只回看 3 步）；windowed 策略干脆不提前压（保真优先）；fetch_webpage 工具完全不压（agent.py L232 注释 "used for follow-ups"——追补信息保持原文）。没有策略能两全，这是压缩的本质取舍。
+`len(text)//4` 的粗估——与 count_tokens 的回退路径同一公式。两个函数并存提醒你：**token 数有三个口径**（tiktoken 精确 / 字符估算 / 服务端 usage），报表里别混用。
 
 ---
 
-## 3. 溢出判定的口径：最后一次请求 vs 累计值
+## 13–21. 配套一：run_all_strategies.py（战役入口）
 
-**遇到的问题**
+| # | 函数 | 行号 | 作用 |
+| --- | --- | --- | --- |
+| 13 | `STRATEGY_CHOICES` | L25–32 | CLI 别名 → 六策略 |
+| 14 | `StrategyRunner.__init__` | L39–52 | 日志文件 + JSON 文件路径 |
+| 15 | `setup_logging` | L60–86 | 文件(DEBUG)+控制台(INFO)双 handler |
+| 16 | `log_banner` | L89–94 | 分隔线打印 |
+| 17 | `run_strategy` | L96–255 | ★单策略执行（StreamCapture + 指标） |
+| 18 | `run_all_strategies` | L257–286 | 六策略顺序跑（间隔 2 秒） |
+| 19 | `generate_summary` | L288–340 | 汇总表打印（最佳压缩/最快/最多最少 token） |
+| 20 | `save_json_results` | L342–358 | 结果落盘（含配置快照） |
+| 21 | `build_parser`/`main` | L361–458 | CLI（--strategy/--model/--log-dir/--list-strategies） |
 
-"上下文快满了"有两种算法：把每轮 prompt tokens 加总（累计成本），或看**最近一次请求**的 prompt 大小（当前上下文）。两者差一个量级。
+**`run_strategy`（L96–255）** 两个教学点：**StreamCapture**（L132–173）是个替换 `sys.stdout` 的过滤器——按行扫描 Agent 的控制台输出，含 📝/🎯/📚/✂️ 等关键字的行升 INFO 进日志（压缩过程可复盘）、其余降 DEBUG——**不侵入 Agent 代码的日志采集**；**指标抽取**（L204–240）从 trajectory 汇总执行时间/工具数/溢出数/token，再从每个 `ToolCall.compressed_result` 累计原始与压缩字符——压缩比 `compressed/original` **只统计有 compressed_result 的调用**：no_compression 和 windowed（落地时未压）不产生压缩统计，windowed 的老化压缩走 `compress_for_history`、不经过这个字段，所以它的真实压缩量要看 agent_output 里的 `[COMPRESSED]` 行。
 
-**关键代码**
+**学习版的注入**（运行脚本）：`Config.resolve_llm` 补丁 + `MODEL_NAME` 覆写 + `CONTEXT_WINDOW_SIZE` 128000→16000 + `ResearchAgent.__init__` 强制 `enable_streaming=False`（记录层需要完整 usage）+ `WebTools.search_web/fetch_webpage` 换合成语料（课程无 SERPER key 时本就回退 mock，学习版只是把 mock 加大到足以呈现压缩对照）。
 
-**课程源码原文** · [agent.py · L52–L59](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L52)：
+---
 
-```python linenums="52"
-    total_tokens_used: int = 0
-    prompt_tokens_used: int = 0
-    completion_tokens_used: int = 0
+## 22–27. 配套二：agent.py 的六个精选
+
+全函数清单：`_reasoning_safe_temperature`(L22)、`ToolCall`(L34–45，**带 provider 侧 id** 供老化压缩找回 query)、`AgentTrajectory`(L48–63)、`ResearchAgent.__init__`(L71–109)、`_init_system_prompt`(L111–143)、`_get_tools_description`(L145–187)、`_execute_tool`(L189–235)、`_get_current_context_summary`(L237–249)、`_handle_windowed_compression`(L251–351)、`_stream_response`(L353–448)、`_non_streaming_response`(L450–509)、`execute_research`(L511–668)、`reset`(L670–675)。挑六个：
+
+**`AgentTrajectory` 的两个计数器（L52–59）**：
+
+```python linenums="55"
     # Prompt tokens of the most recent API call = the current context size.
     # prompt_tokens_used above is a cumulative COST counter (each call's
     # prompt re-counts the shared prefix), so it must not be compared
     # against the per-request context window.
     last_prompt_tokens: int = 0
-    context_overflows: int = 0
 ```
 
-**课程源码原文** · [agent.py · L547–L563](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L547)：
+`prompt_tokens_used` 是**钱**的口径（累计，重复计共享前缀）、`last_prompt_tokens` 是**窗口**的口径（单次请求）——注释明文"must not be compared"。累计值会二次方级夸大：第 k 轮请求含全部历史，累计是 1+2+…+k 量级。
 
-```python linenums="547"
-if self.trajectory.total_tokens_used > 0:  # Only check after first call
-    # Compression demo uses a 128k context budget. Compare the
-    # LAST call's prompt size (the actual context) against the
-    # window — the cumulative counter re-counts the shared
-    # prefix every call and overstates usage quadratically.
-    if self.trajectory.last_prompt_tokens > Config.CONTEXT_WINDOW_SIZE * 0.8:
-        logger.warning(f"Approaching context limit: {self.trajectory.last_prompt_tokens:,} prompt tokens in last request")
-        self.trajectory.context_overflows += 1
+**`execute_research` 的溢出判定（L547–563）**：
 
-        if self.compression_strategy == CompressionStrategy.NO_COMPRESSION:
-            print("\n⚠️ Context overflow detected! This demonstrates the limitation of no compression.")
-            return {
-                "error": f"Context window exceeded - {self.trajectory.last_prompt_tokens:,} tokens in last request (limit: {Config.CONTEXT_WINDOW_SIZE})",
-                ...
-            }
+```python linenums="553"
+                    if self.trajectory.last_prompt_tokens > Config.CONTEXT_WINDOW_SIZE * 0.8:
+                        logger.warning(...)
+                        self.trajectory.context_overflows += 1
+                        if self.compression_strategy == CompressionStrategy.NO_COMPRESSION:
+                            print("\n⚠️ Context overflow detected! This demonstrates the limitation of no compression.")
+                            return {"error": f"Context window exceeded - ..."}
 ```
 
-**执行过程：看数据怎样变**
+只有 NO_COMPRESSION 在 80% 阈值**直接死亡**（返回 error），其他策略只计数继续——压缩策略的假设是"摘要能把上下文拉回来"。实测 combined 两次越阈被拉回、windowed 一次越阈触发老化后完成，假设成立。
 
-为什么累计值会"二次方级夸大"：第 k 轮请求的 prompt 包含全部 k-1 轮的内容，累计 = 1+2+…+k 量级。而窗口约束的是**单次请求**的 prompt 长度。同一个 AgentTrajectory 里 `prompt_tokens_used` 是**钱**的口径、`last_prompt_tokens` 是**窗口**的口径——注释专门写了"must not be compared against the per-request context window"。
+**`_handle_windowed_compression`（L251–351）** 三个机制：
 
-溢出行为本身也是实验现象：只有 NO_COMPRESSION 遇到 80% 阈值直接**报错终止**（返回 error），其他策略只是计数 + 继续（压缩策略的假设是压缩能把上下文拉回来；windowed 则在同样阈值触发压缩）。
-
-**动手验证**
-
-第 5 轮请求的 prompt 是 10K tokens，前 4 轮分别是 2/4/6/8K。累计 prompt_tokens_used 和 last_prompt_tokens 各是多少？哪个该和 12.8K 阈值比？
-
-??? tip "先预测，再展开对照"
-    累计 = 2+4+6+8+10 = 30K（超阈值！）；last = 10K（未超）。该比的是 10K。若误用累计值，第 3 轮（累计 12K）就会误报"快满了"——这正是注释里防的 bug。
-
----
-
-## 4. windowed：标记、按 ID 找回 query、只压一次
-
-**遇到的问题**
-
-老化压缩要改写**历史里**的工具消息。三个坑：怎么知道哪条压过？压缩时用什么 query？assistant 的 tool_calls 和 tool 消息的配对不能断。
-
-**关键代码**
-
-**课程源码原文** · [agent.py · L277–L290](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L277)：
-
-```python linenums="277"
-# Compression marker to identify already-compressed messages
-COMPRESSION_MARKER = "[COMPRESSED]"
-
-for i, msg in enumerate(messages):
-    if msg.get('role') == 'tool':
-        original_content = msg.get('content', '')
-        if original_content.startswith(COMPRESSION_MARKER):
-            already_compressed_count += 1
-        else:
-            tool_messages_to_compress.append((i, msg))
+```python linenums="278"
+        COMPRESSION_MARKER = "[COMPRESSED]"
+        ...
+                if original_content.startswith(COMPRESSION_MARKER):
+                    already_compressed_count += 1
+                else:
+                    tool_messages_to_compress.append((i, msg))
 ```
-
-**课程源码原文** · [agent.py · L316–L332](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L316)：
 
 ```python linenums="316"
-# Find the corresponding tool call to get context
-tool_call_id = msg.get('tool_call_id')
-query = "Information search"  # Default
-
-# Try to find the query from the tool call
-for call in self.trajectory.tool_calls:
-    if call.id is not None and call.id == tool_call_id:
-        query = call.arguments.get('query', query)
-        break
-...
-compressed = self.compressor.compress_for_history(
-    original_content, 'search_web', query, preserve_citations=True
-)
+                tool_call_id = msg.get("tool_call_id")
+                query = "Information search"  # Default
+                for call in self.trajectory.tool_calls:
+                    if call.id is not None and call.id == tool_call_id:
+                        query = call.arguments.get('query', query)
+                        break
 ```
 
-**执行过程：看数据怎样变**
+**标记防重压**（前缀 `[COMPRESSED]`，下轮触发时跳过这些）；**按 tool_call_id 找回当初的 query**（`ToolCall.id` 字段的用途——事后压缩也知道为什么查）；**消息形状不变**（`{**msg, 'content': 压缩文本}`——role/id 原样，配对天然保持）。触发条件与溢出判定同一个阈值——**同一个 80% 既是 windowed 的扳机也是 no_compression 的丧钟**。
 
-- **标记防重压**：压缩后的内容前缀 `[COMPRESSED] [Original: 12,345 chars → Compressed: 800 chars]`。下一轮再触发时跳过这些——只压"新长出来的"；
-- **按 tool_call_id 找回 query**：ToolCall 数据类专门存了 provider 侧的调用 id（[agent.py · L42–L45](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L42) 的注释说明用途）。压旧内容时摘要 prompt 里"Focus on information relevant to: {query}"用的是**当时**的查询——事后压缩也知道当初为什么查；
-- **消息形状不变**：`{**msg, 'content': compressed_content}`——只换 content，role/tool_call_id 原样。assistant 的 tool_calls 消息不动，配对天然保持。
+**`_execute_tool`（L189–235）**：search_web 走 `compress_search_results`（立即压缩策略在此生效）；fetch_webpage 返回 `result, None` **永不压缩**（L232 注释 "used for follow-ups"——追补阅读保持原文，压缩风险的三道防线之一）。
 
-`compress_for_history`（[compression_strategies.py · L133–L228](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/compression_strategies.py#L133)）的输入截到 10000 字符、失败回退到"前 2000 字符 + 截断标记"。它内部还有个命名教训（L191–L194 注释）：流式分支里若把增量变量命名为 `content`，会**遮蔽**传入的 `content` 参数、让截断回退拿错对象——所以改叫 `delta_text`。
+**`execute_research` 的工具结果落地（L622–640）**：
 
-**动手验证**
-
-windowed 触发时把**所有**未压缩的 tool 消息一次压完，而不是只压最旧的一条。为什么？
-
-??? tip "先预测，再展开对照"
-    阈值触发说明整体超预算，压一条省几百 token 解决不了问题；一次压完把上下文直接拉回低位，避免接下来每轮都在阈值边缘反复触发（每次触发都是 N 次 LLM 摘要调用）。代价是一次性摘要调用风暴——上下文里 8 条未压消息就是 8 次调用。
-
----
-
-## 5. 主循环：压缩发生在工具结果落地时
-
-**关键代码**
-
-**课程源码原文** · [agent.py · L609–L640](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/agent.py#L609)：
-
-```python linenums="609"
-# Execute the tool
-result, compressed = self._execute_tool(function_name, function_args)
-...
-# Determine what content to add to messages
-if compressed and self.compression_strategy != CompressionStrategy.NO_COMPRESSION:
-    # Use compressed content
-    tool_content = compressed.content
-    print(f"   ✂️ Compressed: {compressed.original_length:,} → {compressed.compressed_length:,} chars")
-else:
-    # Use original content (for no compression or last message in windowed)
-    if function_name == "search_web":
-        tool_content = json.dumps(result, indent=2)
-    else:
-        tool_content = json.dumps(result)
-
-# Add tool result to messages
-tool_msg = {
-    "role": "tool",
-    "tool_call_id": tool_call['id'],
-    "content": tool_content
-}
-messages.append(tool_msg)
+```python linenums="622"
+                        if compressed and self.compression_strategy != CompressionStrategy.NO_COMPRESSION:
+                            tool_content = compressed.content
+                            print(f"   ✂️ Compressed: {compressed.original_length:,} → {compressed.compressed_length:,} chars")
+                        else:
+                            if function_name == "search_web":
+                                tool_content = json.dumps(result, indent=2)
 ```
 
-**执行过程：看数据怎样变**
+立即压缩策略下模型**永远看不到原文**；no_compression/windowed 全文 JSON 落地。`✂️` 行就是 StreamCapture 升 INFO 的那些行。
 
-- 立即压缩策略：模型**永远看不到原文**——`compressed.content` 直接进历史。`✂️` 日志行是压缩发生的人类可读证据；
-- no_compression / windowed：`json.dumps(result, indent=2)` 全文进历史（windowed 等老化时再压）；
-- `fetch_webpage` 永远不压（`_execute_tool` L232 返回 `result, None`）——追补阅读保持原文。
+**坏 JSON 容错（L580–603）**：`bytes/bytearray` 解码、dict 直收、str 解析、其他 str() 再试，全败才 `{}` 继续——流式拼出的 tool_call 参数什么形状都可能有。
 
-坏 JSON 的容错（L580–L603）比其他实验更宽：`bytes/bytearray` 解码、dict 直收、str 解析、其他类型 str() 后再试，全部失败才用 `{}` 继续——流式拼出来的 tool_call 参数什么形状都可能有。
-
-**接回真实源码**
-
-流式分支（`_stream_response` L353–L448）手工拼装 tool_calls 增量：`delta.tool_calls` 按 index 累积 id/name/arguments 片段（L400–L417）——流式协议里函数参数是**分片到达**的，这是所有流式 Agent 都要处理的原语级细节。usage 靠 `stream_options={"include_usage": True}` 从最后一个 chunk 拿。
-
-**动手验证**
-
-模型一轮并行调了 4 个 search_web（学习版实测出现过）。individual 策略下这一轮要发多少次摘要请求？
-
-??? tip "先预测，再展开对照"
-    4 次工具执行 × 每次对语料里的每页各摘要一次（本学习语料每查询 1–2 页）≈ 4–8 次摘要调用，外加 1 次主模型调用。**并行工具调用会放大立即压缩的调用数**——省 token 的策略在请求数上反而更贵，这是压缩实验里容易被忽略的一笔账。
+config.py（121 行）：`resolve_llm`（L82–96，agentbook 注册表三元组）、`CONTEXT_WINDOW_SIZE = 128000`（L51，注释注明"K3 支持到 1M，实验用 128K 预算"——学习版覆写的就是这个）、`SUMMARY_MAX_TOKENS = 500`、`MODEL_NAME` 的默认陷阱（provider=deepseek 时仍默认 kimi-k3）。
 
 ---
 
-## 6. 战役入口：StrategyRunner 的指标与日志
+## 完整执行回放（学习版 no_compression 一次真实运行）
 
-**关键代码**
-
-**课程源码原文** · [run_all_strategies.py · L204–L240](https://github.com/bojieli/ai-agent-book/blob/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/context-compression/run_all_strategies.py#L204)：
-
-```python linenums="204"
-if trajectory:
-    result['metrics'] = {
-        'execution_time': execution_time,
-        'tool_calls': len(trajectory.tool_calls),
-        'context_overflows': trajectory.context_overflows,
-        'total_tokens': trajectory.total_tokens_used,
-        'prompt_tokens': trajectory.prompt_tokens_used,
-        'completion_tokens': trajectory.completion_tokens_used
-    }
-    # Calculate compression statistics
-    total_original = 0
-    total_compressed = 0
-    for call in trajectory.tool_calls:
-        if call.compressed_result:
-            total_original += call.compressed_result.original_length
-            total_compressed += call.compressed_result.compressed_length
-    if total_original > 0:
-        compression_ratio = total_compressed / total_original
+```text
+run_context_compression.py
+ ├─ Config 补丁 → DeepSeek；CONTEXT_WINDOW_SIZE=16000；MAX_ITERATIONS=20
+ ├─ WebTools 换合成语料（每查询 1-2 页 × ~4.6K 字符）
+ └─ StrategyRunner.run_all_strategies（六策略顺序）
+      策略 no_compression:
+       ├─ 轮1: [system][用户任务] → search_web("OpenAI co-founders")
+       │       → json.dumps(result)（~2.5K tok）→ messages.append
+       ├─ 轮2-5: 逐人搜索，每轮 prompt 累加 ~2.5K
+       ├─ 轮6: last_prompt_tokens=13,914 > 12,800(80%×16K)
+       │       → context_overflows += 1
+       │       → NO_COMPRESSION → return error（死亡分支）
+       └─ metrics: 21 次工具调用、溢出 1、无 final_answer
+      （后续五策略各自完成，见实验说明的结果表）
+ → strategy_results_<ts>.json → 学习版 evidence + 密钥扫描
 ```
 
-**执行过程：看数据怎样变**
+## 动手验证
 
-六策略顺序跑（策略间 sleep 2 秒），每策略产出：成功/失败、指标（tokens/工具数/溢出数/压缩比）、`agent_output`（StreamCapture 捕获的全程控制台输出——含每个 `✂️ Compressed` 行，是逐轮复盘的原始材料）。汇总表打印 Strategy × Success × Time × Tokens × Compression × Overflows。
-
-注意 `compression_ratio` 只统计**有 compressed_result 的**工具调用——no_compression 和 windowed（落地时未压）不产生压缩统计；windowed 的老化压缩走 `compress_for_history`，不经过 ToolCall.compressed_result，所以它的"压缩量"要看 agent_output 里的 `[COMPRESSED]` 行而不是这个比率。
-
-**接回真实源码**
-
-另一个入口 `experiment.py`（ExperimentRunner）是同一件事的无日志版（`enable_streaming=False` 默认、tqdm 进度条）；`run_all_strategies` 的 docstring 自己说明分工："本脚本侧重可复盘的详细日志"。书方 ledger 的六臂证据（`results/kimi_k3_real_20260718.json`）不在本仓库快照中，学习版无法与其逐数值对照，只能对照 ledger 的定性结论（无压缩臂溢出、五压缩臂完成）。
-
----
-
-## 7. 学习版缩尺设计：为什么 128K → 16K 是合法的 {#7}
-
-**遇到的问题**
-
-书方的溢出演示靠真实网页把上下文堆到 128K 的 80%（>100K tokens）——一次学习跑要消耗百万级 token 才能看到现象。没有 SERPER_API_KEY 的情况下课程本来就回退到几百字符的 mock 语料，永远堆不满。
-
-**设计思路**
-
-两个变量同时缩放，机制保真：
-
-1. **语料放大**：合成语料保留课程 mock 的 2024 事实快照，每页加约 4K 字符的中性噪声（task1 同款手法）——单次 search 的 tool 输出从 ~500 字符升到 ~9K 字符（JSON 化后约 2.5K tokens）；
-2. **窗口缩小**：`Config.CONTEXT_WINDOW_SIZE` 128000 → 16000。溢出判定、80% 阈值、windowed 触发、NO_COMPRESSION 的死亡分支全部原样，只是"满"的定义缩小了 8 倍。
-
-**学习运行脚本原文** · [run_context_compression.py · L60–L64](../assets/task2/run_context_compression.py)：
-
-```python linenums="60"
-cfg = load("config", "chapter2/context-compression/config.py")
-cfg.Config.resolve_llm = classmethod(lambda cls: (KEY, os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"), MODEL))
-cfg.Config.MODEL_NAME = MODEL
-cfg.Config.CONTEXT_WINDOW_SIZE = WINDOW
-cfg.Config.MAX_ITERATIONS = 20
-```
-
-这样做的合法性论证：上下文窗口在课程代码里只出现在**阈值比较**（`last_prompt_tokens > WINDOW * 0.8`）和错误消息里，不影响任何压缩逻辑本身。DeepSeek 真实窗口 128K 远大于 16K，缩尺不会触碰真实 API 限制。不变量是"工具输出的增长速率 vs 窗口大小"的比值——缩尺后每轮 ~2.5K tokens 对 16K 窗口，与书方真实网页对 128K 的相对速率同量级。
-
-其余注入与前四个实验同构：`resolve_llm` 指向 DeepSeek（config 的 `LLM_PROVIDER=deepseek` 会让 MODEL_NAME 错配 kimi-k3，故显式覆写）、`ResearchAgent.__init__` 强制非流式（记录层需要完整 usage）、`WebTools.search_web/fetch_webpage` 换合成语料。
-
-**动手验证**
-
-如果把窗口缩到 4K 而语料不缩，会发生什么？
-
-??? tip "先预测，再展开对照"
-    第一次 search（~2.5K）就逼近 3.2K 阈值，第二次就溢出——no_compression 两轮死掉，模型连"co-founders 列表"都没查完，压缩策略的对照也失去意义（还没来得及展示多轮积累）。**缩尺的约束是让"几轮积累→溢出"的节奏保持可观察**，不是越小越好。
-
----
-
-## 8. 实测解读
-
-结果与逐策略解读见 [evidence.md#context-compression](evidence.md#context-compression)。
-
----
-
-## 最后回到项目
-
-学习脚本缩尺注入 → 课程 StrategyRunner 六策略 → ResearchAgent 主循环（立即压缩/老化压缩/溢出死亡）→ CompressedContent 与指标 → [看真实实验结果](evidence.md#context-compression)。
+1. **把窗口改成 4K 而语料不缩**：第一次 search（~2.5K）就逼近 3.2K 阈值、第二轮溢出——no_compression 两轮死掉，对照失去意义。体会"缩尺的约束是保持'几轮积累→溢出'的节奏可观察"。
+2. **给 `compress_for_history` 的输入截断从 10000 改成 2000**：老化压缩丢的信息变多——windowed 臂的最终答案还能保住六位创始人吗？（token 省了，信息丢在哪一层？）
+3. **把 `_handle_windowed_compression` 的 `[COMPRESSED]` 检查删掉**：每轮触发都把已压缩的消息再压一遍——**摘要的摘要**，信息滚雪球式丢失。那个前缀标记是 windowed 正确性的静默守卫。

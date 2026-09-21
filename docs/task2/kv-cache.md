@@ -1,17 +1,19 @@
 # KV Cache 实验 · 稳定前缀到底值多少钱？
 
 !!! tip "先跑实验，再跟着代码走一遍"
-    [进入本实验的逐步源码教程](kv-cache-code.md)：消息结构、六个破坏点、主循环分叉、指纹证据，每步附动手验证。
+    [进入本实验的逐步源码教程](kv-cache-code.md)：agent.py 全部 19 个函数按源码顺序逐个讲 + main.py 的报表函数，最后串一次完整执行。
 
-[本次结果](evidence.md#kv-cache) · [学习运行脚本](../assets/task2/run_kv_cache.py) · [课程项目](https://github.com/bojieli/ai-agent-book/tree/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/kv-cache)
+[完整证据与复现](evidence.md#kv-cache) · [学习运行脚本](../assets/task2/run_kv_cache.py) · [课程项目](https://github.com/bojieli/ai-agent-book/tree/cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c/chapter2/kv-cache)
 
 ## 这个实验回答什么问题
 
-Agent 每一轮都要把全部历史重新发给模型。如果**前缀**（从头开始相同的部分）能被服务商缓存复用，后面的轮次就省算力、省延迟、省账单。问题是：哪些"看起来无害"的写法会把缓存悄悄毁掉？
+Agent 每一轮都要把全部历史重新发给模型。如果**前缀**（从头开始相同的部分）能被服务商缓存复用，后面的轮次就省算力、省延迟、省账单。问题：哪些"看起来无害"的写法会把缓存悄悄毁掉？
 
 课程 `KVCacheAgent` 用六个模式把这变成可控实验：一个正确实现加五个反模式，其余一切（任务、工具、模型、温度）全部相同。
 
-## 六个模式各改一件事
+## 设计
+
+六模式各破坏前缀的一个位置：
 
 | 模式 | 每轮的实际变化 | 对应的现实写法 |
 | --- | --- | --- |
@@ -22,30 +24,39 @@ Agent 每一轮都要把全部历史重新发给模型。如果**前缀**（从�
 | sliding_window | 只保留最近 6 条历史 | "省 token 就砍历史" |
 | text_format | 历史拍平成一条纯文本 | "自己拼 prompt 字符串" |
 
-```python
-# 教学示意：六模式共享同一个 ReAct 循环，只在消息构造处分叉
-for mode in KVCacheMode:                       # 课程 agent.py 的枚举
-    agent = KVCacheAgent(api_key, mode=mode, root_dir=fixture)
-    result = agent.execute_task(task)          # 同一任务、同一工具
-```
+靶子是 5 文件的小型任务队列项目（`learning/task2/work/kv_fixture/`），任务固定"find 发现 → read 逐个读 → 总结"——工具结果稳定，缓存效应不被随机性淹没。
 
-## 任务与靶子
+**与课程原版的差异**：Kimi K2.6 → DeepSeek（`deepseek-v4-flash` 请求、`deepseek-flash` 回报——两家缓存机制同构但绝对数值**不可跨厂商比**）；缓存口径 DeepSeek 用 `prompt_cache_hit_tokens`（课程的 `cached_tokens` 检测路径不识别，学习版在记录层自抓）；thinking 统一关闭降方差；每条消息算 SHA-256 指纹求相邻调用公共前缀——把"前缀断了"直接拍进证据。每模式一次运行（课程同款设计）。
 
-默认任务（main.py 的 `create_summary_task`）是分析课程 chapter1+chapter2 全部项目——目录太大。学习版把 `root_dir` 指向一个 5 文件的小型任务队列项目（`learning/task2/work/kv_fixture/`，models/storage/queue/worker/cli），任务固定为"find 发现文件 → 逐个 read → 总结模块关系"。这样每轮工具结果稳定、历史可控，缓存效应不被巨大目录的随机性淹没。
+## 看结果前先想清楚
 
-## 与课程原版的差异
-
-- **模型**：课程用 Kimi K2.6（Moonshot），学习版用 DeepSeek（`deepseek-v4-flash` 请求，服务端回报 `deepseek-flash`）。两家缓存机制同构（前缀复用）但实现不同，**绝对数值不可跨厂商比较**；
-- **缓存口径**：课程代码读 `usage.cached_tokens` / `prompt_tokens_details.cached_tokens`（Kimi/OpenAI 风格）；DeepSeek 报 `prompt_cache_hit_tokens` / `prompt_cache_miss_tokens`。学习脚本在记录层抓原始 usage，不依赖课程 metrics；
-- **thinking**：学习版统一关闭 thinking（`extra_body`），降低延迟测量的方差。课程默认 Kimi 是推理模型无法关闭；
-- **指纹证据**：学习脚本给每次请求的每条消息算 SHA-256，相邻调用求公共前缀条数——把"前缀断了"直接拍在证据里；
-- **规模**：每模式一次运行（课程 `compare_implementations` 同款设计），不是统计显著的成功率研究。
-
-## 先想清楚再去看数字
-
-读结果前先预测，再看 [实测](evidence.md#kv-cache)：
-
-1. dynamic_system 的命中率应该是多少？（提示：时间戳在第几条消息？）
-2. shuffled_tools 和 dynamic_profile，哪个更糟？（提示：谁的位置更靠前？）
+1. dynamic_system 的命中率应该是多少？（时间戳在第几条消息？）
+2. shuffled_tools 和 dynamic_profile，哪个更糟？（谁的位置更靠前？）
 3. text_format 拍平后内容只增不改，纯 token 前缀会命中吗？那它"错"在哪？
 4. sliding_window 又砍历史又毁缓存，为什么总 miss token 反而可能最少？
+
+## 运行结果
+
+26 次真实调用、80,471 prompt tokens，六模式全部完成任务。"公共前缀"列是相邻两次请求消息列表的相同前缀条数（按内容 SHA-256 判等）：
+
+| 模式 | 调用数 | 命中 tokens | miss tokens | 命中率 | 相邻公共前缀（条） | 工具顺序数 |
+| --- | ---: | ---: | ---: | ---: | --- | ---: |
+| correct | 4 | 6,016 | 5,883 | 51% | `[0, 2, 5, 11]` | 1 |
+| dynamic_system | 4 | **0** | 13,930 | **0%** | `[0, 0, 0, 0]` | 1 |
+| shuffled_tools | 4 | 1,536 | 9,710 | 14% | `[0, 1, 3, 9]` | 3 |
+| dynamic_profile | 4 | 2,432 | 11,211 | 18% | `[0, 1, 1, 1]` | 1 |
+| sliding_window | 4 | 5,504 | 4,892 | 53% | `[0, 1, 1, 7]` | 1 |
+| text_format | 6 | 13,568 | 5,789 | 70% | `[0, 1, 1, 1, 1, 1]` | 1 |
+
+## 分析
+
+- **dynamic_system 0% 是最干净的结果**：微秒时间戳让第 1 条消息就变，13,930 个 prompt token 全部重算——一个没人用的时钟，代价是整条前缀。公共前缀全程 0，机制直接坐实；
+- **shuffled_tools 14%**：4 次调用出现 3 种工具顺序。工具定义排在序列化前缀的**最前面**（system 之前），顺序一变连 system 的缓存一起毁——所以它比 dynamic_profile 更糟；
+- **dynamic_profile 18%**：公共前缀恒为 1——只剩 system 段幸存，profile 之后全部失效；
+- **correct 51%**：公共前缀逐轮增长（2→5→11），命中 token 同步增长（768→1024→4224）。miss 主要来自每轮新增的工具结果（整段文件内容）；
+- **sliding_window 53% 但总 miss 最少（4,892）**：窗口每轮丢头部、前缀对不齐（中途公共前缀只剩 1），但上下文本身被压小了。**缓存差和上下文小两个效应叠加**——"省"和"缓存友好"是两个维度；
+- **text_format 70% 命中但总 token 爆炸（19,357 ≈ correct 的 1.6 倍）**：拍平文本逐轮只增不改，DeepSeek 按 token 块缓存不看消息结构，所以照样命中——它"错"不在缓存，在体积膨胀和结构语义丢失。**缓存命中率高不等于高效**；
+- **跨模式污染**：六模式顺序执行，后续模式的首轮 128–512 命中来自前面模式留下的 system+tools 前缀缓存（DeepSeek 缓存跨请求存活）——比较"首轮冷启动"只看 correct 的第一次调用；
+- **与书方 Kimi K2.6 回执对照**：书方 dynamic_system 仍有 768 cached tokens（本次 DeepSeek 是 0）。机制同构（前缀复用）、实现不同（块粒度/命中口径/tools 段处理）——**方向一致，绝对值不可比**，与课程 README"以命中率为稳健信号、TTFT 仅作参考"一致。
+
+**边界**：每模式一次运行、无置信区间；"每轮重建但内容逐字节不变"是否真不损缓存，本次没有第七模式单独验证；非流式计时含全部生成时间（末轮长答案在所有模式都约 6 秒），工具轮延迟才有比较意义。
