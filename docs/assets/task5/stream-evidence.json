@@ -1,0 +1,329 @@
+{
+  "rows": [
+    {
+      "where": "text",
+      "repeat": 0,
+      "strategy": "resend",
+      "partial": {
+        "reasoning": "",
+        "text": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细",
+        "tool_name": null,
+        "tool_args": "",
+        "tool_index": null,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细"
+      },
+      "result": {
+        "text": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细 | 原币金额 | 折合人民币 |\n|---|---|---|---|\n| 往返机票 | 北京⇄东京 | — | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 | 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 | 24,000 JPY | ¥1,152 |\n| **合计** | | | **¥6,944** |\n\n计算说明：日元汇率按 1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**总预算约为 ¥6,944 人民币**（未含市内交通、签证、保险等杂费）。",
+        "tool_calls": []
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": null,
+        "args_correct": null,
+        "duplicate_side_effects": 0,
+        "combined_chars": 350,
+        "answer_correct": true
+      },
+      "strict_correct": true,
+      "recovery_tokens": 984,
+      "recovery_output_tokens": 200,
+      "recovery_seconds": 0.92
+    },
+    {
+      "where": "text",
+      "repeat": 0,
+      "strategy": "meta",
+      "partial": {
+        "reasoning": "",
+        "text": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细",
+        "tool_name": null,
+        "tool_args": "",
+        "tool_index": null,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细"
+      },
+      "result": {
+        "text": "| 项目 | 明细 | 金额 |\n|---|---|---|\n| 往返机票 | 北京 ⇄ 东京 | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 = 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 = 24,000 JPY | ¥1,152 |\n\n**计算说明**\n- 汇率：1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**人民币总额：3,200 + 2,592 + 1,152 = ¥6,944**\n\n即从北京去东京出差 3 晚 4 天，总预算约为 **6,944 元人民币**。",
+        "tool_calls": []
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": null,
+        "args_correct": null,
+        "duplicate_side_effects": 0,
+        "combined_chars": 361,
+        "answer_correct": true
+      },
+      "strict_correct": true,
+      "recovery_tokens": 1017,
+      "recovery_output_tokens": 191,
+      "recovery_seconds": 0.969
+    },
+    {
+      "where": "text",
+      "repeat": 1,
+      "strategy": "resend",
+      "partial": {
+        "reasoning": "",
+        "text": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）*",
+        "tool_name": null,
+        "tool_args": "",
+        "tool_index": null,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）**\n"
+      },
+      "result": {
+        "text": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细 | 原币金额 | 折合人民币 |\n|---|---|---|---|\n| 往返机票 | 北京⇄东京 | — | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 | 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 | 24,000 JPY | ¥1,152 |\n| **合计** | | | **¥6,944** |\n\n计算说明：日元汇率按 1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**总预算约 ¥6,944 人民币**（未含市内交通、签证、保险等杂费，如需可另行估算）。",
+        "tool_calls": []
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": null,
+        "args_correct": null,
+        "duplicate_side_effects": 0,
+        "combined_chars": 357,
+        "answer_correct": true
+      },
+      "strict_correct": true,
+      "recovery_tokens": 989,
+      "recovery_output_tokens": 205,
+      "recovery_seconds": 1.135
+    },
+    {
+      "where": "text",
+      "repeat": 1,
+      "strategy": "meta",
+      "partial": {
+        "reasoning": "",
+        "text": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）*",
+        "tool_name": null,
+        "tool_args": "",
+        "tool_index": null,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）**\n"
+      },
+      "result": {
+        "text": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）**\n- 3,200 元\n\n**2. 住宿（3 晚，日元换算）**\n- 每晚 18,000 JPY × 3 晚 = 54,000 JPY\n- 54,000 × 0.048 = 2,592 元\n\n**3. 餐费（4 天，日元换算）**\n- 每天 6,000 JPY × 4 天 = 24,000 JPY\n- 24,000 × 0.048 = 1,152 元\n\n**总计**\n- 3,200 + 2,592 + 1,152 = **6,944 元人民币**\n\n北京往返东京、3 晚 4 天出差的总预算约为 **6,944 元人民币**（汇率按 1 JPY = 0.048 CNY 计算）。",
+        "tool_calls": []
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": null,
+        "args_correct": null,
+        "duplicate_side_effects": 0,
+        "combined_chars": 351,
+        "answer_correct": true
+      },
+      "strict_correct": true,
+      "recovery_tokens": 1020,
+      "recovery_output_tokens": 196,
+      "recovery_seconds": 0.87
+    },
+    {
+      "where": "tool_args",
+      "repeat": 0,
+      "strategy": "resend",
+      "partial": {
+        "reasoning": "",
+        "text": "",
+        "tool_name": "get_hotel_price",
+        "tool_args": "{\"city\":",
+        "tool_index": 0,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "{\"city\": "
+      },
+      "result": {
+        "text": "",
+        "tool_calls": [
+          {
+            "name": "get_hotel_price",
+            "arguments": {
+              "city": "东京"
+            }
+          },
+          {
+            "name": "get_meal_price",
+            "arguments": {
+              "city": "东京"
+            }
+          }
+        ]
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": true,
+        "args_correct": true,
+        "duplicate_side_effects": 0
+      },
+      "strict_correct": true,
+      "recovery_tokens": 484,
+      "recovery_output_tokens": 64,
+      "recovery_seconds": 0.527
+    },
+    {
+      "where": "tool_args",
+      "repeat": 0,
+      "strategy": "meta",
+      "partial": {
+        "reasoning": "",
+        "text": "",
+        "tool_name": "get_hotel_price",
+        "tool_args": "{\"city\":",
+        "tool_index": 0,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "{\"city\": "
+      },
+      "result": {
+        "text": "",
+        "tool_calls": [
+          {
+            "name": "get_hotel_price",
+            "arguments": {
+              "city": "东京"
+            }
+          },
+          {
+            "name": "get_meal_price",
+            "arguments": {
+              "city": "东京"
+            }
+          }
+        ]
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": true,
+        "args_correct": true,
+        "duplicate_side_effects": 0
+      },
+      "strict_correct": true,
+      "recovery_tokens": 509,
+      "recovery_output_tokens": 64,
+      "recovery_seconds": 0.441
+    },
+    {
+      "where": "tool_args",
+      "repeat": 1,
+      "strategy": "resend",
+      "partial": {
+        "reasoning": "",
+        "text": "",
+        "tool_name": "get_hotel_price",
+        "tool_args": "{\"city\":",
+        "tool_index": 0,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "{\"city\": "
+      },
+      "result": {
+        "text": "",
+        "tool_calls": [
+          {
+            "name": "get_hotel_price",
+            "arguments": {
+              "city": "东京"
+            }
+          }
+        ]
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": true,
+        "args_correct": true,
+        "duplicate_side_effects": 0
+      },
+      "strict_correct": true,
+      "recovery_tokens": 454,
+      "recovery_output_tokens": 34,
+      "recovery_seconds": 0.67
+    },
+    {
+      "where": "tool_args",
+      "repeat": 1,
+      "strategy": "meta",
+      "partial": {
+        "reasoning": "",
+        "text": "",
+        "tool_name": "get_hotel_price",
+        "tool_args": "{\"city\":",
+        "tool_index": 0,
+        "tool_args_closed": false,
+        "truncated": true,
+        "finished": false,
+        "received_before_character_cut": "{\"city\": "
+      },
+      "result": {
+        "text": "",
+        "tool_calls": [
+          {
+            "name": "get_hotel_price",
+            "arguments": {
+              "city": "东京"
+            }
+          },
+          {
+            "name": "get_meal_price",
+            "arguments": {
+              "city": "东京"
+            }
+          }
+        ]
+      },
+      "course_verdict": {
+        "recovered": true,
+        "json_valid": true,
+        "args_correct": true,
+        "duplicate_side_effects": 0
+      },
+      "strict_correct": true,
+      "recovery_tokens": 509,
+      "recovery_output_tokens": 64,
+      "recovery_seconds": 0.52
+    }
+  ],
+  "streams_file": "streams.json",
+  "cut_stream_usage": "unknown: intentionally closed before final usage; not included in token total",
+  "strategies": [
+    "resend",
+    "meta"
+  ],
+  "not_run": [
+    "native prefill",
+    "reasoning cut",
+    "audio cancellation",
+    "cross-provider handoff"
+  ],
+  "negative_control": {
+    "json": "{\"city\":\"大阪\"}",
+    "parse_ok": true,
+    "args_correct": false
+  },
+  "completed": true,
+  "model_requested": "deepseek-flash",
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "source_sha256": {
+    "chapter5/provider-failover/streaming.py": "4108875a4c4fabd730c5a73ecaafd167edd7b40b888dee17d491f4a4ba913ada",
+    "chapter5/provider-failover/run_continuation.py": "a857c5fabeaf80dac33dd1e5cd400049617d345f878b9815eff0913ca6762161",
+    "chapter5/provider-failover/judging.py": "41fc56e77108fc4c1f9ad0a5143da2c6629484e6406217b929a0fa0c88a56b01",
+    "chapter5/provider-failover/tools.py": "ec6530ce9c4ff0ae521ac8533a335a379c23306350a408baca07e00bfd8d650c",
+    "chapter5/provider-failover/renderers.py": "53afe45ed54843c54e352a21d01834ea55914f31e9798ed6a8fe5fa21dd9f314",
+    "chapter5/provider-failover/neutral_trace.py": "4ec92d2141893deb67f5e2eacb15833e04e18e351a1e1f2ab58ab800502607f6"
+  },
+  "calls": 8,
+  "tokens": 5966,
+  "scope": "learning variant; not full canonical campaign"
+}

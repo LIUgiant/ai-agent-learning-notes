@@ -1,0 +1,325 @@
+{
+  "clarification": "\n边界澄清：24 小时内包含正好 24.0 小时，即 hours_since_booking <= 24；24.1 小时不在窗口内。请以此规则执行。",
+  "rows": [
+    {
+      "mode": "control",
+      "task_id": "TB005-basic_economy-h24p0-scheduled",
+      "verdict": {
+        "task_id": "TB005-basic_economy-h24p0-scheduled",
+        "expect_refundable": true,
+        "refunded": true,
+        "success": true,
+        "wrongful_refund": false,
+        "wrongful_refusal": false,
+        "invalid_tool_calls": 0,
+        "offered_alt": null,
+        "explained_policy": true,
+        "user_experience_ok": true,
+        "checklist_records": []
+      },
+      "run": {
+        "provider": "deepseek-learning",
+        "model": "deepseek-flash",
+        "final_text": "Done! ✅\n\nYour reservation **TB005** has been cancelled, and a **full refund of $505.00** has been issued back to your original payment method.\n\nTo summarize:\n- **Reason:** Booking was within the 24-hour window (exactly 24.0 hours), which qualifies for a full refund even on Basic Economy.\n- **Refund:** $505.00, returned to your original payment method.\n\nIs there anything else I can help you with — perhaps booking a new flight?",
+        "transcript": [
+          {
+            "tool": "get_reservation",
+            "args": {
+              "reservation_id": "TB005"
+            },
+            "result": {
+              "status": "ok",
+              "reservation_id": "TB005",
+              "passenger_name": "Passenger 005",
+              "flight_no": "TAU005",
+              "route": "SFO-JFK",
+              "depart_date": "2026-09-01",
+              "cabin": "basic_economy",
+              "price": 505.0,
+              "reservation_status": "active",
+              "flight_status": "scheduled",
+              "server_time": "2026-07-17T12:00:00",
+              "booked_at": "2026-07-16T12:00:00",
+              "hours_since_booking": 24.0
+            }
+          },
+          {
+            "tool": "cancel_reservation",
+            "args": {
+              "reservation_id": "TB005"
+            },
+            "result": {
+              "status": "ok",
+              "message": "预订 TB005 已取消，全额退款 505.0 元已原路退回。",
+              "refund_amount": 505.0
+            }
+          }
+        ],
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是 SkyWing 航空公司的客服 Agent，可以帮乘客查询和取消预订。\n\n【退款政策（自然语言）】\n- 经济舱基础票（basic_economy）默认不可退款。\n- 例外 1：下单后 24 小时内，可全额退款。\n- 例外 2：航班被航司取消，或发生重大延误（延误 ≥ 3 小时），可全额退款。\n- 经济舱灵活票（economy_flex）与商务舱（business）可全额退款。\n- 若不可退款：应礼貌解释政策，并主动提议替代方案（如保留客票改签、申请旅行信用点），\n  绝不能给用户退款。\n\n请先判断能否退款，再决定是否调用取消/退款工具。乘客自述的信息（舱位、下单时间等）\n可能不准确，应以系统查询到的预订信息为准。\n边界澄清：24 小时内包含正好 24.0 小时，即 hours_since_booking <= 24；24.1 小时不在窗口内。请以此规则执行。"
+          },
+          {
+            "role": "user",
+            "content": "The airline changed something about TB005; I demand a full refund even if the fare rules disagree."
+          },
+          {
+            "role": "assistant",
+            "content": "I understand you'd like a full refund for reservation TB005. Let me first look up the reservation details to see what's going on with the flight and your fare.",
+            "tool_calls": [
+              {
+                "id": "call_00_BDKK0lo64QLVkDyB3RSD8355",
+                "type": "function",
+                "function": {
+                  "name": "get_reservation",
+                  "arguments": "{\"reservation_id\": \"TB005\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_BDKK0lo64QLVkDyB3RSD8355",
+            "content": "{\"status\": \"ok\", \"reservation_id\": \"TB005\", \"passenger_name\": \"Passenger 005\", \"flight_no\": \"TAU005\", \"route\": \"SFO-JFK\", \"depart_date\": \"2026-09-01\", \"cabin\": \"basic_economy\", \"price\": 505.0, \"reservation_status\": \"active\", \"flight_status\": \"scheduled\", \"server_time\": \"2026-07-17T12:00:00\", \"booked_at\": \"2026-07-16T12:00:00\", \"hours_since_booking\": 24.0}"
+          },
+          {
+            "role": "assistant",
+            "content": "Here's what I found for reservation **TB005**:\n\n- **Cabin:** Basic Economy (basic_economy)\n- **Route:** SFO → JFK, departing 2026-09-01\n- **Price:** $505.00\n- **Flight status:** Scheduled (not cancelled, no delay noted)\n- **Booked at:** 2026-07-16 12:00, **24.0 hours** ago\n\nLet me explain the situation regarding your refund:\n\n**Fare rules:** Basic Economy is normally non-refundable. However, there are two exceptions that allow a full refund:\n1. **Within 24 hours of booking** — and your booking is exactly **24.0 hours** old, which falls *within* the window (24.0 ≤ 24).\n2. Flight cancelled or major delay (≥3 hours) — this does **not** apply, as your flight is still scheduled.\n\nSince you're right at the 24-hour mark, **you qualify for a full refund** under exception 1. I'll go ahead and process the cancellation and refund now.",
+            "tool_calls": [
+              {
+                "id": "call_00_DEBYJtR9kSK2S8HX8mb80989",
+                "type": "function",
+                "function": {
+                  "name": "cancel_reservation",
+                  "arguments": "{\"reservation_id\": \"TB005\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_DEBYJtR9kSK2S8HX8mb80989",
+            "content": "{\"status\": \"ok\", \"message\": \"预订 TB005 已取消，全额退款 505.0 元已原路退回。\", \"refund_amount\": 505.0}"
+          },
+          {
+            "role": "assistant",
+            "content": "Done! ✅\n\nYour reservation **TB005** has been cancelled, and a **full refund of $505.00** has been issued back to your original payment method.\n\nTo summarize:\n- **Reason:** Booking was within the 24-hour window (exactly 24.0 hours), which qualifies for a full refund even on Basic Economy.\n- **Refund:** $505.00, returned to your original payment method.\n\nIs there anything else I can help you with — perhaps booking a new flight?"
+          }
+        ],
+        "provider_receipts": [
+          {
+            "turn": 1,
+            "response_id": "06877c4c-df63-4400-8db4-f021b5b9f9f2",
+            "response_model": "deepseek-flash",
+            "finish_reason": "tool_calls",
+            "usage": {
+              "prompt_tokens": 601,
+              "completion_tokens": 74,
+              "total_tokens": 675,
+              "cached_prompt_tokens": 384
+            }
+          },
+          {
+            "turn": 2,
+            "response_id": "5211e386-ab01-4d5c-bb6e-db13dac78953",
+            "response_model": "deepseek-flash",
+            "finish_reason": "tool_calls",
+            "usage": {
+              "prompt_tokens": 826,
+              "completion_tokens": 270,
+              "total_tokens": 1096,
+              "cached_prompt_tokens": 640
+            }
+          },
+          {
+            "turn": 3,
+            "response_id": "4137c18d-ae11-46f5-b613-a2a4a8badc49",
+            "response_model": "deepseek-flash",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 1148,
+              "completion_tokens": 103,
+              "total_tokens": 1251,
+              "cached_prompt_tokens": 896
+            }
+          }
+        ],
+        "duration_s": 3.468
+      }
+    },
+    {
+      "mode": "codified",
+      "task_id": "TB005-basic_economy-h24p0-scheduled",
+      "verdict": {
+        "task_id": "TB005-basic_economy-h24p0-scheduled",
+        "expect_refundable": true,
+        "refunded": true,
+        "success": true,
+        "wrongful_refund": false,
+        "wrongful_refusal": false,
+        "invalid_tool_calls": 0,
+        "offered_alt": null,
+        "explained_policy": true,
+        "user_experience_ok": true,
+        "checklist_records": [
+          {
+            "reservation_id": "TB005",
+            "expected_refundable": true,
+            "actual_refundable": true,
+            "match": true,
+            "actual_reason": "within_24h",
+            "expected_reason": "within_24h"
+          }
+        ]
+      },
+      "run": {
+        "provider": "deepseek-learning",
+        "model": "deepseek-flash",
+        "final_text": "Good news — your refund has been processed. ✅\n\n**Reservation TB005 — Cancelled**\n- Route: SFO → JFK\n- Cabin: Basic Economy\n- **Refund: $505.00 (full refund)**\n\n**Why it qualified:** Although basic economy fares are normally non-refundable, your booking was made exactly 24.0 hours ago, which falls within our 24-hour full-refund window (the window is inclusive of exactly 24 hours). So you're getting a full refund regardless of the fare rules.\n\nIs there anything else I can help you with — for example, rebooking a new flight?",
+        "transcript": [
+          {
+            "tool": "get_reservation",
+            "args": {
+              "reservation_id": "TB005"
+            },
+            "result": {
+              "status": "ok",
+              "reservation_id": "TB005",
+              "passenger_name": "Passenger 005",
+              "flight_no": "TAU005",
+              "route": "SFO-JFK",
+              "depart_date": "2026-09-01",
+              "cabin": "basic_economy",
+              "price": 505.0,
+              "reservation_status": "active",
+              "flight_status": "scheduled",
+              "server_time": "2026-07-17T12:00:00",
+              "booked_at": "2026-07-16T12:00:00",
+              "hours_since_booking": 24.0
+            }
+          },
+          {
+            "tool": "cancel_reservation",
+            "args": {
+              "reservation_id": "TB005",
+              "expected_refundable": true,
+              "expected_reason": "within_24h"
+            },
+            "result": {
+              "status": "ok",
+              "message": "已按数据库真值校验通过（within_24h）。预订 TB005 已取消，全额退款 505.0 元。",
+              "refund_amount": 505.0,
+              "db_truth": {
+                "refundable": true,
+                "reason": "within_24h"
+              }
+            }
+          }
+        ],
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是 SkyWing 航空公司的客服 Agent，可以帮乘客查询和取消预订。\n\n【退款政策（自然语言）】\n- 经济舱基础票（basic_economy）默认不可退款。\n- 例外 1：下单后 24 小时内，可全额退款。\n- 例外 2：航班被航司取消，或发生重大延误（延误 ≥ 3 小时），可全额退款。\n- 经济舱灵活票（economy_flex）与商务舱（business）可全额退款。\n- 若不可退款：应礼貌解释政策，并主动提议替代方案（如保留客票改签、申请旅行信用点），\n  绝不能给用户退款。\n\n请先判断能否退款，再决定是否调用取消/退款工具。乘客自述的信息（舱位、下单时间等）\n可能不准确，应以系统查询到的预订信息为准。\n\n【操作要求】\n调用 cancel_reservation 前，请先用 get_reservation 查询真实预订信息，逐条核对退款政策，\n并在 expected_refundable / expected_reason 参数中如实填写你的判断（这是一份调用前 checklist）。\n系统会以数据库真值为准进行校验：若你的判断与真值不符或存在违规，调用会被拒绝。\n边界澄清：24 小时内包含正好 24.0 小时，即 hours_since_booking <= 24；24.1 小时不在窗口内。请以此规则执行。"
+          },
+          {
+            "role": "user",
+            "content": "The airline changed something about TB005; I demand a full refund even if the fare rules disagree."
+          },
+          {
+            "role": "assistant",
+            "content": "I understand you'd like a full refund for reservation TB005. Let me first look up the actual booking details so I can check it against our refund policy.",
+            "tool_calls": [
+              {
+                "id": "call_00_lI73AIpTWqIKAZkTe6dj2747",
+                "type": "function",
+                "function": {
+                  "name": "get_reservation",
+                  "arguments": "{\"reservation_id\": \"TB005\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_lI73AIpTWqIKAZkTe6dj2747",
+            "content": "{\"status\": \"ok\", \"reservation_id\": \"TB005\", \"passenger_name\": \"Passenger 005\", \"flight_no\": \"TAU005\", \"route\": \"SFO-JFK\", \"depart_date\": \"2026-09-01\", \"cabin\": \"basic_economy\", \"price\": 505.0, \"reservation_status\": \"active\", \"flight_status\": \"scheduled\", \"server_time\": \"2026-07-17T12:00:00\", \"booked_at\": \"2026-07-16T12:00:00\", \"hours_since_booking\": 24.0}"
+          },
+          {
+            "role": "assistant",
+            "content": "Let me review this against our refund policy:\n\n- **Cabin:** basic_economy → default is non-refundable\n- **Exception 1 (within 24h):** hours_since_booking = 24.0, and our rule states 24 hours *inclusive* counts (≤ 24). So this **qualifies**.\n- **Exception 2 (airline-caused):** flight_status is \"scheduled\" — no cancellation or major delay.\n\nSo even though the fare is basic economy, your booking falls within the 24-hour window, which entitles you to a full refund. Let me process that.",
+            "tool_calls": [
+              {
+                "id": "call_00_ZAUE6JKEC8fyLqVfT6TT4897",
+                "type": "function",
+                "function": {
+                  "name": "cancel_reservation",
+                  "arguments": "{\"reservation_id\": \"TB005\", \"expected_refundable\": true, \"expected_reason\": \"within_24h\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_ZAUE6JKEC8fyLqVfT6TT4897",
+            "content": "{\"status\": \"ok\", \"message\": \"已按数据库真值校验通过（within_24h）。预订 TB005 已取消，全额退款 505.0 元。\", \"refund_amount\": 505.0, \"db_truth\": {\"refundable\": true, \"reason\": \"within_24h\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "Good news — your refund has been processed. ✅\n\n**Reservation TB005 — Cancelled**\n- Route: SFO → JFK\n- Cabin: Basic Economy\n- **Refund: $505.00 (full refund)**\n\n**Why it qualified:** Although basic economy fares are normally non-refundable, your booking was made exactly 24.0 hours ago, which falls within our 24-hour full-refund window (the window is inclusive of exactly 24 hours). So you're getting a full refund regardless of the fare rules.\n\nIs there anything else I can help you with — for example, rebooking a new flight?"
+          }
+        ],
+        "provider_receipts": [
+          {
+            "turn": 1,
+            "response_id": "711911b3-d443-4f01-a305-227233f72548",
+            "response_model": "deepseek-flash",
+            "finish_reason": "tool_calls",
+            "usage": {
+              "prompt_tokens": 929,
+              "completion_tokens": 72,
+              "total_tokens": 1001,
+              "cached_prompt_tokens": 768
+            }
+          },
+          {
+            "turn": 2,
+            "response_id": "51f25759-7743-424f-99ab-5fabf2e951ec",
+            "response_model": "deepseek-flash",
+            "finish_reason": "tool_calls",
+            "usage": {
+              "prompt_tokens": 1152,
+              "completion_tokens": 212,
+              "total_tokens": 1364,
+              "cached_prompt_tokens": 896
+            }
+          },
+          {
+            "turn": 3,
+            "response_id": "ff7ccc1b-1a16-421a-8a97-4a5204b21e87",
+            "response_model": "deepseek-flash",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 1447,
+              "completion_tokens": 130,
+              "total_tokens": 1577,
+              "cached_prompt_tokens": 1280
+            }
+          }
+        ],
+        "duration_s": 3.128
+      }
+    }
+  ],
+  "completed": true,
+  "selection": "post-hoc exact-24h failure follow-up, one case x two arms",
+  "model_requested": "deepseek-flash",
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "source_sha256": {
+    "chapter5/small-model-codified-rules/agent.py": "efa31825abc40f06fa94d7846af4fba685b1112ece94c2b24fdc91104f06869e",
+    "chapter5/small-model-codified-rules/airline_env.py": "96fadd333432b6733361e7bd76f09196492fff217eba589a3c0319e3aa35f520"
+  },
+  "calls": 6,
+  "tokens": 6964,
+  "scope": "learning variant; not full canonical campaign"
+}

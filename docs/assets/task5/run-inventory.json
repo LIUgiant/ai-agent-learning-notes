@@ -1,0 +1,74 @@
+[
+  {
+    "name": "boundary",
+    "utc_run_id": "20260929T024836Z",
+    "selected_for_main_results": false,
+    "completed": true,
+    "complete_calls": 6,
+    "reported_tokens": 6884,
+    "note": "earlier rules/boundary requests not used after snapshot recorder fix"
+  },
+  {
+    "name": "boundary",
+    "utc_run_id": "20260929T030351Z",
+    "selected_for_main_results": true,
+    "completed": true,
+    "complete_calls": 6,
+    "reported_tokens": 6964,
+    "note": ""
+  },
+  {
+    "name": "coding",
+    "utc_run_id": "20260929T024751Z",
+    "selected_for_main_results": true,
+    "completed": true,
+    "complete_calls": 5,
+    "reported_tokens": 11527,
+    "note": ""
+  },
+  {
+    "name": "diagnosis",
+    "utc_run_id": "20260929T024507Z",
+    "selected_for_main_results": true,
+    "completed": true,
+    "complete_calls": 2,
+    "reported_tokens": 3207,
+    "note": ""
+  },
+  {
+    "name": "rules",
+    "utc_run_id": "20260929T024411Z",
+    "selected_for_main_results": false,
+    "completed": true,
+    "complete_calls": 44,
+    "reported_tokens": 47589,
+    "note": "earlier rules/boundary requests not used after snapshot recorder fix"
+  },
+  {
+    "name": "rules",
+    "utc_run_id": "20260929T024551Z",
+    "selected_for_main_results": false,
+    "completed": true,
+    "complete_calls": 40,
+    "reported_tokens": 41229,
+    "note": "earlier rules/boundary requests not used after snapshot recorder fix"
+  },
+  {
+    "name": "rules",
+    "utc_run_id": "20260929T030308Z",
+    "selected_for_main_results": true,
+    "completed": true,
+    "complete_calls": 40,
+    "reported_tokens": 41284,
+    "note": ""
+  },
+  {
+    "name": "stream",
+    "utc_run_id": "20260929T024647Z",
+    "selected_for_main_results": true,
+    "completed": true,
+    "complete_calls": 8,
+    "reported_tokens": 5966,
+    "note": "stream cut calls have unknown usage"
+  }
+]

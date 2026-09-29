@@ -128,6 +128,23 @@ nav:
           - 实验说明: task4/tool-selection.md
           - 一步步读源码: task4/tool-selection-code.md
       - 运行证据与复现: task4/evidence.md
+  - Task 5 · Coding Agent 与可验证的执行:
+      - 学习任务与范围: task5/index.md
+      - 知识点地图: task5/concepts.md
+      - Coding Agent 入门:
+          - 实验与结果: task5/coding.md
+          - 一步步读源码: task5/coding-code.md
+      - 业务规则代码化:
+          - 实验与结果: task5/rules.md
+          - 一步步读源码: task5/rules-code.md
+      - 流式中断恢复:
+          - 实验与结果: task5/stream.md
+          - 一步步读源码: task5/stream-code.md
+      - 日志诊断与回归:
+          - 实验与结果: task5/diagnosis.md
+          - 一步步读源码: task5/diagnosis-code.md
+      - 项目结合与动手练习: task5/practice.md
+      - 运行证据与复现: task5/evidence.md
   - 持续学习:
       - Task 索引: tasks.md
       - 新 Task 写作模板: template.md

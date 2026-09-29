@@ -1,0 +1,722 @@
+{
+  "sources": {
+    "HTTP-RF-001": {
+      "trajectory_id": "HTTP-RF-001::buggy",
+      "source_trajectory_id": "HTTP-RF-001",
+      "implementation": "buggy",
+      "task_input": {
+        "intent": "refund",
+        "order_id": "ORD-58-A"
+      },
+      "final_status": "success",
+      "turns": [
+        {
+          "index": 0,
+          "role": "user",
+          "content": "{\"intent\": \"refund\", \"order_id\": \"ORD-58-A\"}"
+        },
+        {
+          "index": 1,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "query_order",
+          "method": "GET",
+          "path": "/orders/ORD-58-A",
+          "request": null,
+          "http_status": 200,
+          "status": "success",
+          "latency_ms": 4.119,
+          "response": {
+            "order_id": "ORD-58-A",
+            "status": "paid",
+            "sku": "SKU-42"
+          }
+        },
+        {
+          "index": 2,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "process_refund",
+          "method": "POST",
+          "path": "/refund/process",
+          "request": {
+            "order_id": "ORD-58-A"
+          },
+          "http_status": 200,
+          "status": "success",
+          "latency_ms": 0.485,
+          "response": {
+            "order_id": "ORD-58-A",
+            "refund_id": "RF-LIVE-1"
+          }
+        },
+        {
+          "index": 3,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "notify_user",
+          "method": "POST",
+          "path": "/notifications",
+          "request": {
+            "status": "success"
+          },
+          "http_status": 200,
+          "status": "success",
+          "latency_ms": 0.386,
+          "response": {
+            "sent": true,
+            "status": "success"
+          }
+        }
+      ]
+    },
+    "HTTP-INV-001": {
+      "trajectory_id": "HTTP-INV-001::buggy",
+      "source_trajectory_id": "HTTP-INV-001",
+      "implementation": "buggy",
+      "task_input": {
+        "intent": "order_status",
+        "order_id": "ORD-58-B",
+        "sku": "SKU-42"
+      },
+      "final_status": "failed",
+      "turns": [
+        {
+          "index": 0,
+          "role": "user",
+          "content": "{\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}"
+        },
+        {
+          "index": 1,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "query_order",
+          "method": "GET",
+          "path": "/orders/ORD-58-B",
+          "request": null,
+          "http_status": 200,
+          "status": "success",
+          "latency_ms": 0.38,
+          "response": {
+            "order_id": "ORD-58-B",
+            "status": "paid",
+            "sku": "SKU-42"
+          }
+        },
+        {
+          "index": 2,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "check_stock",
+          "method": "GET",
+          "path": "/inventory/SKU-42",
+          "request": null,
+          "http_status": null,
+          "status": "error",
+          "latency_ms": 351.269,
+          "error": "TimeoutError: timed out"
+        },
+        {
+          "index": 3,
+          "role": "tool",
+          "module": "http_order_system",
+          "tool": "notify_user",
+          "method": "POST",
+          "path": "/notifications",
+          "request": {
+            "status": "failed"
+          },
+          "http_status": 200,
+          "status": "success",
+          "latency_ms": 4.205,
+          "response": {
+            "sent": true,
+            "status": "failed"
+          }
+        }
+      ]
+    }
+  },
+  "problems": [
+    {
+      "title": "Refund processed without eligibility verification",
+      "priority": "P0",
+      "module": "http_order_system",
+      "description": "In trajectory HTTP-RF-001, the refund flow calls process_refund at turn 2 without first calling verify_refund_eligibility. This violates R1, which requires every refund to call verify_refund_eligibility before process_refund.",
+      "suggestion": "Insert a verify_refund_eligibility call before process_refund in the refund flow and enforce the ordering in the orchestrator.",
+      "prd_ref": "R1",
+      "trajectory_ids": [
+        "HTTP-RF-001"
+      ],
+      "focus_turns": [
+        2
+      ],
+      "suggested_assignee": "refund-flow-owner"
+    },
+    {
+      "title": "Inventory origin timeout not recovered via degraded cache route",
+      "priority": "P1",
+      "module": "http_order_system",
+      "description": "In trajectory HTTP-INV-001, check_stock at turn 2 times out after 351.269 ms, exceeding the 250 ms deadline. The orchestrator does not call check_stock through the degraded cache route and instead finishes with failed status, violating R2.",
+      "suggestion": "On check_stock origin timeout, call the same check_stock operation through the degraded cache route and complete normally instead of failing.",
+      "prd_ref": "R2",
+      "trajectory_ids": [
+        "HTTP-INV-001"
+      ],
+      "focus_turns": [
+        2
+      ],
+      "suggested_assignee": "inventory-integration-owner"
+    }
+  ],
+  "test_attempts": [
+    {
+      "attempt": 0,
+      "passed": true,
+      "records": [
+        {
+          "test": {
+            "test_id": "TC-R1-001",
+            "trajectory_id": "HTTP-RF-001",
+            "focus_turn": 2,
+            "description": "Refund flow must call verify_refund_eligibility before process_refund; in the buggy trajectory process_refund occurs at turn 2 with no prior eligibility check, violating R1.",
+            "assertion": {
+              "type": "step_present",
+              "params": {
+                "tool": "verify_refund_eligibility"
+              }
+            }
+          },
+          "buggy": {
+            "passed": false,
+            "detail": "verify_refund_eligibility calls=0",
+            "trajectory": {
+              "trajectory_id": "HTTP-RF-001::buggy",
+              "source_trajectory_id": "HTTP-RF-001",
+              "implementation": "buggy",
+              "task_input": {
+                "intent": "refund",
+                "order_id": "ORD-58-A"
+              },
+              "final_status": "success",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"refund\", \"order_id\": \"ORD-58-A\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-A",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 2.33,
+                  "response": {
+                    "order_id": "ORD-58-A",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "process_refund",
+                  "method": "POST",
+                  "path": "/refund/process",
+                  "request": {
+                    "order_id": "ORD-58-A"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.468,
+                  "response": {
+                    "order_id": "ORD-58-A",
+                    "refund_id": "RF-LIVE-1"
+                  }
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "success"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 3.893,
+                  "response": {
+                    "sent": true,
+                    "status": "success"
+                  }
+                }
+              ]
+            }
+          },
+          "fixed": {
+            "passed": true,
+            "detail": "verify_refund_eligibility calls=1",
+            "trajectory": {
+              "trajectory_id": "HTTP-RF-001::fixed",
+              "source_trajectory_id": "HTTP-RF-001",
+              "implementation": "fixed",
+              "task_input": {
+                "intent": "refund",
+                "order_id": "ORD-58-A"
+              },
+              "final_status": "success",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"refund\", \"order_id\": \"ORD-58-A\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-A",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.17,
+                  "response": {
+                    "order_id": "ORD-58-A",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "verify_refund_eligibility",
+                  "method": "POST",
+                  "path": "/refund/eligibility",
+                  "request": {
+                    "order_id": "ORD-58-A"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 5.187,
+                  "response": {
+                    "order_id": "ORD-58-A",
+                    "eligible": true
+                  }
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "process_refund",
+                  "method": "POST",
+                  "path": "/refund/process",
+                  "request": {
+                    "order_id": "ORD-58-A"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.636,
+                  "response": {
+                    "order_id": "ORD-58-A",
+                    "refund_id": "RF-LIVE-1"
+                  }
+                },
+                {
+                  "index": 4,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "success"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.34,
+                  "response": {
+                    "sent": true,
+                    "status": "success"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "test": {
+            "test_id": "TC-R2-001",
+            "trajectory_id": "HTTP-INV-001",
+            "focus_turn": 2,
+            "description": "check_stock must complete within 250 ms; in the buggy trajectory check_stock at turn 2 times out at 351.269 ms, violating R2.",
+            "assertion": {
+              "type": "latency_under",
+              "params": {
+                "tool": "check_stock",
+                "threshold_ms": 250
+              }
+            }
+          },
+          "buggy": {
+            "passed": false,
+            "detail": "check_stock max_latency_ms=351.888, threshold_ms=250.000",
+            "trajectory": {
+              "trajectory_id": "HTTP-INV-001::buggy",
+              "source_trajectory_id": "HTTP-INV-001",
+              "implementation": "buggy",
+              "task_input": {
+                "intent": "order_status",
+                "order_id": "ORD-58-B",
+                "sku": "SKU-42"
+              },
+              "final_status": "failed",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-B",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 4.388,
+                  "response": {
+                    "order_id": "ORD-58-B",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42",
+                  "request": null,
+                  "http_status": null,
+                  "status": "error",
+                  "latency_ms": 351.888,
+                  "error": "TimeoutError: timed out"
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "failed"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 12.287,
+                  "response": {
+                    "sent": true,
+                    "status": "failed"
+                  }
+                }
+              ]
+            }
+          },
+          "fixed": {
+            "passed": true,
+            "detail": "check_stock max_latency_ms=101.919, threshold_ms=250.000",
+            "trajectory": {
+              "trajectory_id": "HTTP-INV-001::fixed",
+              "source_trajectory_id": "HTTP-INV-001",
+              "implementation": "fixed",
+              "task_input": {
+                "intent": "order_status",
+                "order_id": "ORD-58-B",
+                "sku": "SKU-42"
+              },
+              "final_status": "success",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-B",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.057,
+                  "response": {
+                    "order_id": "ORD-58-B",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42",
+                  "request": null,
+                  "http_status": null,
+                  "status": "error",
+                  "latency_ms": 101.919,
+                  "error": "TimeoutError: timed out"
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42?degraded=1",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 3.223,
+                  "response": {
+                    "sku": "SKU-42",
+                    "stock": 12,
+                    "source": "cache",
+                    "degraded": true
+                  }
+                },
+                {
+                  "index": 4,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "success"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 2.082,
+                  "response": {
+                    "sent": true,
+                    "status": "success"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "test": {
+            "test_id": "TC-R2-002",
+            "trajectory_id": "HTTP-INV-001",
+            "focus_turn": 2,
+            "description": "On check_stock origin timeout the orchestrator must recover via the degraded cache route and complete normally; in the buggy trajectory the run ends with failed status, violating R2.",
+            "assertion": {
+              "type": "final_status_is",
+              "params": {
+                "value": "success"
+              }
+            }
+          },
+          "buggy": {
+            "passed": false,
+            "detail": "final_status=failed, expected=success",
+            "trajectory": {
+              "trajectory_id": "HTTP-INV-001::buggy",
+              "source_trajectory_id": "HTTP-INV-001",
+              "implementation": "buggy",
+              "task_input": {
+                "intent": "order_status",
+                "order_id": "ORD-58-B",
+                "sku": "SKU-42"
+              },
+              "final_status": "failed",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-B",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 5.189,
+                  "response": {
+                    "order_id": "ORD-58-B",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42",
+                  "request": null,
+                  "http_status": null,
+                  "status": "error",
+                  "latency_ms": 352.525,
+                  "error": "TimeoutError: timed out"
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "failed"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 7.476,
+                  "response": {
+                    "sent": true,
+                    "status": "failed"
+                  }
+                }
+              ]
+            }
+          },
+          "fixed": {
+            "passed": true,
+            "detail": "final_status=success, expected=success",
+            "trajectory": {
+              "trajectory_id": "HTTP-INV-001::fixed",
+              "source_trajectory_id": "HTTP-INV-001",
+              "implementation": "fixed",
+              "task_input": {
+                "intent": "order_status",
+                "order_id": "ORD-58-B",
+                "sku": "SKU-42"
+              },
+              "final_status": "success",
+              "turns": [
+                {
+                  "index": 0,
+                  "role": "user",
+                  "content": "{\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}"
+                },
+                {
+                  "index": 1,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "query_order",
+                  "method": "GET",
+                  "path": "/orders/ORD-58-B",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 1.957,
+                  "response": {
+                    "order_id": "ORD-58-B",
+                    "status": "paid",
+                    "sku": "SKU-42"
+                  }
+                },
+                {
+                  "index": 2,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42",
+                  "request": null,
+                  "http_status": null,
+                  "status": "error",
+                  "latency_ms": 102.564,
+                  "error": "TimeoutError: timed out"
+                },
+                {
+                  "index": 3,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "check_stock",
+                  "method": "GET",
+                  "path": "/inventory/SKU-42?degraded=1",
+                  "request": null,
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 2.897,
+                  "response": {
+                    "sku": "SKU-42",
+                    "stock": 12,
+                    "source": "cache",
+                    "degraded": true
+                  }
+                },
+                {
+                  "index": 4,
+                  "role": "tool",
+                  "module": "http_order_system",
+                  "tool": "notify_user",
+                  "method": "POST",
+                  "path": "/notifications",
+                  "request": {
+                    "status": "success"
+                  },
+                  "http_status": 200,
+                  "status": "success",
+                  "latency_ms": 4.686,
+                  "response": {
+                    "sent": true,
+                    "status": "success"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "completed": true,
+  "external_issue_created": false,
+  "fix_author": "pre-existing course orchestrator",
+  "verifier_probe": {
+    "refund_before_check": true,
+    "course_step_present_passes": true,
+    "meaning": "presence is weaker than ordering"
+  },
+  "model_requested": "deepseek-flash",
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "source_sha256": {
+    "chapter5/log-diagnosis/campaign.py": "034b8c6a883b793f070007e303742e23d26d65996d2dc684b2aee91ec1da1917",
+    "chapter5/log-diagnosis/http_service.py": "bbe0170e342a34fb70dc2477fede68cd393e1fd9a6d98140974a61677413c997"
+  },
+  "calls": 2,
+  "tokens": 3207,
+  "scope": "learning variant; not full canonical campaign"
+}

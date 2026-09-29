@@ -1,0 +1,1593 @@
+[
+  {
+    "label": "text-0-resend",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_30",
+              "type": "function",
+              "function": {
+                "name": "get_hotel_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_30",
+          "content": "{\"city\":\"东京\",\"per_night\":18000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_50",
+              "type": "function",
+              "function": {
+                "name": "get_meal_budget",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_50",
+          "content": "{\"city\":\"东京\",\"per_day\":6000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_70",
+              "type": "function",
+              "function": {
+                "name": "get_exchange_rate",
+                "arguments": "{\"currency\": \"JPY\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_70",
+          "content": "{\"currency\":\"JPY\",\"cny_per_unit\":0.048}"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "75249d12-0063-4e86-8d84-bd14b3ada774",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细 | 原币金额 | 折合人民币 |\n|---|---|---|---|\n| 往返机票 | 北京⇄东京 | — | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 | 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 | 24,000 JPY | ¥1,152 |\n| **合计** | | | **¥6,944** |\n\n计算说明：日元汇率按 1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**总预算约为 ¥6,944 人民币**（未含市内交通、签证、保险等杂费）。",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790650008,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 200,
+        "prompt_tokens": 784,
+        "total_tokens": 984,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 144
+      }
+    },
+    "seconds": 0.92
+  },
+  {
+    "label": "text-0-meta",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_30",
+              "type": "function",
+              "function": {
+                "name": "get_hotel_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_30",
+          "content": "{\"city\":\"东京\",\"per_night\":18000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_50",
+              "type": "function",
+              "function": {
+                "name": "get_meal_budget",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_50",
+          "content": "{\"city\":\"东京\",\"per_day\":6000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_70",
+              "type": "function",
+              "function": {
+                "name": "get_exchange_rate",
+                "arguments": "{\"currency\": \"JPY\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_70",
+          "content": "{\"currency\":\"JPY\",\"cny_per_unit\":0.048}"
+        },
+        {
+          "role": "user",
+          "content": "你上一次的回复在这里被截断了：「**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细」。请从断点继续，不要重复已经输出的部分。"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "26c73bfb-8aa6-4ef3-bf66-a0f4b766f556",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "| 项目 | 明细 | 金额 |\n|---|---|---|\n| 往返机票 | 北京 ⇄ 东京 | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 = 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 = 24,000 JPY | ¥1,152 |\n\n**计算说明**\n- 汇率：1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**人民币总额：3,200 + 2,592 + 1,152 = ¥6,944**\n\n即从北京去东京出差 3 晚 4 天，总预算约为 **6,944 元人民币**。",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790650008,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 191,
+        "prompt_tokens": 826,
+        "total_tokens": 1017,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 186
+      }
+    },
+    "seconds": 0.969
+  },
+  {
+    "label": "text-1-resend",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_30",
+              "type": "function",
+              "function": {
+                "name": "get_hotel_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_30",
+          "content": "{\"city\":\"东京\",\"per_night\":18000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_50",
+              "type": "function",
+              "function": {
+                "name": "get_meal_budget",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_50",
+          "content": "{\"city\":\"东京\",\"per_day\":6000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_70",
+              "type": "function",
+              "function": {
+                "name": "get_exchange_rate",
+                "arguments": "{\"currency\": \"JPY\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_70",
+          "content": "{\"currency\":\"JPY\",\"cny_per_unit\":0.048}"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "58f99fec-9fc0-4a70-a79c-4b59014676d4",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "**东京出差预算（3 晚 4 天）**\n\n| 项目 | 明细 | 原币金额 | 折合人民币 |\n|---|---|---|---|\n| 往返机票 | 北京⇄东京 | — | ¥3,200 |\n| 住宿 | 18,000 JPY/晚 × 3 晚 | 54,000 JPY | ¥2,592 |\n| 餐费 | 6,000 JPY/天 × 4 天 | 24,000 JPY | ¥1,152 |\n| **合计** | | | **¥6,944** |\n\n计算说明：日元汇率按 1 JPY = 0.048 CNY\n- 住宿：54,000 × 0.048 = ¥2,592\n- 餐费：24,000 × 0.048 = ¥1,152\n\n**总预算约 ¥6,944 人民币**（未含市内交通、签证、保险等杂费，如需可另行估算）。",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790650010,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 205,
+        "prompt_tokens": 784,
+        "total_tokens": 989,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 144
+      }
+    },
+    "seconds": 1.135
+  },
+  {
+    "label": "text-1-meta",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_30",
+              "type": "function",
+              "function": {
+                "name": "get_hotel_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_30",
+          "content": "{\"city\":\"东京\",\"per_night\":18000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_50",
+              "type": "function",
+              "function": {
+                "name": "get_meal_budget",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_50",
+          "content": "{\"city\":\"东京\",\"per_day\":6000,\"currency\":\"JPY\"}"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_70",
+              "type": "function",
+              "function": {
+                "name": "get_exchange_rate",
+                "arguments": "{\"currency\": \"JPY\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_70",
+          "content": "{\"currency\":\"JPY\",\"cny_per_unit\":0.048}"
+        },
+        {
+          "role": "user",
+          "content": "你上一次的回复在这里被截断了：「已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）*」。请从断点继续，不要重复已经输出的部分。"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "ed048ea1-3e61-40b7-8c77-25f0acef8f72",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "已拿到全部数据，计算如下：\n\n**1. 往返机票（人民币）**\n- 3,200 元\n\n**2. 住宿（3 晚，日元换算）**\n- 每晚 18,000 JPY × 3 晚 = 54,000 JPY\n- 54,000 × 0.048 = 2,592 元\n\n**3. 餐费（4 天，日元换算）**\n- 每天 6,000 JPY × 4 天 = 24,000 JPY\n- 24,000 × 0.048 = 1,152 元\n\n**总计**\n- 3,200 + 2,592 + 1,152 = **6,944 元人民币**\n\n北京往返东京、3 晚 4 天出差的总预算约为 **6,944 元人民币**（汇率按 1 JPY = 0.048 CNY 计算）。",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790650011,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 196,
+        "prompt_tokens": 824,
+        "total_tokens": 1020,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 640
+        },
+        "prompt_cache_hit_tokens": 640,
+        "prompt_cache_miss_tokens": 184
+      }
+    },
+    "seconds": 0.87
+  },
+  {
+    "label": "tool_args-0-resend",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": {
+        "type": "function",
+        "function": {
+          "name": "get_hotel_price"
+        }
+      },
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "7f7bbba1-4bd3-40d8-beba-1a3cc5138dcd",
+      "choices": [
+        {
+          "finish_reason": "tool_calls",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [
+              {
+                "id": "call_00_gll5YjUT9h6odfAWoQEr7793",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_hotel_price"
+                },
+                "type": "function",
+                "index": 0
+              },
+              {
+                "id": "call_01_NrkZhmqKLLDJkVJRNaDZ1955",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_meal_price"
+                },
+                "type": "function",
+                "index": 1
+              }
+            ]
+          }
+        }
+      ],
+      "created": 1790650012,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 64,
+        "prompt_tokens": 420,
+        "total_tokens": 484,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 164
+      }
+    },
+    "seconds": 0.527
+  },
+  {
+    "label": "tool_args-0-meta",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "user",
+          "content": "你上一次的回复在这里被截断了：「{\"city\":」。请从断点继续，不要重复已经输出的部分。"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": {
+        "type": "function",
+        "function": {
+          "name": "get_hotel_price"
+        }
+      },
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "9878a0d9-466e-4a5d-af50-12a511ded6bb",
+      "choices": [
+        {
+          "finish_reason": "tool_calls",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [
+              {
+                "id": "call_00_dILreTeBhXmQNN4Kpb845893",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_hotel_price"
+                },
+                "type": "function",
+                "index": 0
+              },
+              {
+                "id": "call_01_Rc4OLUN23EBHoojPYRHc1843",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_meal_price"
+                },
+                "type": "function",
+                "index": 1
+              }
+            ]
+          }
+        }
+      ],
+      "created": 1790650013,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 64,
+        "prompt_tokens": 445,
+        "total_tokens": 509,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 189
+      }
+    },
+    "seconds": 0.441
+  },
+  {
+    "label": "tool_args-1-resend",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": {
+        "type": "function",
+        "function": {
+          "name": "get_hotel_price"
+        }
+      },
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "8c027ad7-20c8-44bb-af20-60f0be594fe2",
+      "choices": [
+        {
+          "finish_reason": "tool_calls",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [
+              {
+                "id": "call_00_HVZ1Tive7ZrEZxJaOnSn1160",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_hotel_price"
+                },
+                "type": "function",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "created": 1790650014,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 34,
+        "prompt_tokens": 420,
+        "total_tokens": 454,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 164
+      }
+    },
+    "seconds": 0.67
+  },
+  {
+    "label": "tool_args-1-meta",
+    "request": {
+      "model": "deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "你是一个差旅助理。需要数据时调用工具，不要凭印象编造价格或汇率。拿齐数据后给出人民币总额。"
+        },
+        {
+          "role": "user",
+          "content": "帮我算一下从北京去东京出差的总预算：往返机票、住宿和餐费都要算上，行程是 3 晚 4 天，住宿按 3 晚、餐费按 4 天计。最后用人民币给出一个总额。"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_10",
+              "type": "function",
+              "function": {
+                "name": "get_flight_price",
+                "arguments": "{\"city\": \"东京\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_10",
+          "content": "{\"city\":\"东京\",\"round_trip_cny\":3200}"
+        },
+        {
+          "role": "user",
+          "content": "你上一次的回复在这里被截断了：「{\"city\":」。请从断点继续，不要重复已经输出的部分。"
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_flight_price",
+            "description": "查询往返机票价格（人民币）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "目的地城市"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_hotel_price",
+            "description": "查询每晚住宿价格及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_meal_budget",
+            "description": "查询每日餐费预算及其币种",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_exchange_rate",
+            "description": "查询该币种兑人民币的汇率",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "如 JPY"
+                }
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": {
+        "type": "function",
+        "function": {
+          "name": "get_hotel_price"
+        }
+      },
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "17e9b413-5d2e-44c7-8c30-f4494b9fd2cc",
+      "choices": [
+        {
+          "finish_reason": "tool_calls",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": [
+              {
+                "id": "call_00_2uQNS6VlkV6Nbu85Fhsr7419",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_hotel_price"
+                },
+                "type": "function",
+                "index": 0
+              },
+              {
+                "id": "call_01_R2lwuWuea2KEu2GYtRdD0892",
+                "function": {
+                  "arguments": "{\"city\": \"东京\"}",
+                  "name": "get_meal_price"
+                },
+                "type": "function",
+                "index": 1
+              }
+            ]
+          }
+        }
+      ],
+      "created": 1790650014,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 64,
+        "prompt_tokens": 445,
+        "total_tokens": 509,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 189
+      }
+    },
+    "seconds": 0.52
+  }
+]

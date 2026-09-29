@@ -9,6 +9,7 @@
 | Task 2 | 第 2 章上下文工程实验 | 五个 API 实验学习版（KV Cache/注入/System-Hint/消融/压缩）已运行并精读源码；本地模型实验未执行 | [进入](task2/index.md) |
 | Task 3 | 第 3 章用户记忆与知识库 | 记忆四模式/Agentic RAG/上下文感知检索已运行并精读源码；3-4 待跑（Docker），其余未执行见导读 | [进入](task3/index.md) |
 | Task 4 | 第 4 章工具与 MCP | 主动工具发现/感知 MCP/多模态三范式/执行安全门/协作工具/工具选型六项已运行并精读源码；缺凭据与外部能力项如实标 blocked | [进入](task4/index.md) |
+| Task 5 | Coding Agent 与可验证的执行 | 入门修复 + 规则代码化、流式恢复、日志诊断学习版已运行；含源码精读、SVG 与边界分析 | [进入](task5/index.md) |
 | 后续 Task | 等待课程任务确定 | 待添加 | [使用模板](template.md) |
 
 ## 新增约定

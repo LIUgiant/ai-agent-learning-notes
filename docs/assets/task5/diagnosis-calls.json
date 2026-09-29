@@ -1,0 +1,132 @@
+[
+  {
+    "label": "diagnosis-0",
+    "request": {
+      "messages": [
+        {
+          "role": "system",
+          "content": "Diagnose only evidenced defects. Return a JSON object."
+        },
+        {
+          "role": "user",
+          "content": "# Live diagnosis experiment architecture\n\nThe orchestrator calls a local HTTP order service. Refund flows MUST call\n`verify_refund_eligibility` before `process_refund`. Inventory origin calls\nhave a 250 ms client deadline; on timeout the orchestrator MUST call the same\n`check_stock` operation through the degraded cache route and finish normally.\nEvery trajectory turn records its measured HTTP latency and raw response.\n\n# Live diagnosis experiment PRD\n\n- R1 (P0): Every refund must call `verify_refund_eligibility` before\n  `process_refund`; a refund without the check is a policy violation.\n- R2 (P1): `check_stock` must complete within 250 ms. On origin timeout the\n  orchestrator must use the degraded cache route; it must not simply fail.\n- R3 (P1): Regression cases must cite the source trajectory ID and the exact\n  observed turn where the violation is visible.\n\nObserved logs: {\"HTTP-RF-001\": {\"trajectory_id\": \"HTTP-RF-001::buggy\", \"source_trajectory_id\": \"HTTP-RF-001\", \"implementation\": \"buggy\", \"task_input\": {\"intent\": \"refund\", \"order_id\": \"ORD-58-A\"}, \"final_status\": \"success\", \"turns\": [{\"index\": 0, \"role\": \"user\", \"content\": \"{\\\"intent\\\": \\\"refund\\\", \\\"order_id\\\": \\\"ORD-58-A\\\"}\"}, {\"index\": 1, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"query_order\", \"method\": \"GET\", \"path\": \"/orders/ORD-58-A\", \"request\": null, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 4.119, \"response\": {\"order_id\": \"ORD-58-A\", \"status\": \"paid\", \"sku\": \"SKU-42\"}}, {\"index\": 2, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"process_refund\", \"method\": \"POST\", \"path\": \"/refund/process\", \"request\": {\"order_id\": \"ORD-58-A\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.485, \"response\": {\"order_id\": \"ORD-58-A\", \"refund_id\": \"RF-LIVE-1\"}}, {\"index\": 3, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"notify_user\", \"method\": \"POST\", \"path\": \"/notifications\", \"request\": {\"status\": \"success\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.386, \"response\": {\"sent\": true, \"status\": \"success\"}}]}, \"HTTP-INV-001\": {\"trajectory_id\": \"HTTP-INV-001::buggy\", \"source_trajectory_id\": \"HTTP-INV-001\", \"implementation\": \"buggy\", \"task_input\": {\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}, \"final_status\": \"failed\", \"turns\": [{\"index\": 0, \"role\": \"user\", \"content\": \"{\\\"intent\\\": \\\"order_status\\\", \\\"order_id\\\": \\\"ORD-58-B\\\", \\\"sku\\\": \\\"SKU-42\\\"}\"}, {\"index\": 1, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"query_order\", \"method\": \"GET\", \"path\": \"/orders/ORD-58-B\", \"request\": null, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.38, \"response\": {\"order_id\": \"ORD-58-B\", \"status\": \"paid\", \"sku\": \"SKU-42\"}}, {\"index\": 2, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"check_stock\", \"method\": \"GET\", \"path\": \"/inventory/SKU-42\", \"request\": null, \"http_status\": null, \"status\": \"error\", \"latency_ms\": 351.269, \"error\": \"TimeoutError: timed out\"}, {\"index\": 3, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"notify_user\", \"method\": \"POST\", \"path\": \"/notifications\", \"request\": {\"status\": \"failed\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 4.205, \"response\": {\"sent\": true, \"status\": \"failed\"}}]}}\nReturn JSON with problems list. Each problem has title,priority,module,description,suggestion,prd_ref,trajectory_ids,focus_turns,suggested_assignee. Only diagnose evidenced R1 and R2 violations. Use source IDs HTTP-RF-001 and HTTP-INV-001 (not ::buggy IDs), and exact observed turn indexes.\nValidation feedback: "
+        }
+      ],
+      "response_format": {
+        "type": "json_object"
+      },
+      "model": "deepseek-flash",
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "65e4b4b5-56de-45b5-b80f-52ae39ce1906",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "{\n  \"problems\": [\n    {\n      \"title\": \"Refund processed without eligibility verification\",\n      \"priority\": \"P0\",\n      \"module\": \"http_order_system\",\n      \"description\": \"In trajectory HTTP-RF-001, the refund flow calls process_refund at turn 2 without first calling verify_refund_eligibility. This violates R1, which requires every refund to call verify_refund_eligibility before process_refund.\",\n      \"suggestion\": \"Insert a verify_refund_eligibility call before process_refund in the refund flow and enforce the ordering in the orchestrator.\",\n      \"prd_ref\": \"R1\",\n      \"trajectory_ids\": [\"HTTP-RF-001\"],\n      \"focus_turns\": [2],\n      \"suggested_assignee\": \"refund-flow-owner\"\n    },\n    {\n      \"title\": \"Inventory origin timeout not recovered via degraded cache route\",\n      \"priority\": \"P1\",\n      \"module\": \"http_order_system\",\n      \"description\": \"In trajectory HTTP-INV-001, check_stock at turn 2 times out after 351.269 ms, exceeding the 250 ms deadline. The orchestrator does not call check_stock through the degraded cache route and instead finishes with failed status, violating R2.\",\n      \"suggestion\": \"On check_stock origin timeout, call the same check_stock operation through the degraded cache route and complete normally instead of failing.\",\n      \"prd_ref\": \"R2\",\n      \"trajectory_ids\": [\"HTTP-INV-001\"],\n      \"focus_turns\": [2],\n      \"suggested_assignee\": \"inventory-integration-owner\"\n    }\n  ]\n}",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790649908,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 360,
+        "prompt_tokens": 1144,
+        "total_tokens": 1504,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1144
+      }
+    },
+    "seconds": 1.816
+  },
+  {
+    "label": "tests-0",
+    "request": {
+      "messages": [
+        {
+          "role": "system",
+          "content": "Generate executable regression assertions as JSON."
+        },
+        {
+          "role": "user",
+          "content": "# Live diagnosis experiment PRD\n\n- R1 (P0): Every refund must call `verify_refund_eligibility` before\n  `process_refund`; a refund without the check is a policy violation.\n- R2 (P1): `check_stock` must complete within 250 ms. On origin timeout the\n  orchestrator must use the degraded cache route; it must not simply fail.\n- R3 (P1): Regression cases must cite the source trajectory ID and the exact\n  observed turn where the violation is visible.\n\nProblems: [{\"title\": \"Refund processed without eligibility verification\", \"priority\": \"P0\", \"module\": \"http_order_system\", \"description\": \"In trajectory HTTP-RF-001, the refund flow calls process_refund at turn 2 without first calling verify_refund_eligibility. This violates R1, which requires every refund to call verify_refund_eligibility before process_refund.\", \"suggestion\": \"Insert a verify_refund_eligibility call before process_refund in the refund flow and enforce the ordering in the orchestrator.\", \"prd_ref\": \"R1\", \"trajectory_ids\": [\"HTTP-RF-001\"], \"focus_turns\": [2], \"suggested_assignee\": \"refund-flow-owner\"}, {\"title\": \"Inventory origin timeout not recovered via degraded cache route\", \"priority\": \"P1\", \"module\": \"http_order_system\", \"description\": \"In trajectory HTTP-INV-001, check_stock at turn 2 times out after 351.269 ms, exceeding the 250 ms deadline. The orchestrator does not call check_stock through the degraded cache route and instead finishes with failed status, violating R2.\", \"suggestion\": \"On check_stock origin timeout, call the same check_stock operation through the degraded cache route and complete normally instead of failing.\", \"prd_ref\": \"R2\", \"trajectory_ids\": [\"HTTP-INV-001\"], \"focus_turns\": [2], \"suggested_assignee\": \"inventory-integration-owner\"}]\nSources: {\"HTTP-RF-001\": {\"trajectory_id\": \"HTTP-RF-001::buggy\", \"source_trajectory_id\": \"HTTP-RF-001\", \"implementation\": \"buggy\", \"task_input\": {\"intent\": \"refund\", \"order_id\": \"ORD-58-A\"}, \"final_status\": \"success\", \"turns\": [{\"index\": 0, \"role\": \"user\", \"content\": \"{\\\"intent\\\": \\\"refund\\\", \\\"order_id\\\": \\\"ORD-58-A\\\"}\"}, {\"index\": 1, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"query_order\", \"method\": \"GET\", \"path\": \"/orders/ORD-58-A\", \"request\": null, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 4.119, \"response\": {\"order_id\": \"ORD-58-A\", \"status\": \"paid\", \"sku\": \"SKU-42\"}}, {\"index\": 2, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"process_refund\", \"method\": \"POST\", \"path\": \"/refund/process\", \"request\": {\"order_id\": \"ORD-58-A\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.485, \"response\": {\"order_id\": \"ORD-58-A\", \"refund_id\": \"RF-LIVE-1\"}}, {\"index\": 3, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"notify_user\", \"method\": \"POST\", \"path\": \"/notifications\", \"request\": {\"status\": \"success\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.386, \"response\": {\"sent\": true, \"status\": \"success\"}}]}, \"HTTP-INV-001\": {\"trajectory_id\": \"HTTP-INV-001::buggy\", \"source_trajectory_id\": \"HTTP-INV-001\", \"implementation\": \"buggy\", \"task_input\": {\"intent\": \"order_status\", \"order_id\": \"ORD-58-B\", \"sku\": \"SKU-42\"}, \"final_status\": \"failed\", \"turns\": [{\"index\": 0, \"role\": \"user\", \"content\": \"{\\\"intent\\\": \\\"order_status\\\", \\\"order_id\\\": \\\"ORD-58-B\\\", \\\"sku\\\": \\\"SKU-42\\\"}\"}, {\"index\": 1, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"query_order\", \"method\": \"GET\", \"path\": \"/orders/ORD-58-B\", \"request\": null, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 0.38, \"response\": {\"order_id\": \"ORD-58-B\", \"status\": \"paid\", \"sku\": \"SKU-42\"}}, {\"index\": 2, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"check_stock\", \"method\": \"GET\", \"path\": \"/inventory/SKU-42\", \"request\": null, \"http_status\": null, \"status\": \"error\", \"latency_ms\": 351.269, \"error\": \"TimeoutError: timed out\"}, {\"index\": 3, \"role\": \"tool\", \"module\": \"http_order_system\", \"tool\": \"notify_user\", \"method\": \"POST\", \"path\": \"/notifications\", \"request\": {\"status\": \"failed\"}, \"http_status\": 200, \"status\": \"success\", \"latency_ms\": 4.205, \"response\": {\"sent\": true, \"status\": \"failed\"}}]}}\nReturn JSON test_cases list. Each test has test_id,trajectory_id,focus_turn,description,assertion.\nAllowed assertions: {\"type\":\"step_present\",\"params\":{\"tool\":\"verify_refund_eligibility\"}}, {\"type\":\"latency_under\",\"params\":{\"tool\":\"check_stock\",\"threshold_ms\":250}}, {\"type\":\"final_status_is\",\"params\":{\"value\":\"success\"}}.\nCover both R1 and R2. Use exact source IDs without ::buggy and observed focus_turn. Express correct fixed behavior; every test must fail on buggy and pass on fixed. Do not invent tools.\nPrevious feedback: "
+        }
+      ],
+      "response_format": {
+        "type": "json_object"
+      },
+      "model": "deepseek-flash",
+      "extra_body": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "max_tokens": 2200,
+      "temperature": 0
+    },
+    "response": {
+      "id": "85448a6c-c1d5-4eb4-9cf8-c540e776553e",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": "{\"test_cases\":[{\"test_id\":\"TC-R1-001\",\"trajectory_id\":\"HTTP-RF-001\",\"focus_turn\":2,\"description\":\"Refund flow must call verify_refund_eligibility before process_refund; in the buggy trajectory process_refund occurs at turn 2 with no prior eligibility check, violating R1.\",\"assertion\":{\"type\":\"step_present\",\"params\":{\"tool\":\"verify_refund_eligibility\"}}},{\"test_id\":\"TC-R2-001\",\"trajectory_id\":\"HTTP-INV-001\",\"focus_turn\":2,\"description\":\"check_stock must complete within 250 ms; in the buggy trajectory check_stock at turn 2 times out at 351.269 ms, violating R2.\",\"assertion\":{\"type\":\"latency_under\",\"params\":{\"tool\":\"check_stock\",\"threshold_ms\":250}}},{\"test_id\":\"TC-R2-002\",\"trajectory_id\":\"HTTP-INV-001\",\"focus_turn\":2,\"description\":\"On check_stock origin timeout the orchestrator must recover via the degraded cache route and complete normally; in the buggy trajectory the run ends with failed status, violating R2.\",\"assertion\":{\"type\":\"final_status_is\",\"params\":{\"value\":\"success\"}}}]}",
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null
+          }
+        }
+      ],
+      "created": 1790649909,
+      "model": "deepseek-flash",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "usage": {
+        "completion_tokens": 267,
+        "prompt_tokens": 1436,
+        "total_tokens": 1703,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1436
+      }
+    },
+    "seconds": 1.137
+  }
+]

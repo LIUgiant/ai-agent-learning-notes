@@ -1,0 +1,68 @@
+{
+  "course_commit": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "excerpts": [
+    {
+      "file": "chapter5/coding-agent/tool_registry.py",
+      "symbol": "ToolRegistry.get_tool",
+      "start": 38,
+      "end": 43,
+      "sha256": "c193009ca3aa57c2457d2a842b9b8faf51ef0213ef9a01fd3c771a428aa75113"
+    },
+    {
+      "file": "chapter5/small-model-codified-rules/airline_env.py",
+      "symbol": "is_refundable",
+      "start": 52,
+      "end": 68,
+      "sha256": "3c095621b4ffbf12a848bd221234fd8e1d89ba21cb9661f9771916def5d568db"
+    },
+    {
+      "file": "chapter5/small-model-codified-rules/agent.py",
+      "symbol": "_dispatch",
+      "start": 175,
+      "end": 187,
+      "sha256": "57c2010c1f46ecd348dfe9ba68a5caafb7b2a9c2b41b3f1fa3190e3885393f46"
+    },
+    {
+      "file": "chapter5/small-model-codified-rules/demo.py",
+      "symbol": "judge",
+      "start": 47,
+      "end": 78,
+      "sha256": "d67a3450c5ea7e9bb2b7b9e81f5e99078e804c916d51621b974c624d551616a5"
+    },
+    {
+      "file": "chapter5/provider-failover/streaming.py",
+      "symbol": "Partial",
+      "start": 22,
+      "end": 32,
+      "sha256": "4d0847de93ceb5e3a9a99c731c537de624b772cbda2c68a9508330e4380b9c76"
+    },
+    {
+      "file": "chapter5/provider-failover/streaming.py",
+      "symbol": "_cut_here",
+      "start": 35,
+      "end": 43,
+      "sha256": "45562cc4698a27533c9d1a1bd103bc3334abac4ca0d2e3b3e3571b4e4c15e551"
+    },
+    {
+      "file": "chapter5/provider-failover/neutral_trace.py",
+      "symbol": "ToolCall.fingerprint",
+      "start": 46,
+      "end": 48,
+      "sha256": "24293790e174d7a9305cb1aebd212d22260108a694393a402c9858e44732fe4d"
+    },
+    {
+      "file": "chapter5/log-diagnosis/campaign.py",
+      "symbol": "_validate_diagnosis",
+      "start": 324,
+      "end": 350,
+      "sha256": "473f8f76f56a50e3434a776ef92a3cb799b9c93c29845c36a1748c986c39baf3"
+    },
+    {
+      "file": "chapter5/log-diagnosis/campaign.py",
+      "symbol": "_evaluate",
+      "start": 303,
+      "end": 321,
+      "sha256": "38d1439a42353654dc8c8b84f3be31850a04bba5d027613c8d34afb3c903e621"
+    }
+  ]
+}
