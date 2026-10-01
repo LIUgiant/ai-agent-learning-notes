@@ -1,0 +1,54 @@
+{
+  "id": "93075304-6960-4cba-9b1e-41b69bc6ca17",
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I'll start by reading the policy file to understand the classification rules.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [
+          {
+            "id": "call_00_SvGFzcNmwHY2GzkgvNbW7337",
+            "function": {
+              "arguments": "{\"file_path\": \"policy.json\"}",
+              "name": "read_file"
+            },
+            "type": "function",
+            "index": 0
+          }
+        ],
+        "reasoning_content": "Let me read policy.json first.\n\nThe email is a marketing email. Policy says meeting class also needs calendar.json. This is marketing, so no calendar needed. Let me read policy.json first."
+      }
+    }
+  ],
+  "created": 1790736738,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 92,
+    "prompt_tokens": 688,
+    "total_tokens": 780,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 39,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 176
+  }
+}

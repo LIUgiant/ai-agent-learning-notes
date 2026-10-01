@@ -1,0 +1,54 @@
+{
+  "id": "f8992891-6fd0-46f4-bc4a-1a606bf154d2",
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "This email is marketing content (promotional offer with unsubscribe option), so no calendar lookup is needed. I'll write the classification result.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [
+          {
+            "id": "call_00_6BRUytDLWqTTxBVhPaQP4766",
+            "function": {
+              "arguments": "{\"file_path\": \"result.json\", \"content\": \"{\\n  \\\"category\\\": \\\"marketing\\\",\\n  \\\"summary\\\": \\\"发件人发送产品促销营销通讯，内容为订阅促销资讯、产品八折，并提供退订选项。\\\",\\n  \\\"action\\\": \\\"archive\\\",\\n  \\\"evidence\\\": [\\n    \\\"主题为“本周产品促销”\\\",\\n    \\\"正文称“订阅促销资讯：产品八折”\\\",\\n    \\\"正文声明“本邮件为营销通讯，如不需要可退订”\\\"\\n  ]\\n}\\n\"}",
+              "name": "write_file"
+            },
+            "type": "function",
+            "index": 0
+          }
+        ],
+        "reasoning_content": "The email is marketing. So category=marketing, action=archive, summary in Chinese, evidence list. No calendar needed.\n\nLet me write result.json."
+      }
+    }
+  ],
+  "created": 1790736739,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 209,
+    "prompt_tokens": 1116,
+    "total_tokens": 1325,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 32,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 348
+  }
+}

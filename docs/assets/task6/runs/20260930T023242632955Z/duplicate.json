@@ -1,0 +1,133 @@
+[
+  {
+    "seq": 1,
+    "ms": 0.346,
+    "stage": "enqueue",
+    "id": "A",
+    "pending": [
+      "A"
+    ]
+  },
+  {
+    "seq": 2,
+    "ms": 0.365,
+    "stage": "enqueue",
+    "id": "B",
+    "pending": [
+      "A",
+      "B"
+    ]
+  },
+  {
+    "seq": 3,
+    "ms": 0.372,
+    "stage": "enqueue",
+    "id": "B",
+    "pending": [
+      "A",
+      "B",
+      "B"
+    ]
+  },
+  {
+    "seq": 4,
+    "ms": 0.378,
+    "stage": "enqueue",
+    "id": "C",
+    "pending": [
+      "A",
+      "B",
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 5,
+    "ms": 0.428,
+    "stage": "dequeue",
+    "id": "A",
+    "pending": [
+      "B",
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 6,
+    "ms": 0.443,
+    "stage": "start",
+    "id": "A",
+    "model_input": "[IM from demo-parent] 查一下课程"
+  },
+  {
+    "seq": 7,
+    "ms": 0.449,
+    "stage": "local_delivery",
+    "id": "A"
+  },
+  {
+    "seq": 8,
+    "ms": 0.454,
+    "stage": "dequeue",
+    "id": "B",
+    "pending": [
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 9,
+    "ms": 0.459,
+    "stage": "start",
+    "id": "B",
+    "model_input": "[IM from demo-parent] 补充：只看周末"
+  },
+  {
+    "seq": 10,
+    "ms": 0.461,
+    "stage": "local_delivery",
+    "id": "B"
+  },
+  {
+    "seq": 11,
+    "ms": 0.465,
+    "stage": "dequeue",
+    "id": "B",
+    "pending": [
+      "C"
+    ]
+  },
+  {
+    "seq": 12,
+    "ms": 0.47,
+    "stage": "start",
+    "id": "B",
+    "model_input": "[IM from demo-parent] 补充：只看周末"
+  },
+  {
+    "seq": 13,
+    "ms": 0.472,
+    "stage": "local_delivery",
+    "id": "B"
+  },
+  {
+    "seq": 14,
+    "ms": 0.476,
+    "stage": "dequeue",
+    "id": "C",
+    "pending": []
+  },
+  {
+    "seq": 15,
+    "ms": 0.485,
+    "stage": "start",
+    "id": "C",
+    "model_input": "[System Alert: query_done] 后台查询完成：演示数据"
+  },
+  {
+    "seq": 16,
+    "ms": 0.487,
+    "stage": "local_delivery",
+    "id": "C"
+  }
+]

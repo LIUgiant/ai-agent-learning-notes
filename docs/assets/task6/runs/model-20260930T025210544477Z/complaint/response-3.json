@@ -1,0 +1,44 @@
+{
+  "id": "c3ad24a9-c6e3-4675-b71f-6b61c04654bd",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "已处理完这封邮件，结果已写入本地 result.json。\n\n- 分类：complaint（投诉）\n- 摘要：客户投诉订单 DEMO-2048 晚到七天、此前无人回复，诉求是退款并请人工尽快联系本人\n- 优先级：high\n- 建议动作：notify_human（建议人工跟进）\n\n说明：以上仅为本地生成的分类与处理建议，并未真正发送邮件、通知真人或归档邮箱；如需升级人工，请由你按流程实际转交。",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null,
+        "reasoning_content": ""
+      }
+    }
+  ],
+  "created": 1790736737,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 110,
+    "prompt_tokens": 1634,
+    "total_tokens": 1744,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 1408
+    },
+    "prompt_cache_hit_tokens": 1408,
+    "prompt_cache_miss_tokens": 226
+  }
+}

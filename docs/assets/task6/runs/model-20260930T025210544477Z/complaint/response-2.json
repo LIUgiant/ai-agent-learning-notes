@@ -1,0 +1,54 @@
+{
+  "id": "5576881c-b766-4442-8c7c-b107b575c7fa",
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [
+          {
+            "id": "call_00_ycxRndB9gd9VrMQJRQ6h7499",
+            "function": {
+              "arguments": "{\"file_path\": \"result.json\", \"content\": \"{\\n  \\\"category\\\": \\\"complaint\\\",\\n  \\\"summary\\\": \\\"客户投诉订单 DEMO-2048 晚到七天且此前无人回复，明确要求退款，并希望人工尽快联系其本人。\\\",\\n  \\\"action\\\": \\\"notify_human\\\",\\n  \\\"evidence\\\": [\\n    \\\"邮件主题：订单投诉\\\",\\n    \\\"订单编号：DEMO-2048\\\",\\n    \\\"问题：订单晚到七天了\\\",\\n    \\\"客户称之前无人回复\\\",\\n    \\\"实际诉求：希望退款，请人工尽快联系我\\\"\\n  ],\\n  \\\"priority\\\": \\\"high\\\",\\n  \\\"order_id\\\": \\\"DEMO-2048\\\"\\n}\\n\"}",
+              "name": "write_file"
+            },
+            "type": "function",
+            "index": 0
+          }
+        ],
+        "reasoning_content": "This is a complaint email. Category = complaint. Extract order id DEMO-2048, demand: refund, human contact. priority=high, action=notify_human. Evidence list. No decision/reply_draft needed for complaint (those apply to meeting).\n\nWrite result.json."
+      }
+    }
+  ],
+  "created": 1790736736,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 246,
+    "prompt_tokens": 1309,
+    "total_tokens": 1555,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 59,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 541
+  }
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "seq": 1,
+    "ms": 0.518,
+    "stage": "enqueue",
+    "id": "A",
+    "pending": [
+      "A"
+    ]
+  },
+  {
+    "seq": 2,
+    "ms": 0.59,
+    "stage": "dequeue",
+    "id": "A",
+    "pending": []
+  },
+  {
+    "seq": 3,
+    "ms": 0.61,
+    "stage": "start",
+    "id": "A",
+    "model_input": "[IM from demo-parent] 查一下课程"
+  },
+  {
+    "seq": 4,
+    "ms": 0.639,
+    "stage": "enqueue",
+    "id": "B",
+    "pending": [
+      "B"
+    ]
+  },
+  {
+    "seq": 5,
+    "ms": 0.65,
+    "stage": "enqueue",
+    "id": "C",
+    "pending": [
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 6,
+    "ms": 155.647,
+    "stage": "local_delivery",
+    "id": "A"
+  },
+  {
+    "seq": 7,
+    "ms": 155.793,
+    "stage": "dequeue",
+    "id": "B",
+    "pending": [
+      "C"
+    ]
+  },
+  {
+    "seq": 8,
+    "ms": 155.832,
+    "stage": "start",
+    "id": "B",
+    "model_input": "[IM from demo-parent] 补充：只看周末"
+  },
+  {
+    "seq": 9,
+    "ms": 155.836,
+    "stage": "local_delivery",
+    "id": "B"
+  },
+  {
+    "seq": 10,
+    "ms": 155.842,
+    "stage": "dequeue",
+    "id": "C",
+    "pending": []
+  },
+  {
+    "seq": 11,
+    "ms": 155.87,
+    "stage": "start",
+    "id": "C",
+    "model_input": "[System Alert: query_done] 后台查询完成：演示数据"
+  },
+  {
+    "seq": 12,
+    "ms": 155.873,
+    "stage": "local_delivery",
+    "id": "C"
+  }
+]

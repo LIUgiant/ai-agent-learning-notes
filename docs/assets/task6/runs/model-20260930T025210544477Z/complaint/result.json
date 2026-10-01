@@ -1,0 +1,14 @@
+{
+  "category": "complaint",
+  "summary": "客户投诉订单 DEMO-2048 晚到七天且此前无人回复，明确要求退款，并希望人工尽快联系其本人。",
+  "action": "notify_human",
+  "evidence": [
+    "邮件主题：订单投诉",
+    "订单编号：DEMO-2048",
+    "问题：订单晚到七天了",
+    "客户称之前无人回复",
+    "实际诉求：希望退款，请人工尽快联系我"
+  ],
+  "priority": "high",
+  "order_id": "DEMO-2048"
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "seq": 1,
+    "ms": 0.318,
+    "stage": "enqueue",
+    "id": "A",
+    "pending": [
+      "A"
+    ]
+  },
+  {
+    "seq": 2,
+    "ms": 0.338,
+    "stage": "enqueue",
+    "id": "B",
+    "pending": [
+      "A",
+      "B"
+    ]
+  },
+  {
+    "seq": 3,
+    "ms": 0.348,
+    "stage": "enqueue",
+    "id": "C",
+    "pending": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 4,
+    "ms": 0.407,
+    "stage": "dequeue",
+    "id": "A",
+    "pending": [
+      "B",
+      "C"
+    ]
+  },
+  {
+    "seq": 5,
+    "ms": 0.428,
+    "stage": "start",
+    "id": "A",
+    "model_input": "[IM from demo-parent] 查一下课程"
+  },
+  {
+    "seq": 6,
+    "ms": 0.433,
+    "stage": "local_delivery",
+    "id": "A"
+  },
+  {
+    "seq": 7,
+    "ms": 0.44,
+    "stage": "dequeue",
+    "id": "B",
+    "pending": [
+      "C"
+    ]
+  },
+  {
+    "seq": 8,
+    "ms": 0.448,
+    "stage": "start",
+    "id": "B",
+    "model_input": "[IM from demo-parent] 补充：只看周末"
+  },
+  {
+    "seq": 9,
+    "ms": 0.452,
+    "stage": "error",
+    "id": "B",
+    "reason": "injected handler failure"
+  },
+  {
+    "seq": 10,
+    "ms": 0.729,
+    "stage": "dequeue",
+    "id": "C",
+    "pending": []
+  },
+  {
+    "seq": 11,
+    "ms": 0.745,
+    "stage": "start",
+    "id": "C",
+    "model_input": "[System Alert: query_done] 后台查询完成：演示数据"
+  },
+  {
+    "seq": 12,
+    "ms": 0.749,
+    "stage": "local_delivery",
+    "id": "C"
+  }
+]

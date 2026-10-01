@@ -1,0 +1,10 @@
+{
+  "event_type": "email_reply",
+  "content": "订阅促销资讯：产品八折。本邮件为营销通讯，如不需要可退订。",
+  "metadata": {
+    "from": "sender@example.invalid",
+    "subject": "本周产品促销"
+  },
+  "timestamp": "2026-09-30T10:52:18.699071",
+  "event_id": "marketing"
+}

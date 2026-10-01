@@ -146,6 +146,38 @@ nav:
           - 一步步读源码: task5/diagnosis-code.md
       - 项目结合与动手练习: task5/practice.md
       - 运行证据与复现: task5/evidence.md
+  - Task 6 · 事件驱动与实时交互:
+      - 学习导读与两条项目路线: task6/index.md
+      - 整章知识串讲: task6/reading.md
+      - 客服项目与事件驱动: task6/events.md
+      - 6-1 事件触发:
+          - 第一课：事件队列实验: task6/event-trigger.md
+          - 第一课：队列代码精读: task6/event-trigger-code.md
+          - 第二课：真实模型与工具: task6/event-agent.md
+          - 第二课：Agent 代码精读: task6/event-agent-code.md
+      - 3D 课堂与语音节奏: task6/voice.md
+      - 逐课实验与验收计划: task6/plan.md
+  - Task 7 · 安全进化与多 Agent 协作:
+      - 阅读任务与导读: task7/index.md
+      - 第 9 章：持续进化的安全边界: task7/safety.md
+      - 9-1 轨迹验证器:
+          - 实验与反例: task7/verifier.md
+          - 一步步读源码: task7/verifier-code.md
+      - 9-3 Prompt 自动优化:
+          - 实验与结果: task7/prompt-evolution.md
+          - 一步步读源码: task7/prompt-evolution-code.md
+      - 9-4 澄清与 Spec 进化:
+          - 实验与结果: task7/clarification.md
+          - 一步步读代码: task7/clarification-code.md
+      - 第 9 章运行证据与复现: task7/evidence.md
+      - 第 10 章：多 Agent 实验:
+          - 分层学习入口: task7/chapter10.md
+          - Starter · 10-4 实测: task7/parallel-research.md
+          - Starter · 一步步读代码: task7/parallel-research-code.md
+          - Builder · 共享与信息隔离: task7/collaboration-builder.md
+          - Maintainer · 协调与维护审计: task7/collaboration-maintainer.md
+          - 运行证据与复现: task7/chapter10-evidence.md
+          - 交接链阅读设计: task7/handoff.md
   - 持续学习:
       - Task 索引: tasks.md
       - 新 Task 写作模板: template.md

@@ -1,0 +1,106 @@
+{
+  "model": "deepseek-flash",
+  "base_url": "https://api.deepseek.com",
+  "scope": "real LLM, original loop, synthetic inputs, local read/write tools",
+  "course_head": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "sha256": {
+    "agent.py": "fa8a1477fc0bccf10204c9406d90e4f937b7cce91f862d8c435c723aa6615715",
+    "event_types.py": "33b743ce084a09766be9dc283bf692fe26155efe9c949c476700afd3d639fc4a",
+    "event_loop_demo.py": "3204d2c6e25db46cfec0e9c438e0eab9435d6e9c326abc9db4a3afa7353014ff",
+    "run_61_model.py": "2c783f855975ab6e7137a517af7f805967860372ba6717ff148d1f0433f92184"
+  },
+  "cases": [
+    {
+      "id": "meeting",
+      "checks": {
+        "agent_final_answer": true,
+        "artifact_expected_fields": true,
+        "summary_present": true,
+        "policy_read": true,
+        "tools_succeeded": true,
+        "tool_call_ids_paired": true,
+        "multiple_model_rounds": true,
+        "last_round_has_tool_results": true,
+        "calendar_read": true,
+        "draft_present": true
+      },
+      "rounds": 3,
+      "tool_calls": 3,
+      "final_answer": "已完成分类与结果写入（本地文件 result.json，未发送任何邮件）。\n\n**处理结果**\n- **分类**：meeting（会议邀请）\n- **冲突判断**：邀请时段 2026-10-08 10:00–10:30 与日历中已有事件「已安排的演示会议」09:45–10:15（Asia/Shanghai）重叠（重叠区间 10:00–10:15），故判定 **decline（无法参加）**\n- **建议动作**：draft_reply —— 以下是本地草稿，供你参考或修改后再自行发送：\n\n> 您好：\n>\n> 感谢邀请。关于2026-10-08 10:00至10:30（Asia/Shanghai）的项目讨论，我无法参加——该时段与已安排的演示会议（09:45至10:15，Asia/Shanghai）时间重叠。\n>\n> 如需，我可以改约其他时段，例如10-08 10:30之后，或其他日期，烦请告知您方便的时间。\n>\n> 谢谢！\n\n说明：该回复仅为本地草稿，尚未发送；也未对邮箱或日历做任何实际改动。",
+      "artifact": {
+        "category": "meeting",
+        "summary": "发件人邀请于2026-10-08 10:00至10:30（Asia/Shanghai）参加项目讨论，并询问能否参加。经查询日历，该时段与已安排的演示会议（2026-10-08 09:45至10:15，Asia/Shanghai）重叠，因此无法参加。",
+        "action": "draft_reply",
+        "evidence": [
+          "邮件主题：会议邀请",
+          "邮件正文：请于2026-10-08 10:00至10:30（Asia/Shanghai）参加项目讨论，能否参加？",
+          "日历时区：Asia/Shanghai",
+          "日历已有事件：已安排的演示会议 2026-10-08T09:45:00+08:00 至 2026-10-08T10:15:00+08:00",
+          "时间重叠：邀请时段10:00-10:30与已有事件09:45-10:15存在重叠（10:00-10:15）"
+        ],
+        "decision": "decline",
+        "reply_draft": "您好：\n\n感谢邀请。关于2026-10-08 10:00至10:30（Asia/Shanghai）的项目讨论，我无法参加——该时段与已安排的演示会议（09:45至10:15，Asia/Shanghai）时间重叠。\n\n如需，我可以改约其他时段，例如10-08 10:30之后，或其他日期，烦请告知您方便的时间。\n\n谢谢！"
+      },
+      "passed": true
+    },
+    {
+      "id": "complaint",
+      "checks": {
+        "agent_final_answer": true,
+        "artifact_expected_fields": true,
+        "summary_present": true,
+        "policy_read": true,
+        "tools_succeeded": true,
+        "tool_call_ids_paired": true,
+        "multiple_model_rounds": true,
+        "last_round_has_tool_results": true
+      },
+      "rounds": 3,
+      "tool_calls": 3,
+      "final_answer": "已处理完这封邮件，结果已写入本地 result.json。\n\n- 分类：complaint（投诉）\n- 摘要：客户投诉订单 DEMO-2048 晚到七天、此前无人回复，诉求是退款并请人工尽快联系本人\n- 优先级：high\n- 建议动作：notify_human（建议人工跟进）\n\n说明：以上仅为本地生成的分类与处理建议，并未真正发送邮件、通知真人或归档邮箱；如需升级人工，请由你按流程实际转交。",
+      "artifact": {
+        "category": "complaint",
+        "summary": "客户投诉订单 DEMO-2048 晚到七天且此前无人回复，明确要求退款，并希望人工尽快联系其本人。",
+        "action": "notify_human",
+        "evidence": [
+          "邮件主题：订单投诉",
+          "订单编号：DEMO-2048",
+          "问题：订单晚到七天了",
+          "客户称之前无人回复",
+          "实际诉求：希望退款，请人工尽快联系我"
+        ],
+        "priority": "high",
+        "order_id": "DEMO-2048"
+      },
+      "passed": true
+    },
+    {
+      "id": "marketing",
+      "checks": {
+        "agent_final_answer": true,
+        "artifact_expected_fields": true,
+        "summary_present": true,
+        "policy_read": true,
+        "tools_succeeded": true,
+        "tool_call_ids_paired": true,
+        "multiple_model_rounds": true,
+        "last_round_has_tool_results": true
+      },
+      "rounds": 3,
+      "tool_calls": 2,
+      "final_answer": "已处理完毕。\n\n- **分类**：marketing（营销通讯）\n- **摘要**：产品促销邮件，订阅促销资讯、产品八折，附带退订选项。\n- **建议动作**：archive（归档建议）\n\n依据 policy.json 中 marketing 规则，仅生成上述本地归档建议草稿，**未修改邮箱、未执行任何退订或归档操作**，也未发送任何邮件。以上为本地建议，需由你确认后自行处理。",
+      "artifact": {
+        "category": "marketing",
+        "summary": "发件人发送产品促销营销通讯，内容为订阅促销资讯、产品八折，并提供退订选项。",
+        "action": "archive",
+        "evidence": [
+          "主题为“本周产品促销”",
+          "正文称“订阅促销资讯：产品八折”",
+          "正文声明“本邮件为营销通讯，如不需要可退订”"
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "passed": true
+}

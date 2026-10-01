@@ -1,0 +1,100 @@
+{
+  "kind": "offline mechanism experiment",
+  "hold_seconds": 0.15,
+  "python": "3.12.13 (main, Mar  3 2026, 12:39:30) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "course_root": "/Users/tal/Documents/Codex/learning-projects/ai-agent-book",
+  "course_head": "cf7f7a8e16b234ac303034e4ec8f75bf2d61ac2c",
+  "sha256": {
+    "event_loop_demo.py": "3204d2c6e25db46cfec0e9c438e0eab9435d6e9c326abc9db4a3afa7353014ff",
+    "event_types.py": "33b743ce084a09766be9dc283bf692fe26155efe9c949c476700afd3d639fc4a",
+    "run_61.py": "12d538254e1a46d41db304e0868e553941b3bfd669c469823aae6fcc84307e4d"
+  },
+  "cases": [
+    {
+      "case": "burst",
+      "checks": {
+        "all_input_consumed_in_order": true,
+        "local_receipts_match": true,
+        "processed_counts_attempts": true,
+        "producer_finished": true,
+        "expected_errors_only": true
+      },
+      "deliveries": [
+        "A",
+        "B",
+        "C"
+      ],
+      "processed": 3,
+      "errors": []
+    },
+    {
+      "case": "slow",
+      "checks": {
+        "all_input_consumed_in_order": true,
+        "local_receipts_match": true,
+        "processed_counts_attempts": true,
+        "producer_finished": true,
+        "expected_errors_only": true,
+        "B_arrives_while_A_active": true,
+        "B_waits_for_A": true
+      },
+      "deliveries": [
+        "A",
+        "B",
+        "C"
+      ],
+      "processed": 3,
+      "errors": []
+    },
+    {
+      "case": "failure",
+      "checks": {
+        "all_input_consumed_in_order": true,
+        "local_receipts_match": true,
+        "processed_counts_attempts": true,
+        "producer_finished": true,
+        "expected_errors_only": true
+      },
+      "deliveries": [
+        "A",
+        "C"
+      ],
+      "processed": 3,
+      "errors": []
+    },
+    {
+      "case": "duplicate",
+      "checks": {
+        "all_input_consumed_in_order": true,
+        "local_receipts_match": true,
+        "processed_counts_attempts": true,
+        "producer_finished": true,
+        "expected_errors_only": true
+      },
+      "deliveries": [
+        "A",
+        "B",
+        "B",
+        "C"
+      ],
+      "processed": 4,
+      "errors": []
+    }
+  ],
+  "timer": {
+    "command": [
+      "/opt/homebrew/opt/python@3.12/bin/python3.12",
+      "/Users/tal/Documents/Codex/learning-projects/ai-agent-book/chapter6/agent-with-event-trigger/event_loop_demo.py",
+      "--mock",
+      "--trigger",
+      "timer",
+      "--delay",
+      "0.1",
+      "--duration",
+      "0.3"
+    ],
+    "returncode": 0,
+    "passed": true
+  },
+  "passed": true
+}

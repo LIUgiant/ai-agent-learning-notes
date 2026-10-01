@@ -1,0 +1,21 @@
+{
+  "type": "manual artifact review, separate from automated checks",
+  "meeting": {
+    "conflict": "10:00–10:15 overlap confirmed from fixture",
+    "decision": "decline correct",
+    "draft_caveat": "10:30之后是模型提出的改约候选；只有局部测试日历，不证明真实可用性"
+  },
+  "complaint": {
+    "facts": "DEMO-2048、晚到七天、未回复、退款、人工联系均保留",
+    "efficiency": "额外读取 calendar.json；功能正确不等于最少工具调用"
+  },
+  "marketing": {
+    "facts": "八折、促销、退订选项符合输入",
+    "action": "archive 是本地建议，不是邮箱归档回执"
+  },
+  "limits": [
+    "三条固定样例，不是成功率评估",
+    "自动检查仅校验指定字段、工具闭环和非空摘要/草稿",
+    "未测真实邮箱、MCP、HTTP 接入、外部通知、幂等或崩溃恢复"
+  ]
+}

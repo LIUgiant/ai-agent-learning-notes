@@ -1,0 +1,952 @@
+{
+  "qualification": "Teaching download summary; full source texts and SDK receipts retained in local experiment directory. Not the course browser acceptance.",
+  "final": {
+    "created_at": "2026-10-01T10:09:13.638326+00:00",
+    "variant": "HTTP HTML learning adapter; original coordination; deterministic quote verifier added",
+    "model": "deepseek-flash",
+    "parallel": {
+      "outcome": "not_found",
+      "winner": null,
+      "profile": null,
+      "duplicate_hits": [],
+      "acks": [],
+      "expected_loser_acks": [],
+      "missing_loser_acks": [],
+      "errors": {},
+      "failure_summary": {
+        "count": 0,
+        "by_type": {}
+      },
+      "not_found_reasons": {
+        "worker-1": "target name absent from HTTP-extracted text",
+        "worker-3": "independent name/professor/ML/exact-quote check rejected candidate",
+        "worker-2": "independent name/professor/ML/exact-quote check rejected candidate"
+      },
+      "status_table": {
+        "worker-1": {
+          "source": "education-faculty",
+          "state": "已完成",
+          "note": "页面中未找到目标"
+        },
+        "worker-2": {
+          "source": "stanford-profiles",
+          "state": "已完成",
+          "note": "页面中未找到目标"
+        },
+        "worker-3": {
+          "source": "aimi-profile",
+          "state": "已完成",
+          "note": "页面中未找到目标"
+        }
+      },
+      "terminate_broadcasts": 0,
+      "parallel_seconds": 2.61,
+      "contexts_closed": 3,
+      "resource_failures": {},
+      "resource_audit": {
+        "type": "HTTP clients, not browser contexts",
+        "created": 3,
+        "closed": 3
+      },
+      "events": [
+        {
+          "sender_id": "coordinator",
+          "target": "worker-1",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://ed.stanford.edu/faculty",
+            "task_id": "worker-1"
+          },
+          "seq": 1,
+          "ts": 0.03322550002485514
+        },
+        {
+          "sender_id": "coordinator",
+          "target": "worker-2",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://profiles.stanford.edu/andrew-ng",
+            "task_id": "worker-2"
+          },
+          "seq": 2,
+          "ts": 0.03326520905829966
+        },
+        {
+          "sender_id": "coordinator",
+          "target": "worker-3",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://aimi.stanford.edu/people/andrew-ng",
+            "task_id": "worker-3"
+          },
+          "seq": 3,
+          "ts": 0.033285042038187385
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "education-faculty"
+          },
+          "seq": 4,
+          "ts": 0.03335595899261534
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "stanford-profiles"
+          },
+          "seq": 5,
+          "ts": 0.03336845897138119
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "aimi-profile"
+          },
+          "seq": 6,
+          "ts": 0.03337537497282028
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://ed.stanford.edu/faculty",
+            "source": "education-faculty"
+          },
+          "seq": 7,
+          "ts": 0.04356587491929531
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://profiles.stanford.edu/andrew-ng",
+            "source": "stanford-profiles"
+          },
+          "seq": 8,
+          "ts": 0.05341250007040799
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://aimi.stanford.edu/people/andrew-ng",
+            "source": "aimi-profile"
+          },
+          "seq": 9,
+          "ts": 0.06330879195593297
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "education-faculty"
+          },
+          "seq": 10,
+          "ts": 1.0268335840664804
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "education-faculty"
+          },
+          "seq": 11,
+          "ts": 1.0270079169422388
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "not_found",
+          "payload": {
+            "reason": "target name absent from HTTP-extracted text",
+            "source": "education-faculty"
+          },
+          "seq": 12,
+          "ts": 1.0271576249506325
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已完成",
+            "note": "页面中未找到目标",
+            "source": "education-faculty"
+          },
+          "seq": 13,
+          "ts": 1.0271860000211746
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "education-faculty"
+          },
+          "seq": 14,
+          "ts": 1.027375333942473
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "aimi-profile"
+          },
+          "seq": 15,
+          "ts": 1.3630594999995083
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "aimi-profile"
+          },
+          "seq": 16,
+          "ts": 1.363240750040859
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "stanford-profiles"
+          },
+          "seq": 17,
+          "ts": 2.3175583749543875
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "stanford-profiles"
+          },
+          "seq": 18,
+          "ts": 2.3177626670803875
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "not_found",
+          "payload": {
+            "reason": "independent name/professor/ML/exact-quote check rejected candidate",
+            "source": "aimi-profile"
+          },
+          "seq": 19,
+          "ts": 2.331559667130932
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已完成",
+            "note": "页面中未找到目标",
+            "source": "aimi-profile"
+          },
+          "seq": 20,
+          "ts": 2.331600666977465
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "aimi-profile"
+          },
+          "seq": 21,
+          "ts": 2.331824708962813
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "not_found",
+          "payload": {
+            "reason": "independent name/professor/ML/exact-quote check rejected candidate",
+            "source": "stanford-profiles"
+          },
+          "seq": 22,
+          "ts": 2.642273833975196
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已完成",
+            "note": "页面中未找到目标",
+            "source": "stanford-profiles"
+          },
+          "seq": 23,
+          "ts": 2.6424527920316905
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "stanford-profiles"
+          },
+          "seq": 24,
+          "ts": 2.642768624937162
+        }
+      ]
+    },
+    "serial": {
+      "seconds": 9.531,
+      "visited": 3,
+      "results": [
+        {
+          "site": "education-faculty",
+          "profile": {
+            "found": false,
+            "reason": "target name absent from HTTP-extracted text"
+          },
+          "seconds": 0.9106908750254661
+        },
+        {
+          "site": "stanford-profiles",
+          "profile": {
+            "found": false,
+            "reason": "independent name/professor/ML/exact-quote check rejected candidate"
+          },
+          "seconds": 6.669922417029738
+        },
+        {
+          "site": "aimi-profile",
+          "profile": {
+            "found": true,
+            "name": "Andrew Ng",
+            "position": "Adjunct Professor, Computer Science",
+            "research": "machine learning",
+            "quote_metadata": {
+              "sha256": "cb75c147feb7fe70991db0848fea592fc586fd140070570e9c8c901041ad1bd3",
+              "characters": 290,
+              "full_quote": "local run/validation.json"
+            },
+            "listing_only": false,
+            "url": "https://aimi.stanford.edu/people/andrew-ng",
+            "provider": "deepseek",
+            "verification": "name_professor_ml_exact_quote"
+          },
+          "seconds": 1.9037729590199888
+        }
+      ],
+      "resource_audit": {
+        "type": "HTTP clients, not browser contexts",
+        "created": 3,
+        "closed": 3
+      }
+    },
+    "cascade": {
+      "outcome": "found",
+      "winner": "worker-2",
+      "profile": {
+        "found": true,
+        "name": "Andrew Ng",
+        "position": "Adjunct Professor, Computer Science",
+        "research": "machine learning",
+        "quote_metadata": {
+          "sha256": "cb75c147feb7fe70991db0848fea592fc586fd140070570e9c8c901041ad1bd3",
+          "characters": 290,
+          "full_quote": "local run/validation.json"
+        },
+        "listing_only": false,
+        "url": "https://aimi.stanford.edu/people/andrew-ng",
+        "provider": "deepseek",
+        "verification": "name_professor_ml_exact_quote"
+      },
+      "duplicate_hits": [],
+      "acks": [
+        "worker-1",
+        "worker-3"
+      ],
+      "expected_loser_acks": [
+        "worker-1",
+        "worker-3"
+      ],
+      "missing_loser_acks": [],
+      "errors": {},
+      "failure_summary": {
+        "count": 0,
+        "by_type": {}
+      },
+      "not_found_reasons": {},
+      "status_table": {
+        "worker-1": {
+          "source": "profile-copy-1",
+          "state": "已终止",
+          "note": "安全点响应终止：target_found_by_worker-2"
+        },
+        "worker-2": {
+          "source": "profile-copy-2",
+          "state": "已完成",
+          "note": "找到目标教师"
+        },
+        "worker-3": {
+          "source": "profile-copy-3",
+          "state": "已终止",
+          "note": "安全点响应终止：target_found_by_worker-2"
+        }
+      },
+      "terminate_broadcasts": 1,
+      "parallel_seconds": 1.764,
+      "contexts_closed": 3,
+      "resource_failures": {},
+      "resource_audit": {
+        "type": "HTTP clients, not browser contexts",
+        "created": 3,
+        "closed": 3
+      },
+      "events": [
+        {
+          "sender_id": "coordinator",
+          "target": "worker-1",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://aimi.stanford.edu/people/andrew-ng",
+            "task_id": "worker-1"
+          },
+          "seq": 25,
+          "ts": 12.176944250008091
+        },
+        {
+          "sender_id": "coordinator",
+          "target": "worker-2",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://aimi.stanford.edu/people/andrew-ng",
+            "task_id": "worker-2"
+          },
+          "seq": 26,
+          "ts": 12.177020292030647
+        },
+        {
+          "sender_id": "coordinator",
+          "target": "worker-3",
+          "type": "task_assigned",
+          "payload": {
+            "target": "Andrew Ng",
+            "url": "https://aimi.stanford.edu/people/andrew-ng",
+            "task_id": "worker-3"
+          },
+          "seq": 27,
+          "ts": 12.177051041973755
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "profile-copy-1"
+          },
+          "seq": 28,
+          "ts": 12.177233583992347
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "profile-copy-2"
+          },
+          "seq": 29,
+          "ts": 12.177263125078753
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "创建独立 HTTP client",
+            "source": "profile-copy-3"
+          },
+          "seq": 30,
+          "ts": 12.177287583937868
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://aimi.stanford.edu/people/andrew-ng",
+            "source": "profile-copy-1"
+          },
+          "seq": 31,
+          "ts": 12.192065542098135
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://aimi.stanford.edu/people/andrew-ng",
+            "source": "profile-copy-2"
+          },
+          "seq": 32,
+          "ts": 12.203594959108159
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在加载 https://aimi.stanford.edu/people/andrew-ng",
+            "source": "profile-copy-3"
+          },
+          "seq": 33,
+          "ts": 12.2150400839746
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "profile-copy-1"
+          },
+          "seq": 34,
+          "ts": 12.981494375038892
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "profile-copy-2"
+          },
+          "seq": 35,
+          "ts": 12.981588084017858
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在读取HTTP HTML 提取文本",
+            "source": "profile-copy-3"
+          },
+          "seq": 36,
+          "ts": 12.98162700003013
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "profile-copy-1"
+          },
+          "seq": 37,
+          "ts": 12.981715792091563
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "profile-copy-2"
+          },
+          "seq": 38,
+          "ts": 12.98245608410798
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "执行中",
+            "note": "正在做证据约束的教师信息抽取",
+            "source": "profile-copy-3"
+          },
+          "seq": 39,
+          "ts": 12.982510792091489
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "target_found",
+          "payload": {
+            "data": {
+              "found": true,
+              "name": "Andrew Ng",
+              "position": "Adjunct Professor, Computer Science",
+              "research": "machine learning",
+              "quote_metadata": {
+                "sha256": "cb75c147feb7fe70991db0848fea592fc586fd140070570e9c8c901041ad1bd3",
+                "characters": 290,
+                "full_quote": "local run/validation.json"
+              },
+              "listing_only": false,
+              "url": "https://aimi.stanford.edu/people/andrew-ng",
+              "provider": "deepseek",
+              "verification": "name_professor_ml_exact_quote"
+            },
+            "source": "profile-copy-2"
+          },
+          "seq": 40,
+          "ts": 13.936442709062248
+        },
+        {
+          "sender_id": "coordinator",
+          "target": "*",
+          "type": "terminate",
+          "payload": {
+            "reason": "target_found_by_worker-2",
+            "winner": "worker-2"
+          },
+          "seq": 41,
+          "ts": 13.936567000113428
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已完成",
+            "note": "找到目标教师",
+            "source": "profile-copy-2"
+          },
+          "seq": 42,
+          "ts": 13.936615500133485
+        },
+        {
+          "sender_id": "worker-2",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "profile-copy-2"
+          },
+          "seq": 43,
+          "ts": 13.93715316709131
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已终止",
+            "note": "安全点响应终止：target_found_by_worker-2",
+            "source": "profile-copy-1"
+          },
+          "seq": 44,
+          "ts": 13.940816959133372
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "status_update",
+          "payload": {
+            "state": "已终止",
+            "note": "安全点响应终止：target_found_by_worker-2",
+            "source": "profile-copy-3"
+          },
+          "seq": 45,
+          "ts": 13.940829792059958
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "ack",
+          "payload": {
+            "acked": "terminate",
+            "source": "profile-copy-1"
+          },
+          "seq": 46,
+          "ts": 13.940871916944161
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "ack",
+          "payload": {
+            "acked": "terminate",
+            "source": "profile-copy-3"
+          },
+          "seq": 47,
+          "ts": 13.940877709072083
+        },
+        {
+          "sender_id": "worker-1",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "profile-copy-1"
+          },
+          "seq": 48,
+          "ts": 13.941040750127286
+        },
+        {
+          "sender_id": "worker-3",
+          "target": "coordinator",
+          "type": "resource_closed",
+          "payload": {
+            "browser_context_closed": true,
+            "source": "profile-copy-3"
+          },
+          "seq": 49,
+          "ts": 13.941054959082976
+        }
+      ]
+    },
+    "speedup_single_run": 3.652,
+    "checks": {
+      "parallel_verified_hit": false,
+      "serial_verified_hit": true,
+      "parallel_single_broadcast": false,
+      "cascade_single_broadcast": true,
+      "cascade_no_missing_ack": true,
+      "parallel_no_missing_ack": true,
+      "all_clients_closed": true,
+      "real_llm_responses": true,
+      "accepted_profiles_have_quotes": true
+    },
+    "llm_completed": 5,
+    "llm_interrupted_or_failed": 2,
+    "returned_usage_total_tokens": 3820,
+    "limitations": [
+      "Not browser-rendered JS/isolated Chromium acceptance",
+      "One run, different early-stop work volume; no general speedup claim",
+      "Exact quote does not verify every generated field",
+      "Canceled provider calls may still be billed; absent response means unknown usage"
+    ]
+  },
+  "analysis": {
+    "evidence_sha256": "3883ef20d9ed95c6b90e4793f77092d9374c29795d4827e1c2cbb5047fce5bc5",
+    "gates_passed": 7,
+    "gates_total": 9,
+    "timing_comparable_success": false,
+    "valid_speedup": null,
+    "reason": "Parallel rejected the target candidate for missing machine-learning evidence in its quote; serial succeeded. The recorded numeric ratio is not a success-equivalent speedup.",
+    "parallel_false_negative": "Target page was present but returned quote omitted required field; fail-closed without retry.",
+    "cascade_ack_count": 2,
+    "role_probes_passed": 6,
+    "visibility_probes_passed": 3,
+    "original_coordination_tests": "8 passed",
+    "verifier_probes_passed": 5
+  },
+  "builder": {
+    "role_comparison": {
+      "mode": "offline method-level probe, no actual model handoff",
+      "checks": {
+        "transfer_keeps_history": true,
+        "transfer_changes_system": true,
+        "transfer_changes_tools": true,
+        "skill_fixed_system": true,
+        "skill_preload_gate": true,
+        "skill_calculation": true
+      },
+      "transfer_tools": {
+        "before": [
+          "transfer_to_agent"
+        ],
+        "after": [
+          "calculate",
+          "descriptive_stats",
+          "transfer_to_agent"
+        ]
+      },
+      "skill_before_load": "策略门拒绝：尚未加载 Skill，不能调用 calculate。请先调用 load_skill(name='triage')，再按该 Skill 的规程继续。",
+      "skill_calculation": "2+3 = 5.0",
+      "loaded_skills": [
+        "triage",
+        "data_analysis"
+      ]
+    },
+    "visibility": {
+      "mode": "offline delivery probe, not a full game or audio experiment",
+      "checks": {
+        "public_to_all": true,
+        "wolf_only": true,
+        "seer_only": true
+      },
+      "actual_recipients": {
+        "PUBLIC_PROBE": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "WOLF_PROBE": [
+          "P1",
+          "P2"
+        ],
+        "SEER_PROBE": [
+          "P3"
+        ]
+      },
+      "audit": [
+        {
+          "round_no": 0,
+          "phase": "初始化",
+          "category": "公开发言",
+          "content": "PUBLIC_PROBE:白天开始",
+          "visible_to": [
+            "P1",
+            "P2",
+            "P3",
+            "P4",
+            "P5",
+            "P6"
+          ]
+        },
+        {
+          "round_no": 0,
+          "phase": "初始化",
+          "category": "狼人队友身份",
+          "content": "WOLF_PROBE:P1与P2同队",
+          "visible_to": [
+            "P1",
+            "P2"
+          ]
+        },
+        {
+          "round_no": 0,
+          "phase": "初始化",
+          "category": "预言家查验结果",
+          "content": "SEER_PROBE:P1是狼人",
+          "visible_to": [
+            "P3"
+          ]
+        }
+      ],
+      "memories": {
+        "P1": [
+          "PUBLIC_PROBE:白天开始",
+          "WOLF_PROBE:P1与P2同队"
+        ],
+        "P2": [
+          "PUBLIC_PROBE:白天开始",
+          "WOLF_PROBE:P1与P2同队"
+        ],
+        "P3": [
+          "PUBLIC_PROBE:白天开始",
+          "SEER_PROBE:P1是狼人"
+        ],
+        "P4": [
+          "PUBLIC_PROBE:白天开始"
+        ],
+        "P5": [
+          "PUBLIC_PROBE:白天开始"
+        ],
+        "P6": [
+          "PUBLIC_PROBE:白天开始"
+        ]
+      }
+    }
+  },
+  "audit": {
+    "mode": "offline adversarial method probes, not real malicious worker traffic",
+    "original_manager_accepts_unverified_settle": true,
+    "original_envelope_accepts_wrong_payload_type": true,
+    "supplemental_verifier_checks": {
+      "exact_identity_quote_passes": true,
+      "name_only_is_rejected": true,
+      "invented_quote_rejected": true,
+      "string_true_rejected": true,
+      "wrong_name_rejected": true
+    },
+    "qualification": "Coordinator assumes validated in-process workers; dataclass hints do not enforce wire schema. Our learning adapter validates before emitting a candidate, not a security boundary for arbitrary worker code."
+  },
+  "input": {
+    "target": "Andrew Ng",
+    "target_definition": "machine-learning professor, not a namesake",
+    "sites": [
+      {
+        "name": "education-faculty",
+        "college": "Graduate School of Education",
+        "url": "https://ed.stanford.edu/faculty"
+      },
+      {
+        "name": "stanford-profiles",
+        "college": "Stanford Profiles",
+        "url": "https://profiles.stanford.edu/andrew-ng"
+      },
+      {
+        "name": "aimi-profile",
+        "college": "Stanford AIMI",
+        "url": "https://aimi.stanford.edu/people/andrew-ng"
+      }
+    ],
+    "cascade": [
+      {
+        "name": "profile-copy-1",
+        "college": "Stanford Profiles",
+        "url": "https://aimi.stanford.edu/people/andrew-ng"
+      },
+      {
+        "name": "profile-copy-2",
+        "college": "Stanford Profiles",
+        "url": "https://aimi.stanford.edu/people/andrew-ng"
+      },
+      {
+        "name": "profile-copy-3",
+        "college": "Stanford Profiles",
+        "url": "https://aimi.stanford.edu/people/andrew-ng"
+      }
+    ]
+  },
+  "original_coordination_tests": "8 passed (selected non-historical coordination regressions)"
+}

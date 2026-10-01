@@ -1,0 +1,44 @@
+{
+  "id": "5d232057-c824-410c-afa7-65094f8b0789",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "已处理完毕。\n\n- **分类**：marketing（营销通讯）\n- **摘要**：产品促销邮件，订阅促销资讯、产品八折，附带退订选项。\n- **建议动作**：archive（归档建议）\n\n依据 policy.json 中 marketing 规则，仅生成上述本地归档建议草稿，**未修改邮箱、未执行任何退订或归档操作**，也未发送任何邮件。以上为本地建议，需由你确认后自行处理。",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null,
+        "reasoning_content": ""
+      }
+    }
+  ],
+  "created": 1790736741,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 100,
+    "prompt_tokens": 1404,
+    "total_tokens": 1504,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 1152
+    },
+    "prompt_cache_hit_tokens": 1152,
+    "prompt_cache_miss_tokens": 252
+  }
+}

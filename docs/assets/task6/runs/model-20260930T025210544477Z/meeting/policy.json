@@ -1,0 +1,5 @@
+{
+  "meeting": "查询 calendar.json；时间重叠则 decline，否则 accept；只起草，不发邮件。",
+  "complaint": "提取订单编号和诉求，priority=high，action=notify_human；只写本地通知。",
+  "marketing": "category=marketing，action=archive；只写归档建议，不修改邮箱。"
+}

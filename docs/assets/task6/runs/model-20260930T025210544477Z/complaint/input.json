@@ -1,0 +1,10 @@
+{
+  "event_type": "email_reply",
+  "content": "订单 DEMO-2048 晚到七天了，之前无人回复。我希望退款，请人工尽快联系我。",
+  "metadata": {
+    "from": "sender@example.invalid",
+    "subject": "订单投诉"
+  },
+  "timestamp": "2026-09-30T10:52:15.422488",
+  "event_id": "complaint"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "8f05bf88-fdb6-4031-abbb-be781d8d6241",
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [
+          {
+            "id": "call_00_OFqejqWc1SdMs7MhPzbH7462",
+            "function": {
+              "arguments": "{\"file_path\": \"result.json\", \"content\": \"{\\n  \\\"category\\\": \\\"meeting\\\",\\n  \\\"summary\\\": \\\"发件人邀请于2026-10-08 10:00至10:30（Asia/Shanghai）参加项目讨论，并询问能否参加。经查询日历，该时段与已安排的演示会议（2026-10-08 09:45至10:15，Asia/Shanghai）重叠，因此无法参加。\\\",\\n  \\\"action\\\": \\\"draft_reply\\\",\\n  \\\"evidence\\\": [\\n    \\\"邮件主题：会议邀请\\\",\\n    \\\"邮件正文：请于2026-10-08 10:00至10:30（Asia/Shanghai）参加项目讨论，能否参加？\\\",\\n    \\\"日历时区：Asia/Shanghai\\\",\\n    \\\"日历已有事件：已安排的演示会议 2026-10-08T09:45:00+08:00 至 2026-10-08T10:15:00+08:00\\\",\\n    \\\"时间重叠：邀请时段10:00-10:30与已有事件09:45-10:15存在重叠（10:00-10:15）\\\"\\n  ],\\n  \\\"decision\\\": \\\"decline\\\",\\n  \\\"reply_draft\\\": \\\"您好：\\\\n\\\\n感谢邀请。关于2026-10-08 10:00至10:30（Asia/Shanghai）的项目讨论，我无法参加——该时段与已安排的演示会议（09:45至10:15，Asia/Shanghai）时间重叠。\\\\n\\\\n如需，我可以改约其他时段，例如10-08 10:30之后，或其他日期，烦请告知您方便的时间。\\\\n\\\\n谢谢！\\\"\\n}\\n\"}",
+              "name": "write_file"
+            },
+            "type": "function",
+            "index": 0
+          }
+        ],
+        "reasoning_content": "The meeting is 2026-10-08 10:00-10:30. Existing event 09:45-10:15 overlaps. So decline.\n\nWrite result.json."
+      }
+    }
+  ],
+  "created": 1790736731,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 447,
+    "prompt_tokens": 1332,
+    "total_tokens": 1779,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 38,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 564
+  }
+}

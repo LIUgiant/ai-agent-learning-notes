@@ -1,0 +1,10 @@
+{
+  "event_type": "email_reply",
+  "content": "请于2026-10-08 10:00至10:30（Asia/Shanghai）参加项目讨论，能否参加？",
+  "metadata": {
+    "from": "sender@example.invalid",
+    "subject": "会议邀请"
+  },
+  "timestamp": "2026-09-30T10:52:10.600296",
+  "event_id": "meeting"
+}

@@ -2,6 +2,10 @@
 
 <div class="home-intro"><span class="eyeline">LEARN · EXPERIMENT · BUILD</span><p>从实验现象出发，<br><strong>把 Agent 的设计读懂、写出来。</strong></p><div>记录每一次学习、真实运行与代码复盘。保留失败，也保留判断的依据。</div></div>
 
+## 最新学习
+
+[Task 7：持续进化的安全边界与多 Agent 交接](task7/index.md) · 第 9 章 9-1 / 9-3 / 9-4 已实测，含源码讲解与 SVG；第 10 章新增分层学习与 Starter 教学运行。
+
 ## 从这里开始
 
 <div class="grid cards" markdown>
@@ -39,6 +43,10 @@
     [查看后续实验 →](task0/search.md)
 
 </div>
+
+## 正在学习
+
+[Task 6：事件驱动与实时交互](task6/index.md)——前半章对照客服消息工作流，语音部分对照 3D AI 老师。当前完成阅读笔记，实验将逐个进行。
 
 ## 当前学习进度
 

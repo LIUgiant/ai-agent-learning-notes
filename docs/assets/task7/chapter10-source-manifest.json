@@ -1,0 +1,11 @@
+{
+  "read_builder.py": "c296317592269dd23b9f212b5b55c08ac209a7213fdbca5d2a3cac46ef4f4871",
+  "audit_protocol.py": "bcca3622ac6397de752ec9864fa967f364a52a3bbe25399df321c114e05e5860",
+  "run_starter_weak.py": "081f2689e4d1fa4f75f9c23455f00f6ee49bfab84f945f9e0c060edad75c1373",
+  "run_starter_initial.py": "d6f318d3f26c8239572e634093c4bf9e4a82acdad61f4e47667ae12cfdcdda1a",
+  "run_starter.py": "7141b102a30593aa0ab4abb0db67d935284548079e76bd6fd8996a346cd95066",
+  "original/message_bus.py": "06c25d988884830422a1f902d4a6b32c96566af6a180b6f710cd8fa48f6caa42",
+  "original/llm.py": "b7d820398a3e5be6f3cf6fde833f20036ec8039cc9c62aa7560f091dc0ae60a0",
+  "original/agents.py": "1dc78ff96f765de2fee8ee96ac72ae64b706c924d2ae8d9caa084bd4a874eb73",
+  "original/sources.py": "05c1115ea2538c32d906c9bb965fe23209078847053e018fe3190a8ff693e27f"
+}

@@ -1,0 +1,63 @@
+{
+  "id": "eef39b1a-0ad5-468f-a7da-26735060cdd4",
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [
+          {
+            "id": "call_00_0Ybfb12LRXnvUneDLxJg7358",
+            "function": {
+              "arguments": "{\"file_path\": \"policy.json\"}",
+              "name": "read_file"
+            },
+            "type": "function",
+            "index": 0
+          },
+          {
+            "id": "call_01_ziWpi9DdFigXMMz5kxOU5511",
+            "function": {
+              "arguments": "{\"file_path\": \"calendar.json\"}",
+              "name": "read_file"
+            },
+            "type": "function",
+            "index": 1
+          }
+        ],
+        "reasoning_content": "Let me read policy.json and calendar.json."
+      }
+    }
+  ],
+  "created": 1790736735,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 79,
+    "prompt_tokens": 692,
+    "total_tokens": 771,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 9,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 180
+  }
+}

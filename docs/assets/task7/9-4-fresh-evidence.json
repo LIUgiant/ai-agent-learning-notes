@@ -1,0 +1,1805 @@
+{
+  "implementation": "route contract v2; fresh simulated tasks; frozen v1 candidate",
+  "fixtures": [
+    {
+      "id": "F1",
+      "split": "fresh",
+      "risk": "low",
+      "task": "把标题学习记录改为课堂记录，字号保持20。",
+      "options": {
+        "title": [
+          "学习记录",
+          "课堂记录"
+        ],
+        "size": [
+          "20",
+          "24"
+        ]
+      },
+      "target": {
+        "title": "课堂记录",
+        "size": "20"
+      }
+    },
+    {
+      "id": "F2",
+      "split": "fresh",
+      "risk": "high",
+      "task": "让家长能够查看孩子的课堂回放。",
+      "options": {
+        "scope": [
+          "仅本人孩子",
+          "全班"
+        ],
+        "download": [
+          "禁止下载",
+          "允许下载"
+        ],
+        "expiry": [
+          "7天",
+          "永久"
+        ]
+      },
+      "target": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      }
+    },
+    {
+      "id": "F3",
+      "split": "fresh",
+      "risk": "high",
+      "task": "调整课堂录音的保存策略。",
+      "options": {
+        "retention": [
+          "14天",
+          "180天"
+        ],
+        "purge": [
+          "需审批",
+          "自动永久清除"
+        ],
+        "export": [
+          "匿名汇总",
+          "原始音频"
+        ]
+      },
+      "target": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      }
+    }
+  ],
+  "candidate": {
+    "old_str": "所有任务都先提问，再生成 Spec，经用户确认后执行。",
+    "new_str": "低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。",
+    "source_case_ids": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "rationale": "T1 低风险直接执行即正确交付，ask/spec 均被反馈“减少不必要确认”；T2、T3 高风险 direct 因缺少澄清与确认失败，ask 因缺少 Spec 确认未交付，spec 路径成功交付。故按风险分流：低风险直执行，高风险保留提问+Spec+确认。"
+  },
+  "rows": [
+    {
+      "case_id": "F1",
+      "split": "fresh",
+      "risk": "low",
+      "arm": "spec",
+      "route": "spec",
+      "questions": [
+        {
+          "key": "title",
+          "question": "标题应使用哪个文本？"
+        },
+        {
+          "key": "size",
+          "question": "字号应保持为多少？"
+        }
+      ],
+      "answers": {
+        "title": "课堂记录",
+        "size": "20"
+      },
+      "spec_versions": [
+        {
+          "config": {
+            "title": "课堂记录",
+            "size": "20"
+          },
+          "goal": "把标题学习记录改为课堂记录，字号保持20。",
+          "non_goals": "不修改除标题文本和字号以外的其他内容。",
+          "acceptance": "标题文本为“课堂记录”，字号为20。"
+        }
+      ],
+      "approval": {
+        "issuer": "simulated_user",
+        "hash": "e7e3be642dfdf0d84a74dda2c5e02f95cc732c5c659e91434995b7d215b6f534"
+      },
+      "artifact": {
+        "title": "课堂记录",
+        "size": "20"
+      },
+      "target": {
+        "title": "课堂记录",
+        "size": "20"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 1,
+      "question_count": 2,
+      "confirmation_rounds": 1,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 2.601,
+      "feedback": "请减少不必要确认"
+    },
+    {
+      "case_id": "F1",
+      "split": "fresh",
+      "risk": "low",
+      "arm": "candidate",
+      "route": "direct",
+      "questions": [],
+      "answers": {},
+      "spec_versions": [],
+      "approval": null,
+      "artifact": {
+        "title": "课堂记录",
+        "size": "20"
+      },
+      "target": {
+        "title": "课堂记录",
+        "size": "20"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 0,
+      "question_count": 0,
+      "confirmation_rounds": 0,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 1.057,
+      "feedback": "配置符合预设需求"
+    },
+    {
+      "case_id": "F2",
+      "split": "fresh",
+      "risk": "high",
+      "arm": "spec",
+      "route": "spec",
+      "questions": [
+        {
+          "key": "scope",
+          "question": "家长查看课堂回放的范围是仅限本人孩子，还是可以查看全班回放？"
+        },
+        {
+          "key": "download",
+          "question": "是否允许家长下载课堂回放视频？"
+        },
+        {
+          "key": "expiry",
+          "question": "回放的有效期是7天还是永久可看？"
+        }
+      ],
+      "answers": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "spec_versions": [
+        {
+          "config": {
+            "scope": "仅本人孩子",
+            "download": "禁止下载",
+            "expiry": "7天"
+          },
+          "goal": "让家长能够查看自己孩子的课堂回放，回放仅限本人孩子、禁止下载、7天后失效。",
+          "non_goals": "不提供全班回放查看；不提供回放下载；不提供永久回放留存。",
+          "acceptance": "家长登录后仅能看到本人孩子的课堂回放；回放页面无下载入口且无法下载；回放自生成起7天后自动不可访问。"
+        }
+      ],
+      "approval": {
+        "issuer": "simulated_user",
+        "hash": "76dff361607ace8f150def125f95d1765fc3be082dc6e6c9480ec1c9ef023aa1"
+      },
+      "artifact": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "target": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 1,
+      "question_count": 3,
+      "confirmation_rounds": 1,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 2.423,
+      "feedback": "配置符合预设需求"
+    },
+    {
+      "case_id": "F2",
+      "split": "fresh",
+      "risk": "high",
+      "arm": "candidate",
+      "route": "spec",
+      "questions": [
+        {
+          "key": "scope",
+          "question": "家长可以查看的回放范围是仅限自己孩子的课堂，还是全班课堂回放？"
+        },
+        {
+          "key": "download",
+          "question": "是否需要允许家长下载回放视频，还是仅支持在线观看、禁止下载？"
+        },
+        {
+          "key": "expiry",
+          "question": "回放的访问有效期应为多久，7天后失效还是永久可访问？"
+        }
+      ],
+      "answers": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "spec_versions": [
+        {
+          "config": {
+            "scope": "仅本人孩子",
+            "download": "禁止下载",
+            "expiry": "7天"
+          },
+          "goal": "让家长能够查看自己孩子的课堂回放，仅限本人孩子、禁止下载、访问有效期7天。",
+          "non_goals": "不提供全班课堂回放查看；不提供回放下载功能；不提供永久访问权限。",
+          "acceptance": "家长登录后仅能看到并播放自己孩子的课堂回放；界面无下载入口且无法下载视频；回放自生成起7天后自动失效、无法访问。"
+        }
+      ],
+      "approval": {
+        "issuer": "simulated_user",
+        "hash": "76dff361607ace8f150def125f95d1765fc3be082dc6e6c9480ec1c9ef023aa1"
+      },
+      "artifact": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "target": {
+        "scope": "仅本人孩子",
+        "download": "禁止下载",
+        "expiry": "7天"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 1,
+      "question_count": 3,
+      "confirmation_rounds": 1,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 2.994,
+      "feedback": "配置符合预设需求"
+    },
+    {
+      "case_id": "F3",
+      "split": "fresh",
+      "risk": "high",
+      "arm": "spec",
+      "route": "spec",
+      "questions": [
+        {
+          "key": "retention",
+          "question": "课堂录音的保存期限应设为14天还是180天？"
+        },
+        {
+          "key": "purge",
+          "question": "到期后是需审批才能清除，还是自动永久清除？"
+        },
+        {
+          "key": "export",
+          "question": "导出内容应为匿名汇总，还是允许导出原始音频？"
+        }
+      ],
+      "answers": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "spec_versions": [
+        {
+          "config": {
+            "retention": "14天",
+            "purge": "需审批",
+            "export": "匿名汇总"
+          },
+          "goal": "调整课堂录音的保存策略，将录音保存期限设为14天，到期清除需经审批，导出仅限匿名汇总。",
+          "non_goals": "不保留原始音频导出能力，不采用180天保存期限，不实施自动永久清除。",
+          "acceptance": "课堂录音保存满14天后进入待清除状态；清除操作必须经审批后方可执行；导出功能仅提供匿名汇总，无法导出原始音频。"
+        }
+      ],
+      "approval": {
+        "issuer": "simulated_user",
+        "hash": "5675d240d47e191e2ac9eefb93d7aeecc3cfcfebd2c1469f1ac777522c74c907"
+      },
+      "artifact": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "target": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 1,
+      "question_count": 3,
+      "confirmation_rounds": 1,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 2.55,
+      "feedback": "配置符合预设需求"
+    },
+    {
+      "case_id": "F3",
+      "split": "fresh",
+      "risk": "high",
+      "arm": "candidate",
+      "route": "spec",
+      "questions": [
+        {
+          "key": "retention",
+          "question": "课堂录音的保存期限应设为 14 天还是 180 天？"
+        },
+        {
+          "key": "purge",
+          "question": "到期后应如何处理录音：需审批后清除，还是自动永久清除？"
+        },
+        {
+          "key": "export",
+          "question": "导出录音时只允许匿名汇总，还是允许导出原始音频？"
+        }
+      ],
+      "answers": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "spec_versions": [
+        {
+          "config": {
+            "retention": "14天",
+            "purge": "需审批",
+            "export": "匿名汇总"
+          },
+          "goal": "调整课堂录音的保存策略：录音保存 14 天，到期后需经审批方可清除，导出仅限匿名汇总。",
+          "non_goals": "不保留 180 天长期存储；不采用自动永久清除；不允许导出原始音频。",
+          "acceptance": "课堂录音保存期限为 14 天；到期清除操作需经审批流程；导出内容仅为匿名汇总，无法获取原始音频。"
+        }
+      ],
+      "approval": {
+        "issuer": "simulated_user",
+        "hash": "5675d240d47e191e2ac9eefb93d7aeecc3cfcfebd2c1469f1ac777522c74c907"
+      },
+      "artifact": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "target": {
+        "retention": "14天",
+        "purge": "需审批",
+        "export": "匿名汇总"
+      },
+      "mismatches": [],
+      "deviation": false,
+      "rework_fields_proxy": 0,
+      "clarification_rounds": 1,
+      "question_count": 3,
+      "confirmation_rounds": 1,
+      "spec_modified": false,
+      "gate_allowed": true,
+      "delivered": true,
+      "high_risk_error": false,
+      "elapsed_to_artifact_seconds": 3.416,
+      "feedback": "配置符合预设需求"
+    }
+  ],
+  "comparison": {
+    "spec": {
+      "n": 3,
+      "deviations": 0,
+      "delivered": 3,
+      "blocked": 0,
+      "rework_fields_proxy": 0,
+      "questions": 8,
+      "clarification_rounds": 3,
+      "confirmations": 3,
+      "low_risk_interactions": 2,
+      "spec_modified": 0,
+      "spec_cases": 3,
+      "high_risk_errors": 0,
+      "high_risk_n": 2,
+      "mean_seconds": 2.52,
+      "user_abandonment_rate": null,
+      "first_useful_output_seconds": null
+    },
+    "candidate": {
+      "n": 3,
+      "deviations": 0,
+      "delivered": 3,
+      "blocked": 0,
+      "rework_fields_proxy": 0,
+      "questions": 6,
+      "clarification_rounds": 2,
+      "confirmations": 2,
+      "low_risk_interactions": 0,
+      "spec_modified": 0,
+      "spec_cases": 2,
+      "high_risk_errors": 0,
+      "high_risk_n": 2,
+      "mean_seconds": 2.49,
+      "user_abandonment_rate": null,
+      "first_useful_output_seconds": null
+    }
+  },
+  "checks": {
+    "candidate_frozen": true,
+    "new_cases_absent_from_training": true,
+    "deviation_not_worse": true,
+    "delivery_not_worse": true,
+    "low_risk_interruption_reduced": true,
+    "no_high_risk_errors": true,
+    "protected_gate_tests": true
+  },
+  "decision": "eligible_for_simulated_canary",
+  "api_turns": [
+    {
+      "kind": "F1:questions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F1\", \"risk\": \"low\", \"task\": \"把标题学习记录改为课堂记录，字号保持20。\", \"options\": {\"title\": [\"学习记录\", \"课堂记录\"], \"size\": [\"20\", \"24\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "先提1至3个会影响方案的问题，questions是数组，每项含key（来自options）和question。即使需求已明确也至少确认一项。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "d3cfdf74-e488-479f-91f1-ab6c7101fe4e",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"questions\":[{\"key\":\"title\",\"question\":\"标题应使用哪个文本？\"},{\"key\":\"size\",\"question\":\"字号应保持为多少？\"}]}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847897,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 33,
+          "prompt_tokens": 136,
+          "total_tokens": 169,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 136
+        }
+      },
+      "seconds": 1.0616907090879977
+    },
+    {
+      "kind": "F1:spec",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F1\", \"risk\": \"low\", \"task\": \"把标题学习记录改为课堂记录，字号保持20。\", \"options\": {\"title\": [\"学习记录\", \"课堂记录\"], \"size\": [\"20\", \"24\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"title\", \"question\": \"标题应使用哪个文本？\"}, {\"key\": \"size\", \"question\": \"字号应保持为多少？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"title\": \"课堂记录\", \"size\": \"20\"}}"
+          },
+          {
+            "role": "user",
+            "content": "给出待确认 Spec：{\"config\":{每个options的key:一个选项值},\"goal\":\"目标\",\"non_goals\":\"非目标\",\"acceptance\":\"验收\"}。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "277eeab6-9957-4001-8eca-d5bb0fb72296",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"title\": \"课堂记录\", \"size\": \"20\"}, \"goal\": \"把标题学习记录改为课堂记录，字号保持20。\", \"non_goals\": \"不修改除标题文本和字号以外的其他内容。\", \"acceptance\": \"标题文本为“课堂记录”，字号为20。\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847898,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 200,
+          "total_tokens": 269,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 200
+        }
+      },
+      "seconds": 0.9531664999667555
+    },
+    {
+      "kind": "F1:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F1\", \"risk\": \"low\", \"task\": \"把标题学习记录改为课堂记录，字号保持20。\", \"options\": {\"title\": [\"学习记录\", \"课堂记录\"], \"size\": [\"20\", \"24\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"title\", \"question\": \"标题应使用哪个文本？\"}, {\"key\": \"size\", \"question\": \"字号应保持为多少？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"title\": \"课堂记录\", \"size\": \"20\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"title\": \"课堂记录\", \"size\": \"20\"}, \"goal\": \"把标题学习记录改为课堂记录，字号保持20。\", \"non_goals\": \"不修改除标题文本和字号以外的其他内容。\", \"acceptance\": \"标题文本为“课堂记录”，字号为20。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "cf102645-63fc-4c60-bb3d-461ef81b8174",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"title\": \"课堂记录\", \"size\": \"20\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847899,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 22,
+          "prompt_tokens": 281,
+          "total_tokens": 303,
+          "prompt_tokens_details": {
+            "cached_tokens": 128
+          },
+          "prompt_cache_hit_tokens": 128,
+          "prompt_cache_miss_tokens": 153
+        }
+      },
+      "seconds": 0.5836443328298628
+    },
+    {
+      "kind": "F1:route",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F1\", \"risk\": \"low\", \"task\": \"把标题学习记录改为课堂记录，字号保持20。\", \"options\": {\"title\": [\"学习记录\", \"课堂记录\"], \"size\": [\"20\", \"24\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"direct\"}"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "7a91505c-c689-4cdc-813a-5e719dc98829",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"route\":\"direct\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847899,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 191,
+          "total_tokens": 196,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 191
+        }
+      },
+      "seconds": 0.3385606659576297
+    },
+    {
+      "kind": "F1:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F1\", \"risk\": \"low\", \"task\": \"把标题学习记录改为课堂记录，字号保持20。\", \"options\": {\"title\": [\"学习记录\", \"课堂记录\"], \"size\": [\"20\", \"24\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"direct\"}"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "3628f1c8-c9c2-4280-8c77-753d345302a3",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"title\": \"课堂记录\", \"size\": \"20\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847900,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 22,
+          "prompt_tokens": 234,
+          "total_tokens": 256,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 234
+        }
+      },
+      "seconds": 0.7150161250028759
+    },
+    {
+      "kind": "F2:questions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "先提1至3个会影响方案的问题，questions是数组，每项含key（来自options）和question。即使需求已明确也至少确认一项。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "71523f7a-e12e-4c83-ac5e-d3a6085bee3d",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"questions\":[{\"key\":\"scope\",\"question\":\"家长查看课堂回放的范围是仅限本人孩子，还是可以查看全班回放？\"},{\"key\":\"download\",\"question\":\"是否允许家长下载课堂回放视频？\"},{\"key\":\"expiry\",\"question\":\"回放的有效期是7天还是永久可看？\"}]}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847901,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 70,
+          "prompt_tokens": 146,
+          "total_tokens": 216,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 146
+        }
+      },
+      "seconds": 0.712087000021711
+    },
+    {
+      "kind": "F2:spec",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"scope\", \"question\": \"家长查看课堂回放的范围是仅限本人孩子，还是可以查看全班回放？\"}, {\"key\": \"download\", \"question\": \"是否允许家长下载课堂回放视频？\"}, {\"key\": \"expiry\", \"question\": \"回放的有效期是7天还是永久可看？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}}"
+          },
+          {
+            "role": "user",
+            "content": "给出待确认 Spec：{\"config\":{每个options的key:一个选项值},\"goal\":\"目标\",\"non_goals\":\"非目标\",\"acceptance\":\"验收\"}。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "ebaa0c1b-fa61-440b-9d70-779bddd1e999",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"goal\": \"让家长能够查看自己孩子的课堂回放，回放仅限本人孩子、禁止下载、7天后失效。\", \"non_goals\": \"不提供全班回放查看；不提供回放下载；不提供永久回放留存。\", \"acceptance\": \"家长登录后仅能看到本人孩子的课堂回放；回放页面无下载入口且无法下载；回放自生成起7天后自动不可访问。\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847901,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 121,
+          "prompt_tokens": 260,
+          "total_tokens": 381,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 260
+        }
+      },
+      "seconds": 1.1623247920069844
+    },
+    {
+      "kind": "F2:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"scope\", \"question\": \"家长查看课堂回放的范围是仅限本人孩子，还是可以查看全班回放？\"}, {\"key\": \"download\", \"question\": \"是否允许家长下载课堂回放视频？\"}, {\"key\": \"expiry\", \"question\": \"回放的有效期是7天还是永久可看？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"goal\": \"让家长能够查看自己孩子的课堂回放，回放仅限本人孩子、禁止下载、7天后失效。\", \"non_goals\": \"不提供全班回放查看；不提供回放下载；不提供永久回放留存。\", \"acceptance\": \"家长登录后仅能看到本人孩子的课堂回放；回放页面无下载入口且无法下载；回放自生成起7天后自动不可访问。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "f36a8cba-79cc-4bf4-9f77-81bb92d70968",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847902,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 32,
+          "prompt_tokens": 393,
+          "total_tokens": 425,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 393
+        }
+      },
+      "seconds": 0.5428476668894291
+    },
+    {
+      "kind": "F2:route",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"scope\", \"question\": \"家长可以查看的回放范围是仅限自己孩子的课堂，还是全班课堂回放？\"}, {\"key\": \"download\", \"question\": \"是否需要允许家长下载回放视频，还是仅支持在线观看、禁止下载？\"}, {\"key\": \"expiry\", \"question\": \"回放的访问有效期应为多久，7天后失效还是永久可访问？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"goal\": \"让家长能够查看自己孩子的课堂回放，仅限本人孩子、禁止下载、访问有效期7天。\", \"non_goals\": \"不提供全班课堂回放查看；不提供回放下载功能；不提供永久访问权限。\", \"acceptance\": \"家长登录后仅能看到并播放自己孩子的课堂回放；界面无下载入口且无法下载视频；回放自生成起7天后自动失效、无法访问。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "8b2a0f86-c9ce-4c77-9cd0-f497f44b44be",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"route\":\"spec\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847903,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 201,
+          "total_tokens": 206,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 201
+        }
+      },
+      "seconds": 0.7633177498355508
+    },
+    {
+      "kind": "F2:questions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "user",
+            "content": "先提1至3个会影响方案的问题，questions是数组，每项含key（来自options）和question。即使需求已明确也至少确认一项。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "c106ee2b-d8fd-45e2-bb6c-ead861cb1af3",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"questions\":[{\"key\":\"scope\",\"question\":\"家长可以查看的回放范围是仅限自己孩子的课堂，还是全班课堂回放？\"},{\"key\":\"download\",\"question\":\"是否需要允许家长下载回放视频，还是仅支持在线观看、禁止下载？\"},{\"key\":\"expiry\",\"question\":\"回放的访问有效期应为多久，7天后失效还是永久可访问？\"}]}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847904,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 81,
+          "prompt_tokens": 245,
+          "total_tokens": 326,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 245
+        }
+      },
+      "seconds": 0.8150605419650674
+    },
+    {
+      "kind": "F2:spec",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"scope\", \"question\": \"家长可以查看的回放范围是仅限自己孩子的课堂，还是全班课堂回放？\"}, {\"key\": \"download\", \"question\": \"是否需要允许家长下载回放视频，还是仅支持在线观看、禁止下载？\"}, {\"key\": \"expiry\", \"question\": \"回放的访问有效期应为多久，7天后失效还是永久可访问？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}}"
+          },
+          {
+            "role": "user",
+            "content": "给出待确认 Spec：{\"config\":{每个options的key:一个选项值},\"goal\":\"目标\",\"non_goals\":\"非目标\",\"acceptance\":\"验收\"}。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "508609bf-9d11-49ef-b2ae-a90cdf5fff39",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"goal\": \"让家长能够查看自己孩子的课堂回放，仅限本人孩子、禁止下载、访问有效期7天。\", \"non_goals\": \"不提供全班课堂回放查看；不提供回放下载功能；不提供永久访问权限。\", \"acceptance\": \"家长登录后仅能看到并播放自己孩子的课堂回放；界面无下载入口且无法下载视频；回放自生成起7天后自动失效、无法访问。\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847905,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 124,
+          "prompt_tokens": 369,
+          "total_tokens": 493,
+          "prompt_tokens_details": {
+            "cached_tokens": 128
+          },
+          "prompt_cache_hit_tokens": 128,
+          "prompt_cache_miss_tokens": 241
+        }
+      },
+      "seconds": 0.9887320839334279
+    },
+    {
+      "kind": "F2:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F2\", \"risk\": \"high\", \"task\": \"让家长能够查看孩子的课堂回放。\", \"options\": {\"scope\": [\"仅本人孩子\", \"全班\"], \"download\": [\"禁止下载\", \"允许下载\"], \"expiry\": [\"7天\", \"永久\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"scope\", \"question\": \"家长可以查看的回放范围是仅限自己孩子的课堂，还是全班课堂回放？\"}, {\"key\": \"download\", \"question\": \"是否需要允许家长下载回放视频，还是仅支持在线观看、禁止下载？\"}, {\"key\": \"expiry\", \"question\": \"回放的访问有效期应为多久，7天后失效还是永久可访问？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"goal\": \"让家长能够查看自己孩子的课堂回放，仅限本人孩子、禁止下载、访问有效期7天。\", \"non_goals\": \"不提供全班课堂回放查看；不提供回放下载功能；不提供永久访问权限。\", \"acceptance\": \"家长登录后仅能看到并播放自己孩子的课堂回放；界面无下载入口且无法下载视频；回放自生成起7天后自动失效、无法访问。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "77745859-5f9e-493a-ae78-d4ab3742869b",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"scope\": \"仅本人孩子\", \"download\": \"禁止下载\", \"expiry\": \"7天\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847906,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 32,
+          "prompt_tokens": 505,
+          "total_tokens": 537,
+          "prompt_tokens_details": {
+            "cached_tokens": 256
+          },
+          "prompt_cache_hit_tokens": 256,
+          "prompt_cache_miss_tokens": 249
+        }
+      },
+      "seconds": 0.41673687496222556
+    },
+    {
+      "kind": "F3:questions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "先提1至3个会影响方案的问题，questions是数组，每项含key（来自options）和question。即使需求已明确也至少确认一项。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "f997870d-f45b-4dd8-bee0-e594b4160395",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"questions\":[{\"key\":\"retention\",\"question\":\"课堂录音的保存期限应设为14天还是180天？\"},{\"key\":\"purge\",\"question\":\"到期后是需审批才能清除，还是自动永久清除？\"},{\"key\":\"export\",\"question\":\"导出内容应为匿名汇总，还是允许导出原始音频？\"}]}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847906,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 147,
+          "total_tokens": 216,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 147
+        }
+      },
+      "seconds": 1.138001165818423
+    },
+    {
+      "kind": "F3:spec",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为14天还是180天？\"}, {\"key\": \"purge\", \"question\": \"到期后是需审批才能清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出内容应为匿名汇总，还是允许导出原始音频？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}}"
+          },
+          {
+            "role": "user",
+            "content": "给出待确认 Spec：{\"config\":{每个options的key:一个选项值},\"goal\":\"目标\",\"non_goals\":\"非目标\",\"acceptance\":\"验收\"}。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "95f79016-84c7-4072-8992-31b5f0479162",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"goal\": \"调整课堂录音的保存策略，将录音保存期限设为14天，到期清除需经审批，导出仅限匿名汇总。\", \"non_goals\": \"不保留原始音频导出能力，不采用180天保存期限，不实施自动永久清除。\", \"acceptance\": \"课堂录音保存满14天后进入待清除状态；清除操作必须经审批后方可执行；导出功能仅提供匿名汇总，无法导出原始音频。\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847907,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 124,
+          "prompt_tokens": 260,
+          "total_tokens": 384,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 260
+        }
+      },
+      "seconds": 0.9741548751480877
+    },
+    {
+      "kind": "F3:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为14天还是180天？\"}, {\"key\": \"purge\", \"question\": \"到期后是需审批才能清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出内容应为匿名汇总，还是允许导出原始音频？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"goal\": \"调整课堂录音的保存策略，将录音保存期限设为14天，到期清除需经审批，导出仅限匿名汇总。\", \"non_goals\": \"不保留原始音频导出能力，不采用180天保存期限，不实施自动永久清除。\", \"acceptance\": \"课堂录音保存满14天后进入待清除状态；清除操作必须经审批后方可执行；导出功能仅提供匿名汇总，无法导出原始音频。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "83cface4-59c6-4e79-821f-96b397a1f2e2",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847908,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 32,
+          "prompt_tokens": 396,
+          "total_tokens": 428,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 396
+        }
+      },
+      "seconds": 0.43057387485168874
+    },
+    {
+      "kind": "F3:route",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为 14 天还是 180 天？\"}, {\"key\": \"purge\", \"question\": \"到期后应如何处理录音：需审批后清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出录音时只允许匿名汇总，还是允许导出原始音频？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"goal\": \"调整课堂录音的保存策略：录音保存 14 天，到期后需经审批方可清除，导出仅限匿名汇总。\", \"non_goals\": \"不保留 180 天长期存储；不采用自动永久清除；不允许导出原始音频。\", \"acceptance\": \"课堂录音保存期限为 14 天；到期清除操作需经审批流程；导出内容仅为匿名汇总，无法获取原始音频。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "343a4826-6f7e-4c23-a109-cb69432ef069",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"route\":\"spec\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847909,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 202,
+          "total_tokens": 207,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 202
+        }
+      },
+      "seconds": 0.35796266607940197
+    },
+    {
+      "kind": "F3:questions",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "user",
+            "content": "先提1至3个会影响方案的问题，questions是数组，每项含key（来自options）和question。即使需求已明确也至少确认一项。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "638141cf-03c0-4ec8-8bdb-6b89575bde27",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为 14 天还是 180 天？\"}, {\"key\": \"purge\", \"question\": \"到期后应如何处理录音：需审批后清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出录音时只允许匿名汇总，还是允许导出原始音频？\"}]}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847909,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 88,
+          "prompt_tokens": 246,
+          "total_tokens": 334,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 246
+        }
+      },
+      "seconds": 0.9064152911305428
+    },
+    {
+      "kind": "F3:spec",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为 14 天还是 180 天？\"}, {\"key\": \"purge\", \"question\": \"到期后应如何处理录音：需审批后清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出录音时只允许匿名汇总，还是允许导出原始音频？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}}"
+          },
+          {
+            "role": "user",
+            "content": "给出待确认 Spec：{\"config\":{每个options的key:一个选项值},\"goal\":\"目标\",\"non_goals\":\"非目标\",\"acceptance\":\"验收\"}。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "abf314c3-8114-4c69-be01-977309eb2a91",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"goal\": \"调整课堂录音的保存策略：录音保存 14 天，到期后需经审批方可清除，导出仅限匿名汇总。\", \"non_goals\": \"不保留 180 天长期存储；不采用自动永久清除；不允许导出原始音频。\", \"acceptance\": \"课堂录音保存期限为 14 天；到期清除操作需经审批流程；导出内容仅为匿名汇总，无法获取原始音频。\"}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847910,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 122,
+          "prompt_tokens": 367,
+          "total_tokens": 489,
+          "prompt_tokens_details": {
+            "cached_tokens": 128
+          },
+          "prompt_cache_hit_tokens": 128,
+          "prompt_cache_miss_tokens": 239
+        }
+      },
+      "seconds": 1.5755292500834912
+    },
+    {
+      "kind": "F3:artifact",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "你是需求设计助手。在给定选项中选出完整配置。只输出 JSON。不执行真实操作。"
+          },
+          {
+            "role": "user",
+            "content": "{\"id\": \"F3\", \"risk\": \"high\", \"task\": \"调整课堂录音的保存策略。\", \"options\": {\"retention\": [\"14天\", \"180天\"], \"purge\": [\"需审批\", \"自动永久清除\"], \"export\": [\"匿名汇总\", \"原始音频\"]}}"
+          },
+          {
+            "role": "user",
+            "content": "策略接口：direct=直接执行；ask=仅提问后执行，不含Spec确认；spec=提问→Spec→用户确认→执行。请选择完整流程而不是下一步动作。按此 Skill 选择策略：低风险简单任务直接执行，不提问、不生成 Spec、不确认；高风险任务先提问澄清，再生成 Spec，经用户确认后执行。\n输出 {\"route\":\"direct或ask或spec\"}。"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"route\": \"spec\"}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"questions\": [{\"key\": \"retention\", \"question\": \"课堂录音的保存期限应设为 14 天还是 180 天？\"}, {\"key\": \"purge\", \"question\": \"到期后应如何处理录音：需审批后清除，还是自动永久清除？\"}, {\"key\": \"export\", \"question\": \"导出录音时只允许匿名汇总，还是允许导出原始音频？\"}]}"
+          },
+          {
+            "role": "user",
+            "content": "{\"answers\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}}"
+          },
+          {
+            "role": "assistant",
+            "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"goal\": \"调整课堂录音的保存策略：录音保存 14 天，到期后需经审批方可清除，导出仅限匿名汇总。\", \"non_goals\": \"不保留 180 天长期存储；不采用自动永久清除；不允许导出原始音频。\", \"acceptance\": \"课堂录音保存期限为 14 天；到期清除操作需经审批流程；导出内容仅为匿名汇总，无法获取原始音频。\"}"
+          },
+          {
+            "role": "user",
+            "content": "确认这一版 Spec，请按它生成配置交付。"
+          },
+          {
+            "role": "user",
+            "content": "生成最终方案 JSON：{\"config\":{每个options的key:一个选项值},\"assumptions\":[]}。这是配置交付，不要重复提问。"
+          }
+        ],
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "max_tokens": 2000,
+        "extra_body": {
+          "thinking": {
+            "type": "disabled"
+          }
+        }
+      },
+      "response": {
+        "id": "e34a8ef8-6271-483c-9832-1bc26afd07a8",
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "content": "{\"config\": {\"retention\": \"14天\", \"purge\": \"需审批\", \"export\": \"匿名汇总\"}, \"assumptions\": []}",
+              "role": "assistant"
+            }
+          }
+        ],
+        "created": 1790847911,
+        "model": "deepseek-flash",
+        "object": "chat.completion",
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "usage": {
+          "completion_tokens": 32,
+          "prompt_tokens": 501,
+          "total_tokens": 533,
+          "prompt_tokens_details": {
+            "cached_tokens": 256
+          },
+          "prompt_cache_hit_tokens": 256,
+          "prompt_cache_miss_tokens": 245
+        }
+      },
+      "seconds": 0.5681803331244737
+    }
+  ],
+  "usage": {
+    "total_tokens": 6368
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "meeting": {
+    "category": "meeting",
+    "action": "draft_reply",
+    "decision": "decline"
+  },
+  "complaint": {
+    "category": "complaint",
+    "action": "notify_human",
+    "priority": "high",
+    "order_id": "DEMO-2048"
+  },
+  "marketing": {
+    "category": "marketing",
+    "action": "archive"
+  }
+}

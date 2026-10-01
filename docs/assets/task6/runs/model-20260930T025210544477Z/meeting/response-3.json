@@ -1,0 +1,44 @@
+{
+  "id": "95d98f36-5de8-4644-97fa-3802c1526e18",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "已完成分类与结果写入（本地文件 result.json，未发送任何邮件）。\n\n**处理结果**\n- **分类**：meeting（会议邀请）\n- **冲突判断**：邀请时段 2026-10-08 10:00–10:30 与日历中已有事件「已安排的演示会议」09:45–10:15（Asia/Shanghai）重叠（重叠区间 10:00–10:15），故判定 **decline（无法参加）**\n- **建议动作**：draft_reply —— 以下是本地草稿，供你参考或修改后再自行发送：\n\n> 您好：\n>\n> 感谢邀请。关于2026-10-08 10:00至10:30（Asia/Shanghai）的项目讨论，我无法参加——该时段与已安排的演示会议（09:45至10:15，Asia/Shanghai）时间重叠。\n>\n> 如需，我可以改约其他时段，例如10-08 10:30之后，或其他日期，烦请告知您方便的时间。\n>\n> 谢谢！\n\n说明：该回复仅为本地草稿，尚未发送；也未对邮箱或日历做任何实际改动。",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null,
+        "reasoning_content": ""
+      }
+    }
+  ],
+  "created": 1790736734,
+  "model": "deepseek-flash",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+  "usage": {
+    "completion_tokens": 249,
+    "prompt_tokens": 1859,
+    "total_tokens": 2108,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 1408
+    },
+    "prompt_cache_hit_tokens": 1408,
+    "prompt_cache_miss_tokens": 451
+  }
+}
